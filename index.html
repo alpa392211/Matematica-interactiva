@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Matemática Interactiva - Plataforma educativa especializada en matemáticas desde Aritmética hasta Cálculo Diferencial e Integral." />
+  <title>Matemática Interactiva | Plataforma Educativa de Matemáticas</title>
+
+  <!-- Hojas de Estilo Modulares y Tipografía Matemática KaTeX + MathLive -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathlive@0.101.2/dist/mathlive-static.css" crossorigin="anonymous" />
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/tools.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+  <link rel="stylesheet" href="css/print.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathlive@0.101.2/dist/mathlive.min.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Overlay para menú móvil/tablet -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- Barra Lateral de Navegación (Sidebar) -->
+    <aside class="sidebar" id="app-sidebar" aria-label="Menú principal de materias y herramientas">
+      <div class="sidebar-brand">
+        <div class="brand-logo" aria-hidden="true">∫π</div>
+        <div class="brand-text">
+          <span class="brand-title">Matemática Interactiva</span>
+          <span class="brand-subtitle">Academia Interactiva</span>
+        </div>
+        <button class="sidebar-close-btn" id="btn-close-sidebar" title="Cerrar menú">✕</button>
+      </div>
+
+      <nav class="sidebar-scroll" id="sidebar-nav-container">
+        <!-- Renderizado dinámicamente por js/app.js -->
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-progress-card">
+          <div class="sidebar-progress-header">
+            <span>Dominio Global</span>
+            <span id="sidebar-global-pct">0%</span>
+          </div>
+          <div class="sidebar-progress-bar">
+            <div class="sidebar-progress-fill" id="sidebar-global-fill" style="width: 0%;"></div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Contenedor Principal -->
+    <div class="main-wrapper">
+      <!-- Barra Superior -->
+      <header class="top-header">
+        <div class="header-left">
+          <button class="mobile-menu-btn" id="btn-open-sidebar" title="Abrir menú de navegación">☰</button>
+          <div class="header-breadcrumb" id="header-breadcrumb">
+            <span>Inicio</span> <span>›</span> <strong>Panel Principal</strong>
+          </div>
+          <button class="header-back-btn" id="btn-header-back" type="button" hidden title="Volver al Panel Principal">↩ Volver</button>
+        </div>
+
+        <!-- Buscador Instantáneo -->
+        <div class="header-search">
+          <span class="header-search-icon">🔍</span>
+          <input
+            type="search"
+            id="global-search-input"
+            class="header-search-input"
+            placeholder="Buscar tema (ej. factorización, racionalización, límites, derivadas, integrales...)"
+            autocomplete="off"
+          />
+          <div class="search-results-dropdown" id="global-search-dropdown"></div>
+        </div>
+
+        <!-- Estadísticas Rápidas y Calculadora Flotante -->
+        <div class="header-actions">
+          <span class="stat-pill streak" id="header-streak-pill" title="Racha de días de estudio">🔥 1 día</span>
+          <span class="stat-pill" id="header-xp-pill" title="Puntos de experiencia matemática">🌱 0 XP</span>
+          <button class="quick-tool-btn" id="btn-open-quick-calc" title="Abrir Calculadora Científica Rápida">
+            <span>🧮</span>
+            <span class="btn-text">Calculadora</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- Área Dinámica de Contenido Principal -->
+      <main class="main-content" id="main-view-container">
+        <!-- Renderizado dinámicamente por js/app.js -->
+      </main>
+    </div>
+  </div>
+
+  <!-- Modal Flotante para Calculadora Rápida desde cualquier lección -->
+  <div class="quick-modal-backdrop" id="quick-tool-modal">
+    <div class="quick-modal-window">
+      <div class="quick-modal-header">
+        <strong style="font-size:1rem;">🧮 Calculadora Científica de Apoyo Rápido</strong>
+        <button class="btn btn-glass btn-sm" id="btn-close-quick-modal">✕ Cerrar</button>
+      </div>
+      <div class="quick-modal-body" id="quick-tool-modal-body"></div>
+    </div>
+  </div>
+
+  <!-- Motores Matemáticos y de Almacenamiento -->
+  <script src="js/engine/math-parser.js"></script>
+  <script src="js/engine/math-renderer.js"></script>
+  <script src="js/engine/math-input.js"></script>
+  <script src="js/engine/step-solver.js"></script>
+  <script src="js/engine/storage.js"></script>
+
+  <!-- Base de Conocimiento Curricular (9 Materias Completas) -->
+  <script src="js/data/curriculum-part1.js"></script>
+  <script src="js/data/curriculum-part2.js"></script>
+  <script src="js/data/curriculum-part3.js"></script>
+
+  <!-- Herramientas Interactivas y Gráficas de Lección -->
+  <script src="js/tools/lesson-graphs.js"></script>
+  <script src="js/tools/grapher.js"></script>
+  <script src="js/tools/calculator.js"></script>
+  <script src="js/tools/expression-editor.js"></script>
+  <script src="js/tools/guided-solver.js"></script>
+  <script src="js/tools/formula-sheets.js"></script>
+
+  <!-- Controlador Principal de la Aplicación -->
+  <script src="js/app.js"></script>
+</body>
+</html>
