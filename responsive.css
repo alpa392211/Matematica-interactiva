@@ -1,0 +1,958 @@
+/* ==========================================================================
+   MATEMÁTICA INTERACTIVA - Fase 3: Diseño Responsive Real (Celulares y Tabletas)
+   Archivo: css/responsive.css  (se carga al final; no altera escritorio > 900px)
+   Objetivos de diseño: 360px, 390px, 430px (teléfonos) y 768px-1024px (tabletas)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   0. Reglas seguras en cualquier ancho
+   -------------------------------------------------------------------------- */
+.grapher-layout > *,
+.two-col-grid > *,
+.calc-layout > * {
+  min-width: 0;
+}
+
+.canvas-wrapper canvas {
+  touch-action: none; /* el lienzo gestiona arrastre y pellizco por su cuenta */
+}
+
+/* Botón para alternar el teclado nativo del teléfono (solo se muestra en pantallas táctiles) */
+.mat-native-kb-toggle {
+  display: none;
+}
+
+@media (pointer: coarse) {
+  .mat-native-kb-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    min-width: 44px;
+    min-height: 44px;
+    margin-left: 0.25rem;
+    border: 1px solid var(--primary-200);
+    border-radius: var(--radius-md);
+    background: var(--primary-50);
+    color: var(--primary-700);
+    font-size: 1.1rem;
+    cursor: pointer;
+  }
+  .mat-native-kb-toggle[aria-pressed="true"] {
+    background: var(--primary-600);
+    color: #FFFFFF;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   1. Tabletas y celulares (<= 900px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  html,
+  body {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+  body {
+    overflow-x: clip;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  .app-layout,
+  .main-wrapper,
+  .main-content {
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  img, canvas, svg, video {
+    max-width: 100%;
+  }
+
+  /* Drawer off-canvas: ancho adaptable y desplazamiento propio */
+  .sidebar {
+    width: min(86vw, 320px);
+    max-width: 100%;
+    overscroll-behavior: contain;
+    box-shadow: none;
+    visibility: hidden;
+    transition: transform var(--transition-normal), visibility 0s linear 0.25s, box-shadow var(--transition-normal);
+  }
+  .sidebar.open {
+    visibility: visible;
+    transition: transform var(--transition-normal), visibility 0s linear 0s, box-shadow var(--transition-normal);
+  }
+  .sidebar-scroll {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+  .sidebar-overlay {
+    -webkit-tap-highlight-color: transparent;
+  }
+  .nav-item {
+    min-height: 46px;
+  }
+  .sidebar-close-btn,
+  .mobile-menu-btn {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    font-size: 1.15rem;
+  }
+
+  .main-content {
+    padding: 1.25rem 1rem;
+  }
+
+  /* Áreas táctiles mínimas (44px) */
+  .btn,
+  .btn-sm,
+  .topic-selector-btn,
+  .learning-tab-btn,
+  .diff-pill,
+  .quiz-option-btn,
+  .keypad-chip,
+  .calc-key,
+  .quick-tool-btn,
+  .editor-example-chip,
+  .editor-case-try,
+  .mvk-close-btn,
+  .exercise-vkb-toggle-btn {
+    min-height: 44px;
+  }
+  .btn-sm {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+  .exercise-input,
+  .fn-input,
+  .editor-primary-input,
+  .mat-fallback-input,
+  .header-search-input {
+    min-height: 44px;
+    font-size: 16px; /* evita el zoom automático de iOS al enfocar */
+  }
+  .function-input-row input[type="checkbox"],
+  .grapher-sidebar input[type="checkbox"] {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+  }
+
+  /* Fórmulas con desplazamiento horizontal interno */
+  .katex-display,
+  .formula-expression,
+  .math-block,
+  .editor-preview-stage,
+  .exercise-live-preview-math,
+  .step-math-work,
+  .editor-case-math,
+  .example-chip-math,
+  .calc-result-line,
+  .calc-expression-line,
+  .analysis-stat-box {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+  .katex-display > .katex {
+    max-width: none;
+  }
+  .formula-showcase,
+  .step-body,
+  .step-math-work,
+  .exercise-statement,
+  .theory-paragraph {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  /* Tablas con scroll horizontal limpio */
+  .main-content table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  #graph-table-box {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Graficador: panel de controles y lienzo apilados */
+  .grapher-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .grapher-canvas-card {
+    order: -1; /* el gráfico queda primero, los controles debajo */
+    padding: 0.75rem;
+  }
+  .grapher-sidebar {
+    padding: 1rem;
+  }
+  .canvas-wrapper {
+    height: clamp(280px, 62vw, 460px);
+  }
+  .grapher-toolbar .btn {
+    flex: 1 1 auto;
+  }
+
+  /* Editor de expresiones y guiado: 2 columnas -> 1 */
+  .two-col-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Pestañas y selectores con scroll táctil fluido */
+  .topics-bar,
+  .learning-tabs {
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+  }
+  .topics-bar::-webkit-scrollbar,
+  .learning-tabs::-webkit-scrollbar,
+  .mvk-tabs-bar::-webkit-scrollbar {
+    display: none;
+  }
+  .topic-selector-btn,
+  .learning-tab-btn {
+    scroll-snap-align: start;
+    flex-shrink: 0;
+  }
+  .learning-tab-btn {
+    min-width: 140px;
+  }
+
+  /* Teclado Matemático Visual */
+  .mvk-tabs-bar {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 0.4rem;
+    padding-bottom: 0.2rem;
+  }
+  .mvk-tab-btn {
+    flex: 0 0 auto;
+    min-width: 92px;
+    min-height: 46px;
+    padding: 0.4rem 0.75rem;
+  }
+  .mvk-tab-label {
+    font-size: 0.78rem;
+    white-space: nowrap;
+  }
+  .mvk-keys-grid {
+    grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+    gap: 0.45rem;
+  }
+  .mvk-key-btn {
+    min-height: 48px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .mvk-key-math {
+    font-size: 1rem;
+    max-width: 100%;
+    overflow: hidden;
+  }
+  .mathlive-field-wrapper {
+    min-width: 0;
+    max-width: 100%;
+  }
+  math-field {
+    max-width: 100%;
+    min-width: 0;
+    font-size: 1.15rem;
+  }
+
+  /* Modal de calculadora */
+  .quick-modal-backdrop {
+    padding: 0.5rem;
+  }
+  .quick-modal-window {
+    max-height: 94vh;
+    max-height: 94dvh;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   2. Encabezado reorganizado y tarjetas (<= 640px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 640px) {
+  /*
+     Fila 1: [☰] [ buscador ........ ] [🧮]
+     Fila 2: [ ruta de navegación .. ] [🔥 racha] [🌱 XP]
+  */
+  .top-header {
+    height: auto;
+    min-height: var(--header-height);
+    padding: 0.5rem 0.75rem;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    grid-template-areas:
+      "menu search search calc"
+      "crumb crumb streak xp";
+    align-items: center;
+    gap: 0.4rem 0.5rem;
+  }
+  .header-left,
+  .header-actions {
+    display: contents;
+  }
+  .mobile-menu-btn {
+    grid-area: menu;
+  }
+  .header-search {
+    display: block;
+    grid-area: search;
+    width: 100%;
+    min-width: 0;
+  }
+  .quick-tool-btn {
+    grid-area: calc;
+    justify-self: end;
+    min-width: 44px;
+    justify-content: center;
+    padding: 0.42rem 0.6rem;
+  }
+  .header-breadcrumb {
+    grid-area: crumb;
+    min-width: 0;
+    font-size: 0.82rem;
+  }
+  #header-streak-pill {
+    grid-area: streak;
+    justify-self: end;
+  }
+  #header-xp-pill {
+    grid-area: xp;
+    justify-self: end;
+  }
+  .stat-pill {
+    padding: 0.25rem 0.6rem;
+    font-size: 0.74rem;
+    white-space: nowrap;
+  }
+  .search-results-dropdown {
+    position: fixed;
+    left: 0.75rem;
+    right: 0.75rem;
+    top: auto;
+    margin-top: 6px;
+    max-height: 60vh;
+  }
+
+  .main-content {
+    padding: 0.9rem 0.75rem 1.5rem;
+  }
+
+  .stats-grid,
+  .modules-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.85rem;
+  }
+  .content-card,
+  .exercise-card,
+  .quiz-question-card,
+  .subject-header-card {
+    padding: 1rem;
+    border-radius: var(--radius-md);
+  }
+  .subject-header-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.85rem;
+  }
+  .subject-header-top > div[style*="display:flex"] {
+    width: 100%;
+  }
+
+  /* Cuadrículas inline de herramientas -> una columna */
+  .main-content div[style*="grid-template-columns"]:not([style*="repeat(5"]) {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  .grapher-sidebar div[style*="grid-template-columns"] {
+    grid-template-columns: 1fr 1fr !important; /* límites a y b lado a lado */
+  }
+  .quiz-options-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .graph-analysis-bar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .graph-coords-badge {
+    top: 8px;
+    right: 8px;
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
+  }
+  .canvas-wrapper {
+    height: clamp(260px, 78vw, 400px);
+  }
+
+  .mvk-header-hint {
+    display: none;
+  }
+  .mvk-panel {
+    padding: 0.6rem;
+  }
+
+  .exercise-input-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .exercise-input,
+  .exercise-math-field-mount {
+    min-width: 0;
+    width: 100%;
+    flex: 1 1 auto;
+  }
+  .exercise-input-row .btn {
+    width: 100%;
+  }
+  .learning-tab-btn {
+    min-width: 128px;
+    padding: 0.6rem 0.75rem;
+    font-size: 0.82rem;
+  }
+
+  /* Calculadora a pantalla completa en teléfonos */
+  .quick-modal-backdrop {
+    padding: 0;
+    align-items: stretch;
+  }
+  .quick-modal-window {
+    max-width: 100%;
+    max-height: 100vh;
+    max-height: 100dvh;
+    height: 100%;
+    border-radius: 0;
+  }
+  .quick-modal-header {
+    padding: 0.75rem 1rem;
+    gap: 0.5rem;
+  }
+  .quick-modal-header strong {
+    font-size: 0.9rem !important;
+  }
+  .quick-modal-body {
+    padding: 0.75rem;
+    -webkit-overflow-scrolling: touch;
+  }
+  .calc-layout {
+    gap: 0.85rem;
+  }
+  .calc-keypad-grid {
+    gap: 0.4rem;
+  }
+  .calc-key {
+    min-height: 48px;
+    padding: 0.4rem 0.2rem;
+    font-size: 0.95rem;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   3. Teléfonos pequeños (<= 430px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 430px) {
+  .main-content {
+    padding: 0.75rem 0.6rem 1.25rem;
+  }
+  .editor-action-controls-bar,
+  .editor-action-left,
+  .editor-action-right {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+  .editor-action-left .btn,
+  .editor-action-right .btn {
+    flex: 1 1 calc(50% - 0.5rem);
+  }
+  .editor-eval-controls-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .subject-title-text h1 {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .mvk-key-math {
+    font-size: 0.92rem;
+  }
+  .stat-pill {
+    padding: 0.22rem 0.5rem;
+    font-size: 0.7rem;
+  }
+  .brand-title {
+    font-size: 0.95rem;
+  }
+}
+
+/* ==========================================================================
+   4. Compactación fuerte para teléfonos (<= 480px)  -  iPhone / 360px - 430px
+   Estas reglas van al final para sobrescribir las de las secciones anteriores.
+   ========================================================================== */
+.header-back-btn {
+  display: none;
+}
+
+@media (max-width: 480px) {
+  /* --- 6. Contención general ------------------------------------------- */
+  html,
+  body {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+  .app-layout,
+  .main-wrapper,
+  .main-content,
+  .card,
+  .content-card,
+  .module-container,
+  .dashboard,
+  .wrapper,
+  .exercise-card,
+  .quiz-question-card,
+  .subject-header-card,
+  .step-procedure-card,
+  .lesson-graph-card,
+  .grapher-sidebar,
+  .grapher-canvas-card,
+  .calculator-body,
+  .calc-history-card,
+  .module-card,
+  .stat-card {
+    box-sizing: border-box !important;
+    max-width: 100%;
+    min-width: 0;
+  }
+  .main-content {
+    padding: 0.6rem 10px 1.25rem;
+  }
+  .content-card,
+  .exercise-card,
+  .quiz-question-card,
+  .subject-header-card,
+  .grapher-sidebar,
+  .grapher-canvas-card,
+  .calc-history-card {
+    padding: 0.8rem;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  /* Fórmulas y tablas: scroll horizontal propio, sin empujar al padre */
+  .katex-display,
+  .formula-expression,
+  .math-block,
+  .editor-preview-stage,
+  .exercise-live-preview-math,
+  .step-math-work,
+  .editor-case-math,
+  .calc-result-line,
+  #graph-table-box,
+  .main-content table {
+    overflow-x: auto;
+    max-width: 100%;
+  }
+  .formula-expression,
+  .math-block {
+    font-size: 0.95rem;
+  }
+
+  /* --- 1. Barra superior ------------------------------------------------- */
+  .top-header {
+    padding: 0.4rem 10px;
+    gap: 0.3rem 0.4rem;
+  }
+  .header-breadcrumb {
+    display: none; /* sustituidas por el botón "Volver" */
+  }
+  .header-back-btn:not([hidden]) {
+    grid-area: crumb;
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    min-height: 34px;
+    padding: 0.2rem 0.7rem;
+    border: 1px solid var(--primary-200);
+    border-radius: var(--radius-full);
+    background: var(--primary-50);
+    color: var(--primary-700);
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .header-search {
+    width: 100%;
+  }
+  .header-search-input {
+    min-height: 40px;
+    padding: 0.35rem 0.7rem 0.35rem 2rem;
+    font-size: 16px; /* 16px evita el zoom automático de iOS */
+  }
+  .header-search-icon {
+    left: 0.65rem;
+    font-size: 0.8rem;
+  }
+  .stat-pill,
+  .stat-badge {
+    font-size: 0.8rem;
+    padding: 0.2rem 0.55rem;
+    gap: 0.25rem;
+  }
+  .mobile-menu-btn,
+  .quick-tool-btn {
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+    min-height: 40px;
+  }
+  .quick-tool-btn {
+    padding: 0;
+  }
+
+  /* --- 2. Banner de bienvenida ------------------------------------------ */
+  .hero-banner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    padding: 1rem 12px;
+    border-radius: var(--radius-lg);
+    margin-bottom: 1rem;
+  }
+  .hero-banner::after {
+    font-size: 2.4rem;
+    right: 0.5rem;
+  }
+  .hero-content {
+    max-width: 100%;
+  }
+  .hero-badge {
+    font-size: 0.7rem;
+    margin-bottom: 0.5rem;
+  }
+  .hero-title {
+    font-size: clamp(1.2rem, 5.5vw, 1.4rem);
+    line-height: 1.25;
+  }
+  .hero-description {
+    font-size: 0.85rem;
+    line-height: 1.45;
+    margin-bottom: 0.85rem;
+    padding: 0;
+  }
+  .hero-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .hero-actions .btn {
+    width: 100%;
+    min-height: 40px;
+    font-size: 0.85rem;
+    padding: 0.45rem 0.75rem;
+    white-space: normal;
+    text-align: center;
+    justify-content: center;
+  }
+
+  /* --- 3. Módulos, títulos y pestañas ------------------------------------ */
+  .subject-title-text h1 {
+    font-size: 1.15rem;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+  .subject-title-text p {
+    font-size: 0.82rem;
+    line-height: 1.4;
+  }
+  .subject-title-group {
+    gap: 0.6rem;
+    min-width: 0;
+  }
+  .subject-big-icon {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    font-size: 1.1rem;
+  }
+  .main-content h2,
+  .main-content h3 {
+    font-size: 1.05rem;
+    line-height: 1.3;
+  }
+  .subject-header-top > div[style*="display:flex"] {
+    display: flex;
+    flex-direction: column;
+    gap: 6px !important;
+    width: 100%;
+  }
+  #btn-topic-graph,
+  #btn-topic-editor,
+  .subject-header-top .btn {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+    white-space: normal;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.8rem;
+    line-height: 1.3;
+  }
+  .topic-selector-btn {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.7rem;
+    min-height: 38px;
+  }
+
+  .learning-tabs,
+  .tabs,
+  .tab-buttons {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 0.3rem;
+    padding: 0.3rem;
+    max-width: 100%;
+  }
+  .learning-tab-btn,
+  .tabs > *,
+  .tab-buttons > * {
+    flex: 0 0 auto;
+    min-width: 0;
+    width: auto;
+    padding: 0.45rem 0.75rem;
+    font-size: 0.8rem;
+    min-height: 38px;
+    white-space: nowrap;
+  }
+
+  /* --- 4. Teclado Matemático Visual -------------------------------------- */
+  .mvk-panel {
+    padding: 0.5rem;
+  }
+  .mvk-header-title {
+    font-size: 0.75rem;
+  }
+  .mvk-cat-desc {
+    font-size: 0.75rem;
+    padding: 0.15rem 0.3rem;
+    margin-bottom: 0.35rem;
+  }
+  .mat-native-kb-toggle {
+    min-width: 40px;
+    min-height: 40px;
+  }
+
+  /* --- 5. Calculadora científica ----------------------------------------- */
+  .quick-modal-backdrop {
+    padding: 0.5rem;
+    align-items: center;
+  }
+  .quick-modal-window {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    max-height: 90vh;
+    max-height: 90dvh;
+    overflow-y: auto;
+    border-radius: var(--radius-lg);
+  }
+  .quick-modal-header {
+    padding: 0.5rem 0.75rem;
+    flex-shrink: 0;
+  }
+  .quick-modal-body {
+    padding: 0.5rem;
+    min-height: 0;
+    overflow-y: auto;
+  }
+  .quick-modal-body .subject-header-card {
+    padding: 0.5rem 0.6rem;
+    margin-bottom: 0.5rem;
+  }
+  .quick-modal-body .subject-title-text p,
+  .quick-modal-body .subject-big-icon {
+    display: none;
+  }
+  .calc-layout {
+    gap: 0.5rem;
+  }
+  .calculator-body {
+    padding: 0.5rem;
+    border-radius: var(--radius-md);
+  }
+  .calc-screen {
+    padding: 0.5rem 0.65rem;
+    min-height: 74px;
+    margin-bottom: 0.5rem;
+  }
+  .calc-screen-top {
+    font-size: 0.65rem;
+  }
+  .calc-expression-line {
+    font-size: 0.8rem;
+  }
+  .calc-result-line {
+    font-size: 1.3rem;
+  }
+  .calc-keypad-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 4px;
+  }
+  .calculator-body div[style*="repeat(5"] {
+    gap: 4px !important;
+    margin-bottom: 4px !important;
+  }
+  .calc-key,
+  .calc-key.fn-key,
+  .calc-key.num-key,
+  .calc-key.op-key,
+  .calc-key.equal-key {
+    min-height: 36px;
+    max-height: 40px;
+    height: 38px;
+    padding: 0 0.1rem;
+    font-size: 0.8rem;
+    border-radius: var(--radius-sm);
+  }
+  .calc-key.equal-key {
+    font-size: 0.95rem;
+  }
+  .calc-history-card {
+    padding: 0.5rem;
+  }
+
+  /* Graficador */
+  .canvas-wrapper {
+    height: clamp(240px, 72vw, 340px);
+  }
+  .grapher-toolbar > div:first-child {
+    font-size: 0.75rem;
+  }
+}
+
+/* ==========================================================================
+   5. Agrandar Teclado Oscuro Nativo MathLive y Teclado Blanco de 6 Categorías (<= 640px)
+   ========================================================================== */
+@media (max-width: 640px) {
+  /* --------------------------------------------------------------------------
+     1. Teclado Oscuro Nativo de MathLive (.ML__keyboard)
+     -------------------------------------------------------------------------- */
+  :root,
+  body,
+  .ML__keyboard {
+    --keyboard-row-height: 54px !important;
+  }
+
+  .ML__keyboard {
+    font-size: 1.25rem !important;
+  }
+
+  .ML__keyboard--plate {
+    padding: 4px 2px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .ML__keyboard .keycap,
+  .ML__keyboard .action,
+  .ML__keyboard .fnbutton,
+  .ML__keyboard [role="button"] {
+    min-height: 52px !important;
+    height: 52px !important;
+    font-size: 1.25rem !important;
+    padding: 0 4px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Barra superior de pestañas del teclado nativo (123, ∞≠∈, abc, αβγ, etc.) */
+  .ML__keyboard .segmented-control,
+  .ML__keyboard .track,
+  .ML__keyboard .segmented-control button,
+  .ML__keyboard [role="tablist"] [role="tab"] {
+    font-size: 1rem !important;
+    padding: 10px 12px !important;
+    min-height: 42px !important;
+  }
+
+  /* --------------------------------------------------------------------------
+     2. Teclado Blanco de 6 Categorías (.mvk-panel)
+     -------------------------------------------------------------------------- */
+  /* Pestañas: cuadrícula de 2 columnas x 3 filas visible y sin cortarse */
+  .mvk-tabs-bar {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+    overflow: visible !important;
+    white-space: normal !important;
+    padding-bottom: 0 !important;
+  }
+
+  .mvk-tab-btn {
+    min-width: 0 !important;
+    width: 100% !important;
+    min-height: 44px !important;
+    padding: 0.35rem 0.5rem !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+
+  .mvk-tab-label {
+    font-size: 0.82rem !important;
+    line-height: 1.2 !important;
+    white-space: normal !important;
+    word-break: normal !important;
+  }
+
+  /* Dimensiones generales para todas las teclas de las 6 categorías */
+  .mvk-key-btn {
+    min-height: 52px !important;
+    font-size: 1.15rem !important;
+    padding: 0.3rem 0.2rem !important;
+    box-sizing: border-box !important;
+  }
+
+  .mvk-key-math {
+    font-size: 1.15rem !important;
+    line-height: 1.2 !important;
+  }
+
+  .mvk-key-math .katex {
+    font-size: 1.05em !important;
+  }
+
+  /* Categoría 1 (Operaciones básicas): exactamente 4 columnas */
+  .mvk-keys-grid[data-cat-id="cat-basicas"],
+  .mvk-keys-grid[data-cat-id="1"] {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 5px !important;
+  }
+
+  /* Botón ⌫ Borrar ocupa 2 columnas completas */
+  .mvk-keys-grid[data-cat-id="cat-basicas"] .mvk-key-backspace,
+  .mvk-key-btn.mvk-key-backspace {
+    grid-column: span 2 !important;
+    font-size: 0.95rem !important;
+    font-weight: 700 !important;
+  }
+
+  /* Categorías 2 a 6: exactamente 3 columnas anchas */
+  .mvk-keys-grid:not([data-cat-id="cat-basicas"]):not([data-cat-id="1"]) {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+  }
+}

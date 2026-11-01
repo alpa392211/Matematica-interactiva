@@ -1,0 +1,800 @@
+/* ==========================================================================
+   MATEMÁTICA INTERACTIVA - Estilos de Formularios Matemáticos y Motor @media print
+   Archivo: css/print.css
+   Fase 5A: Diseño en pantalla de Formularios Matemáticos + Impresión Tamaño Carta
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Panel de Control y Selector de Modalidades (Pantalla)
+   -------------------------------------------------------------------------- */
+.fs-header-print-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+
+.fs-controls-panel {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+}
+
+.fs-controls-top-row {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 1rem;
+  align-items: end;
+}
+
+.fs-modality-switch {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.fs-modality-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.18rem;
+  padding: 0.7rem 0.95rem;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--border-light);
+  background: var(--bg-surface-alt);
+  color: var(--text-secondary);
+  text-align: left;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.fs-modality-btn:hover {
+  border-color: var(--primary-400);
+  background: var(--primary-50);
+  color: var(--primary-800);
+}
+
+.fs-modality-btn.active {
+  background: linear-gradient(135deg, var(--primary-700) 0%, var(--primary-600) 100%);
+  border-color: var(--primary-700);
+  color: #FFFFFF;
+  box-shadow: var(--shadow-blue);
+}
+
+.fs-mod-btn-title {
+  font-size: 0.86rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.fs-mod-btn-sub {
+  font-size: 0.74rem;
+  opacity: 0.88;
+  line-height: 1.2;
+}
+
+.fs-search-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.fs-search-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.fs-search-input {
+  width: 100%;
+  padding: 0.58rem 0.85rem;
+  font-family: var(--font-sans);
+  font-size: 0.86rem;
+  border-radius: var(--radius-md);
+}
+
+/* Selector de los 9 Módulos */
+.fs-subject-selector-wrap {
+  border-top: 1px solid var(--border-light);
+  padding-top: 0.95rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.fs-subject-selector-header {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.fs-subject-pills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+  gap: 0.55rem;
+}
+
+.fs-subject-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.65rem;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--border-light);
+  background: #FFFFFF;
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--transition-fast);
+}
+
+.fs-subject-pill:hover {
+  border-color: var(--pill-color, var(--primary-500));
+  background: var(--bg-surface-alt);
+  transform: translateY(-1px);
+}
+
+.fs-subject-pill.active {
+  border-color: var(--pill-color, var(--primary-600));
+  background: var(--primary-50);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.14);
+}
+
+.fs-pill-symbol {
+  width: 30px;
+  min-width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  color: #FFFFFF;
+  font-family: var(--font-math);
+  font-size: 0.82rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.fs-pill-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.fs-pill-name {
+  font-size: 0.81rem;
+  font-weight: 700;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fs-pill-count {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+/* --------------------------------------------------------------------------
+   2. Hoja Académica Imprimible y Membrete (Pantalla)
+   -------------------------------------------------------------------------- */
+.fs-printable-sheet {
+  background: #FFFFFF;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  padding: 2rem 2.25rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 1.65rem;
+}
+
+.fs-print-letterhead {
+  border-bottom: 2px solid var(--primary-800);
+  padding-bottom: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.fs-letterhead-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.fs-letterhead-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.fs-letterhead-logo {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  background: var(--primary-800);
+  color: #FFFFFF;
+  font-family: var(--font-math);
+  font-size: 1.25rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fs-letterhead-org {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--primary-800);
+}
+
+.fs-letterhead-doc-type {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
+.fs-letterhead-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.fs-meta-pill {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.22rem 0.65rem;
+  border-radius: var(--radius-full);
+  background: var(--primary-50);
+  color: var(--primary-800);
+  border: 1px solid var(--primary-200);
+}
+
+.fs-meta-count {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.22rem 0.65rem;
+  border-radius: var(--radius-full);
+  background: var(--bg-surface-alt);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-light);
+}
+
+.fs-document-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.02em;
+  margin-bottom: 0.25rem;
+}
+
+.fs-document-subtitle {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* --------------------------------------------------------------------------
+   3. Índice General por Secciones (Modalidad B) y Chips de Sección (Modalidad A)
+   -------------------------------------------------------------------------- */
+.fs-general-toc {
+  background: #F8FAFC;
+  border: 1px solid #CBD5E1;
+  border-radius: var(--radius-lg);
+  padding: 1.15rem 1.25rem;
+}
+
+.fs-toc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.85rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-light);
+  font-size: 0.92rem;
+  color: var(--primary-900);
+}
+
+.fs-toc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 0.65rem;
+}
+
+.fs-toc-module-card {
+  display: block;
+  background: #FFFFFF;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 0.65rem 0.8rem;
+  text-decoration: none;
+  color: var(--text-main);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.fs-toc-module-card:hover {
+  border-color: var(--primary-500);
+  box-shadow: var(--shadow-xs);
+}
+
+.fs-toc-mod-title {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.84rem;
+  color: var(--primary-800);
+  margin-bottom: 0.3rem;
+}
+
+.fs-toc-mod-num {
+  font-weight: 800;
+}
+
+.fs-toc-mod-count {
+  margin-left: auto;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.fs-toc-sec-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+}
+
+.fs-module-toc {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  padding: 0.65rem 0.9rem;
+  background: var(--bg-surface-alt);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+}
+
+.fs-module-toc-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-right: 0.25rem;
+}
+
+.fs-module-toc-chip {
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-full);
+  background: #FFFFFF;
+  border: 1px solid var(--border-light);
+  color: var(--primary-700);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+}
+
+.fs-module-toc-chip:hover {
+  background: var(--primary-50);
+  border-color: var(--primary-400);
+}
+
+/* --------------------------------------------------------------------------
+   4. Bloques de Módulo, Subsecciones y Fichas de Fórmulas
+   -------------------------------------------------------------------------- */
+.fs-modules-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.fs-module-block {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.fs-module-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.85rem 1.1rem;
+  background: linear-gradient(90deg, #F8FAFC 0%, #FFFFFF 100%);
+  border: 1px solid var(--border-light);
+  border-left: 5px solid var(--fs-mod-color, var(--primary-600));
+  border-radius: var(--radius-md);
+}
+
+.fs-module-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.fs-module-symbol {
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  color: #FFFFFF;
+  font-family: var(--font-math);
+  font-weight: 700;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fs-module-kicker {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+}
+
+.fs-module-heading {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.fs-section-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.fs-section-title {
+  font-size: 0.96rem;
+  font-weight: 800;
+  color: var(--primary-900);
+  padding: 0.35rem 0.65rem;
+  background: var(--primary-50);
+  border-left: 3.5px solid var(--primary-600);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  margin: 0;
+}
+
+.fs-formulas-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.fs-formula-card {
+  border: 1px solid #CBD5E1;
+  border-radius: var(--radius-md);
+  background: #FFFFFF;
+  padding: 0.95rem 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.fs-formula-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  border-bottom: 1px solid #F1F5F9;
+  padding-bottom: 0.4rem;
+}
+
+.fs-formula-code {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  font-weight: 800;
+  padding: 0.14rem 0.48rem;
+  border-radius: 4px;
+  background: var(--primary-50);
+  color: var(--primary-800);
+  border: 1px solid var(--primary-200);
+  flex-shrink: 0;
+}
+
+.fs-formula-name {
+  font-size: 0.94rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.fs-formula-equation-box {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: var(--radius-sm);
+  padding: 0.65rem 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.12rem;
+  color: #0F172A;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+}
+
+.fs-formula-equation-box .katex-display {
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: visible !important;
+}
+
+.fs-formula-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 0.55rem 1rem;
+  font-size: 0.81rem;
+  line-height: 1.45;
+}
+
+.fs-formula-meta-item {
+  color: var(--text-secondary);
+}
+
+.fs-meta-label {
+  font-weight: 700;
+  color: var(--text-main);
+  margin-right: 0.25rem;
+}
+
+.fs-meta-condition {
+  background: #FFFBEB;
+  border-left: 3px solid #F59E0B;
+  padding: 0.28rem 0.55rem;
+  border-radius: 0 4px 4px 0;
+}
+
+.fs-print-footer {
+  border-top: 1px solid var(--border-light);
+  padding-top: 0.85rem;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+
+/* Adaptación móvil en pantalla para la vista de Formularios */
+@media (max-width: 900px) {
+  .fs-controls-top-row {
+    grid-template-columns: 1fr;
+  }
+  .fs-printable-sheet {
+    padding: 1.15rem 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .fs-modality-switch {
+    grid-template-columns: 1fr;
+  }
+  .fs-subject-pills-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .fs-printable-sheet {
+    padding: 0.85rem 0.65rem;
+    border-radius: var(--radius-md);
+  }
+  .fs-document-title {
+    font-size: 1.18rem;
+  }
+  .fs-formula-card {
+    padding: 0.75rem;
+  }
+  .fs-formula-equation-box {
+    justify-content: flex-start;
+    font-size: 0.98rem;
+  }
+}
+
+/* ==========================================================================
+   5. MOTOR DE IMPRESIÓN OFICIAL (@page Tamaño Carta y @media print)
+   ========================================================================== */
+@page {
+  size: letter portrait;
+  margin: 1.5cm;
+}
+
+@media print {
+  /* Ocultar absolutamente toda la interfaz de navegación, controles y barras */
+  .sidebar,
+  .sidebar-overlay,
+  .top-header,
+  .mobile-menu-btn,
+  .header-back-btn,
+  .quick-modal-backdrop,
+  .no-print,
+  .fs-controls-panel,
+  .fs-module-banner-right,
+  .fs-module-toc,
+  .subject-header-card,
+  .learning-tabs,
+  .topics-bar {
+    display: none !important;
+  }
+
+  /* Restablecer contenedores principales para flujo multipágina en papel */
+  html,
+  body,
+  .app-layout,
+  .main-wrapper,
+  .main-content,
+  #main-view-container,
+  #fs-document-mount {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #FFFFFF !important;
+    color: #000000 !important;
+    overflow: visible !important;
+    box-shadow: none !important;
+  }
+
+  .fs-printable-sheet {
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    background: #FFFFFF !important;
+    gap: 1rem !important;
+  }
+
+  /* Membrete impreso limpio y sobrio */
+  .fs-print-letterhead {
+    border-bottom: 1.5pt solid #0F172A !important;
+    padding-bottom: 0.35cm !important;
+    margin-bottom: 0.4cm !important;
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  .fs-letterhead-logo {
+    border: 1pt solid #0F172A !important;
+    background: #FFFFFF !important;
+    color: #000000 !important;
+  }
+
+  .fs-document-title {
+    font-size: 15pt !important;
+    color: #000000 !important;
+  }
+
+  .fs-document-subtitle {
+    font-size: 9.5pt !important;
+    color: #1E293B !important;
+  }
+
+  /* Índice General en papel */
+  .fs-general-toc {
+    background: #FFFFFF !important;
+    border: 1pt solid #94A3B8 !important;
+    padding: 0.35cm !important;
+    margin-bottom: 0.45cm !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .fs-toc-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 0.25cm !important;
+  }
+
+  .fs-toc-module-card {
+    border: 0.5pt solid #CBD5E1 !important;
+    padding: 0.2cm !important;
+  }
+
+  /* Encabezados de módulo y subsección: evitar quedar huérfanos al final de página */
+  .fs-module-banner {
+    background: #FFFFFF !important;
+    border: 1pt solid #64748B !important;
+    border-left: 4pt solid #0F172A !important;
+    padding: 0.25cm 0.35cm !important;
+    margin-top: 0.3cm !important;
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .fs-module-symbol {
+    border: 1pt solid #0F172A !important;
+    background: #FFFFFF !important;
+    color: #000000 !important;
+  }
+
+  .fs-section-title {
+    background: #F8FAFC !important;
+    color: #000000 !important;
+    border-left: 3pt solid #0F172A !important;
+    border-bottom: 0.5pt solid #CBD5E1 !important;
+    font-size: 10.5pt !important;
+    padding: 0.15cm 0.25cm !important;
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+  }
+
+  /* Fichas de fórmula: jamás partir una fórmula a la mitad entre dos páginas */
+  .fs-formula-card {
+    background: #FFFFFF !important;
+    border: 0.75pt solid #94A3B8 !important;
+    border-radius: 4pt !important;
+    padding: 0.28cm 0.35cm !important;
+    margin-bottom: 0.22cm !important;
+    gap: 0.18cm !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .fs-formula-card-header {
+    border-bottom: 0.5pt solid #E2E8F0 !important;
+    padding-bottom: 0.1cm !important;
+  }
+
+  .fs-formula-code {
+    background: #FFFFFF !important;
+    color: #000000 !important;
+    border: 0.75pt solid #475569 !important;
+    font-size: 8pt !important;
+  }
+
+  .fs-formula-name {
+    font-size: 10pt !important;
+    color: #000000 !important;
+  }
+
+  .fs-formula-equation-box {
+    background: #FFFFFF !important;
+    border: 0.5pt solid #CBD5E1 !important;
+    padding: 0.2cm 0.3cm !important;
+    font-size: 11pt !important;
+    color: #000000 !important;
+    overflow: visible !important;
+  }
+
+  .fs-formula-meta-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.25cm !important;
+    font-size: 8.5pt !important;
+    color: #1E293B !important;
+  }
+
+  .fs-meta-condition {
+    background: #FFFFFF !important;
+    border-left: 2pt solid #475569 !important;
+    padding-left: 0.2cm !important;
+  }
+
+  .fs-print-footer {
+    margin-top: 0.5cm !important;
+    border-top: 0.75pt solid #94A3B8 !important;
+    padding-top: 0.2cm !important;
+    font-size: 8pt !important;
+    color: #334155 !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
