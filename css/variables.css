@@ -1,0 +1,156 @@
+/* ==========================================================================
+   MATEMÁTICA INTERACTIVA - Sistema de Diseño y Variables CSS
+   Paleta: Blanco puro, grises claros azulados, gama de azules reales y acentos
+   ========================================================================== */
+
+:root {
+  /* Colores de Fondo (Tema Claro Elegante) */
+  --bg-body: #F8FAFC;
+  --bg-surface: #FFFFFF;
+  --bg-surface-alt: #F1F5F9;
+  --bg-surface-hover: #EFF6FF;
+  --bg-sidebar: #FFFFFF;
+  --bg-glass: rgba(255, 255, 255, 0.88);
+
+  /* Paleta Primaria Azul */
+  --primary-900: #1E3A8A;
+  --primary-800: #1E40AF;
+  --primary-700: #1D4ED8;
+  --primary-600: #2563EB;
+  --primary-500: #3B82F6;
+  --primary-400: #60A5FA;
+  --primary-200: #BFDBFE;
+  --primary-100: #DBEAFE;
+  --primary-50:  #EFF6FF;
+
+  /* Acentos Secundarios */
+  --accent-indigo: #4F46E5;
+  --accent-indigo-light: #EEF2FF;
+  --accent-cyan: #0284C7;
+  --accent-cyan-light: #E0F2FE;
+  --accent-teal: #0D9488;
+  --accent-teal-light: #F0FDFA;
+
+  /* Colores Semánticos (Estados de Aprendizaje) */
+  --success-700: #047857;
+  --success-600: #059669;
+  --success-500: #10B981;
+  --success-100: #D1FAE5;
+  --success-50:  #ECFDF5;
+
+  --warning-700: #B45309;
+  --warning-600: #D97706;
+  --warning-500: #F59E0B;
+  --warning-100: #FEF3C7;
+  --warning-50:  #FFFBEB;
+
+  --danger-700: #B91C1C;
+  --danger-600: #DC2626;
+  --danger-500: #EF4444;
+  --danger-100: #FEE2E2;
+  --danger-50:  #FEF2F2;
+
+  /* Tipografía y Texto */
+  --text-main: #0F172A;
+  --text-secondary: #334155;
+  --text-muted: #64748B;
+  --text-light: #94A3B8;
+  --text-inverse: #FFFFFF;
+
+  /* Bordes y Divisores */
+  --border-light: #E2E8F0;
+  --border-medium: #CBD5E1;
+  --border-focus: #3B82F6;
+
+  /* Sombras sutiles y modernas */
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+  --shadow-xl: 0 20px 25px -5px rgba(15, 23, 42, 0.10), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+  --shadow-blue: 0 4px 14px rgba(37, 99, 235, 0.18);
+
+  /* Radios de borde */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --radius-full: 9999px;
+
+  /* Dimensiones de Layout */
+  --sidebar-width: 280px;
+  --header-height: 68px;
+  --content-max-width: 1280px;
+
+  /* Familias Tipográficas */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  --font-math: 'Cambria Math', 'Latin Modern Math', 'STIX Two Math', 'Times New Roman', Georgia, serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
+
+  /* Transiciones */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Reset y Base */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-body);
+  color: var(--text-main);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+a {
+  color: var(--primary-600);
+  text-decoration: none;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-surface-alt);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-medium);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-light);
+}
