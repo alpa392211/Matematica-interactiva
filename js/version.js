@@ -10,12 +10,25 @@
 
   const APP_NAME = 'MateTic';
   const APP_TAGLINE = 'Matemáticas Interactivas';
-  const APP_VERSION = '1.5.0';
+  const APP_VERSION = '1.5.1';
   const APP_RELEASE_DATE = '2026-11-18';
   const STUDIO_NAME = 'ALPA Studio';
   const STUDIO_MEANING = '';
 
   const RELEASE_NOTES = [
+    {
+      version: '1.5.1',
+      date: '2026-11-18',
+      items: [
+        'Menú lateral móvil sin desplazamiento brusco: al abrir y cerrar el menú desde abajo en la página, la pantalla permanece exactamente en el mismo lugar sin volver a bajar desde arriba.',
+        'Aviso de actualización más limpio: eliminado el botón \'Ver más en Ajustes\' del pie de las novedades.',
+        'Código 23410908 mejorado: además de aumentar la XP y ajustar la racha aleatoria hasta 47 días, ahora también sube o baja aleatoriamente el Dominio Global.',
+        'El botón flotante de las 3 líneas (☰) mantiene su posición exacta al cerrar el menú lateral.',
+        'Las actualizaciones del dominio se reflejan de inmediato en la barra lateral y el panel principal.',
+        'Estabilidad visual mejorada en desplazamientos largos en dispositivos móviles.',
+        'Sin cambios en los datos guardados ni en el funcionamiento de las herramientas matemáticas.'
+      ]
+    },
     {
       version: '1.5.0',
       date: '2026-11-18',

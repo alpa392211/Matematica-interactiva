@@ -323,11 +323,19 @@ window.MatInteractiva = window.MatInteractiva || {};
       document.documentElement.classList.add('has-open-overlay');
       document.body.classList.add('has-open-overlay');
     } else if (!hasOverlay && wasLocked) {
-      document.documentElement.classList.remove('has-open-overlay');
+      const htmlEl = document.documentElement;
+      const prevScrollBehavior = htmlEl.style.scrollBehavior;
+      htmlEl.style.scrollBehavior = 'auto';
+      htmlEl.classList.remove('has-open-overlay');
       document.body.classList.remove('has-open-overlay');
-      document.documentElement.style.removeProperty('--scroll-lock-top');
+      htmlEl.style.removeProperty('--scroll-lock-top');
       if (typeof window !== 'undefined' && typeof window.scrollTo === 'function') {
-        window.scrollTo({ top: lockedScrollY, behavior: 'auto' });
+        window.scrollTo(0, lockedScrollY);
+      }
+      if (prevScrollBehavior) {
+        htmlEl.style.scrollBehavior = prevScrollBehavior;
+      } else {
+        htmlEl.style.removeProperty('scroll-behavior');
       }
     }
     syncFloatingMenuButton();
@@ -653,27 +661,6 @@ window.MatInteractiva = window.MatInteractiva || {};
     whatsNewModal?.addEventListener('click', (ev) => {
       if (ev.target === whatsNewModal) closeWhatsNew();
     });
-    document.getElementById('btn-whats-new-more')?.addEventListener('click', () => {
-      haptic('confirm');
-      closeAccessibleDialog(whatsNewModal);
-      syncPreferenceSwitches();
-      syncPwaAndOfflineUI();
-      openAccessibleDialog(settingsModal, {
-        returnFocusEl: document.getElementById('btn-open-settings')
-      });
-      requestAnimationFrame(() => {
-        const appSec = document.getElementById('settings-sec-app');
-        if (appSec && typeof appSec.scrollIntoView === 'function') {
-          appSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-        const versionRow = document.getElementById('settings-app-version')?.closest('.settings-control-row');
-        if (versionRow) {
-          versionRow.classList.remove('is-highlighted-row');
-          void versionRow.offsetWidth;
-          versionRow.classList.add('is-highlighted-row');
-        }
-      });
-    });
 
     document.getElementById('btn-install-pwa')?.addEventListener('click', async () => {
       if (!pwaState.deferredPrompt) return;
@@ -883,16 +870,19 @@ window.MatInteractiva = window.MatInteractiva || {};
       }
 
       if (code === '23410908') {
-        let boosted = { xp: 0, streakDays: 1 };
+        let boosted = { xp: 0, streakDays: 1, globalPercentage: 0 };
         if (ns.Storage && typeof ns.Storage.applyDeveloperBoost === 'function') {
-          boosted = ns.Storage.applyDeveloperBoost();
+          boosted = ns.Storage.applyDeveloperBoost(ns.Curriculum || []);
         }
         if (ns.PrepMatTool && ns.PrepMatTool.Storage && typeof ns.PrepMatTool.Storage.applyDeveloperBoost === 'function') {
           ns.PrepMatTool.Storage.applyDeveloperBoost(boosted.streakDays);
         }
         if (devCodeInput) devCodeInput.value = '';
         refreshCurrentView();
-        showDevFeedback(`Código aceptado: XP actualizada a ${boosted.xp} XP y racha a ${boosted.streakDays} días.`, true);
+        showDevFeedback(
+          `Código aceptado: XP a ${boosted.xp} XP, racha a ${boosted.streakDays} días y dominio a ${boosted.globalPercentage}%.`,
+          true
+        );
         haptic('achievement');
         return;
       }
@@ -1161,7 +1151,6 @@ window.MatInteractiva = window.MatInteractiva || {};
     const whatsNewModal = document.getElementById('whats-new-modal');
     const titleEl = document.getElementById('whats-new-title');
     const bodyEl = document.getElementById('whats-new-body');
-    const moreBtn = document.getElementById('btn-whats-new-more');
     const ackBtn = document.getElementById('btn-ack-whats-new');
     if (!whatsNewModal || !bodyEl) return;
 
@@ -1182,10 +1171,6 @@ window.MatInteractiva = window.MatInteractiva || {};
     bodyEl.innerHTML = renderWhatsNewNotesHtml(notesToShow, manual, isFirstInstall);
     if (bodyEl && typeof bodyEl.scrollTo === 'function') {
       bodyEl.scrollTop = 0;
-    }
-    if (moreBtn) {
-      // Mantiene visible el acceso directo hacia Ajustes > Aplicación en todo momento
-      moreBtn.hidden = false;
     }
 
     haptic('confirm');

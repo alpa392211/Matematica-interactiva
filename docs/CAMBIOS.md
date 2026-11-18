@@ -419,3 +419,11 @@ Este archivo documenta de forma acumulativa cada fase ejecutada, sus archivos mo
   - **Novedades verticales y enfocadas ([js/app.js](../js/app.js), [css/components.css](../css/components.css))**: el aviso de actualización muestra por defecto solo la última versión en una sola columna vertical y bloquea el desplazamiento horizontal en móvil.
   - **Datos, salida y códigos de desarrollador ([index.html](../index.html), [js/app.js](../js/app.js), [js/engine/storage.js](../js/engine/storage.js), [js/tools/prepmat.js](../js/tools/prepmat.js))**: añadida sección *Datos y sesión* con borrado completo (XP, rachas, progreso, PrepMat y preferencias) y botón *Salir de la app* con diálogo de confirmación (`#app-confirm-modal`) y pantalla de salida (`#app-exited-overlay`); añadida sección colapsable *Códigos de desarrollador* con `06092109` (desbloqueo temporal de sesión para avisos anteriores) y `23410908` (incremento aleatorio de XP y racha `<= 47` días).
 - **Verificación**: `node --test tests/*.test.js` aprobado.
+
+---
+## v1.5.1 — Scroll instantáneo al cerrar menú móvil, dominio aleatorio en 23410908 y limpieza de Novedades
+- **Qué cambió**:
+  - **Restauración instantánea de scroll ([js/app.js](../js/app.js))**: al cerrar el menú lateral o un modal se fuerza temporalmente `scrollBehavior = 'auto'` antes de restaurar `lockedScrollY`, evitando la animación desde el inicio de la página hasta abajo causada por `scroll-behavior: smooth`.
+  - **Código `23410908` ([js/engine/storage.js](../js/engine/storage.js), [js/app.js](../js/app.js))**: ahora también aumenta o disminuye aleatoriamente el Dominio Global (modificando temas estudiados, ejercicios resueltos y evaluaciones) y lo reporta en el mensaje.
+  - **Aviso de actualización ([index.html](../index.html), [js/app.js](../js/app.js))**: eliminado el botón `Ver más en Ajustes` (`#btn-whats-new-more`).
+- **Verificación**: `node --test tests/*.test.js` aprobado.

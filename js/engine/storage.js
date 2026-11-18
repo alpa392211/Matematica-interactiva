@@ -298,7 +298,7 @@ window.MatInteractiva = window.MatInteractiva || {};
     return state;
   }
 
-  function applyDeveloperBoost() {
+  function applyDeveloperBoost(curriculum) {
     const today = new Date().toISOString().slice(0, 10);
     const currentXp = Number(state.xp) || 0;
     const xpGain = Math.floor(Math.random() * 2151) + 350; // +350 .. +2500 XP
@@ -310,12 +310,116 @@ window.MatInteractiva = window.MatInteractiva || {};
     state.streakDays = Math.floor(Math.random() * (maxStreak - minStreak + 1)) + minStreak;
     state.lastActiveDate = today;
 
+    const currList = Array.isArray(curriculum)
+      ? curriculum
+      : (Array.isArray(ns.Curriculum) ? ns.Curriculum : []);
+
+    let globalPercentage = 0;
+    if (currList.length > 0) {
+      const doneItems = [];
+      const todoItems = [];
+
+      for (const subj of currList) {
+        const topics = Array.isArray(subj.topics) ? subj.topics : [];
+        for (const topic of topics) {
+          if (state.studiedTopics[topic.id]) {
+            doneItems.push({ kind: 'topic', id: topic.id });
+          } else {
+            todoItems.push({ kind: 'topic', id: topic.id });
+          }
+
+          if (state.quizScores[topic.id]) {
+            doneItems.push({ kind: 'quiz', id: topic.id, total: Math.max(1, (topic.quiz && topic.quiz.length) || 5) });
+          } else {
+            todoItems.push({ kind: 'quiz', id: topic.id, total: Math.max(1, (topic.quiz && topic.quiz.length) || 5) });
+          }
+
+          const exercises = Array.isArray(topic.exercises) ? topic.exercises : [];
+          for (const ex of exercises) {
+            if (state.solvedExercises[ex.id]) {
+              doneItems.push({ kind: 'ex', id: ex.id, level: ex.level || 'basico', subjectId: subj.id, topicId: topic.id });
+            } else {
+              todoItems.push({ kind: 'ex', id: ex.id, level: ex.level || 'basico', subjectId: subj.id, topicId: topic.id });
+            }
+          }
+        }
+      }
+
+      const totalCount = doneItems.length + todoItems.length;
+      if (totalCount > 0) {
+        const currentDone = doneItems.length;
+        const canIncrease = todoItems.length > 0;
+        const canDecrease = doneItems.length > 0;
+        const increase = canIncrease && (!canDecrease || Math.random() >= 0.45);
+
+        const shuffle = (arr) => {
+          for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            const tmp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = tmp;
+          }
+          return arr;
+        };
+
+        if (increase) {
+          const maxAdd = todoItems.length;
+          const minAdd = Math.min(maxAdd, Math.max(1, Math.ceil(totalCount * 0.05)));
+          const maxStep = Math.min(maxAdd, Math.max(minAdd, Math.ceil(totalCount * 0.35)));
+          const addCount = Math.floor(Math.random() * (maxStep - minAdd + 1)) + minAdd;
+          shuffle(todoItems);
+          for (let i = 0; i < addCount; i++) {
+            const it = todoItems[i];
+            if (it.kind === 'topic') {
+              state.studiedTopics[it.id] = true;
+            } else if (it.kind === 'quiz') {
+              state.quizScores[it.id] = {
+                score: it.total,
+                total: it.total,
+                percentage: 100,
+                completedAt: new Date().toISOString()
+              };
+            } else if (it.kind === 'ex') {
+              state.solvedExercises[it.id] = {
+                solvedAt: new Date().toISOString(),
+                attempts: 1,
+                hintsUsed: 0,
+                level: it.level,
+                subjectId: it.subjectId,
+                topicId: it.topicId
+              };
+            }
+          }
+        } else if (canDecrease) {
+          const maxRem = currentDone;
+          const minRem = Math.min(maxRem, Math.max(1, Math.ceil(totalCount * 0.05)));
+          const maxStep = Math.min(maxRem, Math.max(minRem, Math.ceil(totalCount * 0.35)));
+          const remCount = Math.floor(Math.random() * (maxStep - minRem + 1)) + minRem;
+          shuffle(doneItems);
+          for (let i = 0; i < remCount; i++) {
+            const it = doneItems[i];
+            if (it.kind === 'topic') {
+              delete state.studiedTopics[it.id];
+            } else if (it.kind === 'quiz') {
+              delete state.quizScores[it.id];
+            } else if (it.kind === 'ex') {
+              delete state.solvedExercises[it.id];
+            }
+          }
+        }
+
+        const nextStats = computeProgressStats(currList);
+        globalPercentage = nextStats.globalPercentage;
+      }
+    }
+
     addActivity('Bonificación de práctica', 'achievement', xpGain);
     saveState();
     return {
       xp: state.xp,
       xpGain,
-      streakDays: state.streakDays
+      streakDays: state.streakDays,
+      globalPercentage
     };
   }
 

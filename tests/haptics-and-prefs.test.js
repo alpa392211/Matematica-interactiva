@@ -214,12 +214,37 @@ test('Datos, salida de app, códigos de desarrollador (06092109 / 23410908) y aj
   vm.runInNewContext(storageCode, sandbox);
   const Storage = sandbox.window.MatInteractiva.Storage;
 
-  for (let i = 0; i < 15; i++) {
+  const mockCurriculum = [
+    {
+      id: 'm1',
+      name: 'Materia 1',
+      topics: [
+        {
+          id: 't1',
+          title: 'Tema 1',
+          quiz: [{}, {}],
+          exercises: [{ id: 'e1', level: 'basico' }, { id: 'e2', level: 'intermedio' }]
+        },
+        {
+          id: 't2',
+          title: 'Tema 2',
+          quiz: [{}, {}],
+          exercises: [{ id: 'e3', level: 'avanzado' }, { id: 'e4', level: 'basico' }]
+        }
+      ]
+    }
+  ];
+
+  const domainResults = new Set();
+  for (let i = 0; i < 20; i++) {
     const prevXp = Storage.getState().xp;
-    const boosted = Storage.applyDeveloperBoost();
+    const boosted = Storage.applyDeveloperBoost(mockCurriculum);
     assert.ok(boosted.xp > prevXp, 'applyDeveloperBoost debe incrementar la XP');
     assert.ok(boosted.streakDays >= 1 && boosted.streakDays <= 47, `La racha (${boosted.streakDays}) nunca debe superar 47 días`);
+    assert.ok(boosted.globalPercentage >= 0 && boosted.globalPercentage <= 100);
+    domainResults.add(boosted.globalPercentage);
   }
+  assert.ok(domainResults.size >= 2, 'applyDeveloperBoost debe variar aleatoriamente el dominio global');
 
   Storage.resetAllProgress();
   assert.equal(Storage.getState().xp, 0);
@@ -236,9 +261,11 @@ test('Datos, salida de app, códigos de desarrollador (06092109 / 23410908) y aj
   assert.match(html, /id="app-confirm-modal"/);
   assert.match(html, /id="settings-dev-details"/);
   assert.match(html, /Códigos de desarrollador/);
+  assert.doesNotMatch(html, /id="btn-whats-new-more"/);
   assert.match(appCode, /06092109/);
   assert.match(appCode, /23410908/);
   assert.match(appCode, /devOldNoticesUnlocked/);
+  assert.match(appCode, /htmlEl\.style\.scrollBehavior = 'auto'/);
   assert.match(toolsCss, /\.quick-modal-header\s*\{[^}]*background:\s*transparent/);
   assert.match(componentsCss, /\.whats-new-modal-window\s*\{[^}]*overflow-x:\s*hidden/);
   assert.match(componentsCss, /\.whats-new-items-grid\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)/);
