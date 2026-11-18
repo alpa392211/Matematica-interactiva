@@ -10,12 +10,25 @@
 
   const APP_NAME = 'MateTic';
   const APP_TAGLINE = 'Matemáticas Interactivas';
-  const APP_VERSION = '1.4.2';
-  const APP_RELEASE_DATE = '2026-11-17';
+  const APP_VERSION = '1.4.3';
+  const APP_RELEASE_DATE = '2026-11-18';
   const STUDIO_NAME = 'ALPA Studio';
   const STUDIO_MEANING = '';
 
   const RELEASE_NOTES = [
+    {
+      version: '1.4.3',
+      date: '2026-11-18',
+      items: [
+        'PrepMat: corregidos los enunciados, opciones y explicaciones que mostraban símbolos $ sueltos y texto matemático pegado (por ejemplo, edades, mezclas, engranajes y fuerzas).',
+        'Las cantidades con unidades ahora se muestran limpias y legibles dentro de cada enunciado.',
+        'Las ecuaciones ya no se cortan entre renglones: pasan completas al siguiente renglón y las largas se pueden deslizar horizontalmente.',
+        'Las fórmulas en bloque aparecen centradas en su propio renglón.',
+        'Los saltos de línea de los enunciados se respetan y las palabras fluyen con naturalidad alrededor de las fórmulas.',
+        'Corregidas funciones como sen, cos y tan que aparecían sin formato matemático en preguntas de ángulo doble.',
+        'Sin cambios en el almacenamiento local ni en las demás herramientas.'
+      ]
+    },
     {
       version: '1.4.2',
       date: '2026-11-17',

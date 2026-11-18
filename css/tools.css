@@ -2881,3 +2881,72 @@ body.has-expanded-graph {
 }
 
 
+
+/* --------------------------------------------------------------------------
+   PrepMat · legibilidad de enunciados y explicaciones
+   - Las fórmulas en línea fluyen con el texto (saltos naturales entre palabras).
+   - Las fórmulas en bloque se centran en su renglón y deslizan en horizontal.
+   -------------------------------------------------------------------------- */
+.prepmat-question-statement,
+.prepmat-explanation-body {
+  white-space: pre-line;
+  word-break: normal;
+  overflow-wrap: break-word;
+  hyphens: manual;
+}
+
+.prepmat-question-statement .math-inline,
+.prepmat-explanation-body .math-inline {
+  /* La ecuación nunca se parte: se mueve completa al siguiente renglón */
+  display: inline-block;
+  white-space: nowrap;
+  vertical-align: middle;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.08rem 0.3rem;
+  margin: 0.1rem 0;
+  line-height: 1.5;
+}
+
+.prepmat-question-statement .m-rendered,
+.prepmat-explanation-body .m-rendered {
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
+.prepmat-question-statement .math-block,
+.prepmat-explanation-body .math-block {
+  white-space: normal;
+  display: block;
+  text-align: center;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+  margin: 0.6rem 0;
+  padding: 0.75rem 0.9rem;
+  font-size: 1.12rem;
+}
+
+.prepmat-question-statement .math-block .katex-display,
+.prepmat-explanation-body .math-block .katex-display,
+.prepmat-question-statement .math-block .m-rendered,
+.prepmat-explanation-body .math-block .m-rendered {
+  margin: 0 auto;
+  width: max-content;
+  max-width: none;
+}
+
+.prepmat-question-statement .katex,
+.prepmat-explanation-body .katex {
+  font-size: 1.04em;
+}
+
+@media (max-width: 640px) {
+  .prepmat-question-statement .math-block,
+  .prepmat-explanation-body .math-block {
+    font-size: 1rem;
+    padding: 0.6rem 0.65rem;
+  }
+}

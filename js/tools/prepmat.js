@@ -2686,9 +2686,9 @@ window.MatInteractiva = window.MatInteractiva || {};
       const formula = { sin: "2\\sin\\theta\\cos\\theta", cos: "\\cos^2\\theta - \\sin^2\\theta", tan: "\\frac{2\\sin\\theta\\cos\\theta}{\\cos^2\\theta - \\sin^2\\theta}" }[fn];
       return {
         calculator: "none",
-        question: `Si $\\theta$ es un ángulo agudo y $\\sin(\\theta) = \\frac{${o}}{${h}}$, calcula el valor exacto de ${fn}(2\\theta)$:`,
+        question: `Si $\\theta$ es un ángulo agudo y $\\sin(\\theta) = \\frac{${o}}{${h}}$, calcula el valor exacto de $\\${fn}(2\\theta)$:`,
         options: this.buildUniqueOptions(ans, wrong, (k) => this.formatFrac(nC + k, dC)),
-        explanation: `Como $\\theta$ es agudo, $\\cos(\\theta) = \\sqrt{1 - \\left(\\frac{${o}}{${h}}\\right)^2} = \\frac{${a}}{${h}}$. Aplicando la identidad de ángulo doble: $${fn}(2\\theta) = ${formula} = ${ans}$$`
+        explanation: `Como $\\theta$ es agudo, $\\cos(\\theta) = \\sqrt{1 - \\left(\\frac{${o}}{${h}}\\right)^2} = \\frac{${a}}{${h}}$. Aplicando la identidad de ángulo doble: $\\${fn}(2\\theta) = ${formula} = ${ans}$`
       };
     },
 
@@ -2836,7 +2836,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       calculator: "none",
       question: `Determina el valor de $x$ que satisface la ecuación logarítmica:\n$$\\log_{${b}}(x + ${c}) = ${n}$$`,
       options: this.buildUniqueOptions(`x = ${x}`, [`x = ${n * b - c}`, `x = ${pot + c}`, `x = ${Math.pow(n, b) - c}`], (k) => `x = ${x + k * 2}`),
-      explanation: `1) **Condición de dominio**: el argumento debe cumplir $x + ${c} \\gt 0$. 2) **Conversión a forma exponencial**: por definición, $\\log_b(u) = n \\iff u = b^n$: $$x + ${c} = ${b}^{${n}} = ${pot}$$ 3) **Despeje**: $x = ${pot} - ${c} = ${x}$. Comprobación: ${x} + ${c} = ${pot} \\gt 0$ y $\\log_{${b}}(${pot}) = ${n}$.`
+      explanation: `1) **Condición de dominio**: el argumento debe cumplir $x + ${c} \\gt 0$. 2) **Conversión a forma exponencial**: por definición, $\\log_b(u) = n \\iff u = b^n$: $$x + ${c} = ${b}^{${n}} = ${pot}$$ 3) **Despeje**: $x = ${pot} - ${c} = ${x}$. Comprobación: $${x} + ${c} = ${pot} \\gt 0$ y $\\log_{${b}}(${pot}) = ${n}$.`
     };
   },
 
@@ -3372,7 +3372,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       calculator: "none",
       question: `Por el método de los discos, calcula el volumen del sólido de revolución generado al girar la curva $y = ${k === 1 ? "" : k}\\sqrt{x}$ en el intervalo $[0, ${a}]$ alrededor del eje $x$:`,
       options: this.buildUniqueOptions(ans, [`${num}\\pi\\text{ u}^3`, `${this.formatFrac(num, 3)}\\pi\\text{ u}^3`, `${this.formatFrac(k * a * a, 2)}\\pi\\text{ u}^3`], (step) => `${this.formatFrac(num + step * 2, 2)}\\pi\\text{ u}^3`),
-      explanation: `El volumen por discos circulares perpendiculares al eje $x$ es $V = \\pi\\int_a^b [f(x)]^2\\,dx$. Elevando $f(x) = ${k === 1 ? "" : k}\\sqrt{x}$ al cuadrado obtenemos ${k * k}x$: $$V = \\pi \\int_{0}^{${a}} ${k * k === 1 ? "" : k * k}x\\,dx = \\pi \\left[${this.formatFrac(k * k, 2)}x^2\\right]_0^{${a}} = ${ans}$$`
+      explanation: `El volumen por discos circulares perpendiculares al eje $x$ es $V = \\pi\\int_a^b [f(x)]^2\\,dx$. Elevando $f(x) = ${k === 1 ? "" : k}\\sqrt{x}$ al cuadrado obtenemos $${k * k}x$: $$V = \\pi \\int_{0}^{${a}} ${k * k === 1 ? "" : k * k}x\\,dx = \\pi \\left[${this.formatFrac(k * k, 2)}x^2\\right]_0^{${a}} = ${ans}$$`
     };
   },
 
@@ -3575,13 +3575,13 @@ window.MatInteractiva = window.MatInteractiva || {};
       return {
         calculator: 'basic',
         isWordProblem: true,
-        question: `Una cisterna de laboratorio contiene ${total}\\text{ L}$ de solución. En la mañana se extrae $\\frac{${n1}}{${den1}}$ del volumen total y por la tarde se utiliza $\\frac{${n2}}{${den2}}$ del **volumen restante**. ¿Cuántos litros quedan al final del día?`,
+        question: `Una cisterna de laboratorio contiene $${total}\\text{ L}$ de solución. En la mañana se extrae $\\frac{${n1}}{${den1}}$ del volumen total y por la tarde se utiliza $\\frac{${n2}}{${den2}}$ del **volumen restante**. ¿Cuántos litros quedan al final del día?`,
         options: this.buildUniqueOptions(
           `${finalL}\\text{ L}`,
           [`${queda1}\\text{ L}`, `${total - sacado1 - Math.round((total * n2) / den2)}\\text{ L}`, `${sacado1 + sacado2}\\text{ L}`],
           (k) => `${finalL + k * unit}\\text{ L}`
         ),
-        explanation: `1) **Extracción de la mañana**: $\\frac{${n1}}{${den1}}(${total}) = ${sacado1}\\text{ L}$, por lo que quedan ${total} - ${sacado1} = ${queda1}\\text{ L}$. 2) **Extracción de la tarde**: $\\frac{${n2}}{${den2}}$ de lo restante son $\\frac{${n2}}{${den2}}(${queda1}) = ${sacado2}\\text{ L}$. 3) **Volumen final**: ${queda1} - ${sacado2} = ${finalL}\\text{ L}$.`
+        explanation: `1) **Extracción de la mañana**: $\\frac{${n1}}{${den1}}(${total}) = ${sacado1}\\text{ L}$, por lo que quedan $${total} - ${sacado1} = ${queda1}\\text{ L}$. 2) **Extracción de la tarde**: $\\frac{${n2}}{${den2}}$ de lo restante son $\\frac{${n2}}{${den2}}(${queda1}) = ${sacado2}\\text{ L}$. 3) **Volumen final**: $${queda1} - ${sacado2} = ${finalL}\\text{ L}$.`
       };
     },
 
@@ -3593,13 +3593,13 @@ window.MatInteractiva = window.MatInteractiva || {};
       return {
         calculator: 'basic',
         isWordProblem: true,
-        question: `En un mapa topográfico elaborado a escala $1 : ${scaleK}$, dos estaciones geodésicas están separadas por ${cm}\\text{ cm}$. ¿Cuál es la distancia real en kilómetros entre ambas estaciones?`,
+        question: `En un mapa topográfico elaborado a escala $1 : ${scaleK}$, dos estaciones geodésicas están separadas por $${cm}\\text{ cm}$. ¿Cuál es la distancia real en kilómetros entre ambas estaciones?`,
         options: this.buildUniqueOptions(
           `${kmFmt}\\text{ km}`,
           [`${Number((km * 10).toFixed(2))}\\text{ km}`, `${Number((km / 10).toFixed(3))}\\text{ km}`, `${cm * 2}\\text{ km}`],
           (k) => `${Number((km + k * 0.5).toFixed(2))}\\text{ km}`
         ),
-        explanation: `La escala $1 : ${scaleK}$ indica que $1\\text{ cm}$ en el plano equivale a ${scaleK}\\text{ cm}$ reales. Como $1\\text{ km} = 100\\,000\\text{ cm}$: $d = \\frac{${cm} \\times ${scaleK}}{100\\,000} = ${kmFmt}\\text{ km}$`
+        explanation: `La escala $1 : ${scaleK}$ indica que $1\\text{ cm}$ en el plano equivale $a ${scaleK}\\text{ cm}$ reales. Como $1\\text{ km} = 100\\,000\\text{ cm}$: $d = \\frac{${cm} \\times ${scaleK}}{100\\,000} = ${kmFmt}\\text{ km}$`
       };
     },
 
@@ -3613,13 +3613,13 @@ window.MatInteractiva = window.MatInteractiva || {};
       return {
         calculator: 'basic',
         isWordProblem: true,
-        question: `Un químico mezcla ${v1}\\text{ L}$ de una solución ácida al ${p1}\\%$ con ${v2}\\text{ L}$ de otra solución al ${p2}\\%$. ¿Cuál es el porcentaje de concentración de la mezcla resultante?`,
+        question: `Un químico mezcla $${v1}\\text{ L}$ de una solución ácida al $${p1}\\%$ con $${v2}\\text{ L}$ de otra solución al $${p2}\\%$. ¿Cuál es el porcentaje de concentración de la mezcla resultante?`,
         options: this.buildUniqueOptions(
           `${pFinal}\\%`,
           [`${Math.round((p1 + p2) / 2)}\\%`, `${pFinal + 4}\\%`, `${Math.max(1, pFinal - 5)}\\%`],
           (k) => `${pFinal + k * 2}\\%`
         ),
-        explanation: `Calculamos el soluto puro aportado por cada solución: $S = ${v1}(0.${p1}) + ${v2}(0.${p2}) = \\frac{${num}}{100}\\text{ L}$ Dividiendo entre el volumen total ${v1} + ${v2} = ${totalVol}\\text{ L}$ y multiplicando por $100$: $C = \\frac{${num}}{${totalVol}}\\% = ${pFinal}\\%$`
+        explanation: `Calculamos el soluto puro aportado por cada solución: $S = ${v1}(0.${p1}) + ${v2}(0.${p2}) = \\frac{${num}}{100}\\text{ L}$ Dividiendo entre el volumen total $${v1} + ${v2} = ${totalVol}\\text{ L}$ y multiplicando por $100$: $C = \\frac{${num}}{${totalVol}}\\% = ${pFinal}\\%$`
       };
     },
 
@@ -3632,9 +3632,9 @@ window.MatInteractiva = window.MatInteractiva || {};
       return {
         calculator: 'none',
         isWordProblem: true,
-        question: `Dos engranajes acoplados tienen ${a}$ dientes y ${b}$ dientes respectivamente. Se marca el diente de contacto inicial en ambos y comienzan a girar. ¿Cuántas vueltas completas debe dar el primer engranaje (${a}$ dientes) para que las marcas vuelvan a coincidir por primera vez?`,
+        question: `Dos engranajes acoplados tienen $${a}$ dientes $y ${b}$ dientes respectivamente. Se marca el diente de contacto inicial en ambos y comienzan a girar. ¿Cuántas vueltas completas debe dar el primer engranaje ($${a}$ dientes) para que las marcas vuelvan a coincidir por primera vez?`,
         options: this.buildUniqueOptions(`${vueltasA}`, [`${m}`, `${m / b}`, `${vueltasA + 2}`], (k) => `${vueltasA + k + 2}`),
-        explanation: `Las marcas coinciden cada vez que han pasado un número de dientes que es múltiplo común de ${a}$ y ${b}$. El mínimo número de dientes es $\\operatorname{MCM}(${a}, ${b}) = ${m}$. Como el primer engranaje avanza ${a}$ dientes por vuelta, necesita $\\frac{${m}}{${a}} = ${vueltasA}$ vueltas.`
+        explanation: `Las marcas coinciden cada vez que han pasado un número de dientes que es múltiplo común de $${a}$ y $${b}$. El mínimo número de dientes es $\\operatorname{MCM}(${a}, ${b}) = ${m}$. Como el primer engranaje avanza $${a}$ dientes por vuelta, necesita $\\frac{${m}}{${a}} = ${vueltasA}$ vueltas.`
       };
     },
 
@@ -3648,13 +3648,13 @@ window.MatInteractiva = window.MatInteractiva || {};
       return {
         calculator: 'basic',
         isWordProblem: true,
-        question: `Un cultivo experimental inicia con ${p0}$ bacterias y su población se ${r === 2 ? 'duplica' : 'triplica'} cada ${stepH}$ horas. ¿Cuántas bacterias habrá exactamente al cabo de ${totalT}$ horas?`,
+        question: `Un cultivo experimental inicia con $${p0}$ bacterias y su población se ${r === 2 ? 'duplica' : 'triplica'} cada $${stepH}$ horas. ¿Cuántas bacterias habrá exactamente al cabo de $${totalT}$ horas?`,
         options: this.buildUniqueOptions(
           `${pFinal}`,
           [`${p0 * r * hours}`, `${p0 * Math.pow(r, hours - 1)}`, `${p0 * Math.pow(r, hours + 1)}`],
           (k) => `${pFinal + k * p0}`
         ),
-        explanation: `En ${totalT}$ horas transcurren $n = \\frac{${totalT}}{${stepH}} = ${hours}$ ciclos de crecimiento con razón $r = ${r}$. Aplicamos la progresión geométrica $P(n) = P_0 \\cdot r^n$: $P(${hours}) = ${p0} \\cdot ${r}^{${hours}} = ${p0} \\times ${Math.pow(r, hours)} = ${pFinal}\\text{ bacterias}$`
+        explanation: `En $${totalT}$ horas transcurren $n = \\frac{${totalT}}{${stepH}} = ${hours}$ ciclos de crecimiento con razón $r = ${r}$. Aplicamos la progresión geométrica $P(n) = P_0 \\cdot r^n$: $P(${hours}) = ${p0} \\cdot ${r}^{${hours}} = ${p0} \\times ${Math.pow(r, hours)} = ${pFinal}\\text{ bacterias}$`
       };
     },
 
@@ -3669,13 +3669,13 @@ window.MatInteractiva = window.MatInteractiva || {};
       return {
         calculator: 'none',
         isWordProblem: true,
-        question: `Un protocolo de mantenimiento programado se ejecutó un día **${names[startIdx]}**. Si el sistema programa la siguiente inspección exactamente ${days}$ días después, ¿en qué día de la semana caerá dicha inspección?`,
+        question: `Un protocolo de mantenimiento programado se ejecutó un día **${names[startIdx]}**. Si el sistema programa la siguiente inspección exactamente $${days}$ días después, ¿en qué día de la semana caerá dicha inspección?`,
         options: this.buildUniqueOptions(
           `\\text{${names[targetIdx]}}`,
           [`\\text{${names[(targetIdx + 1) % 7]}}`, `\\text{${names[(targetIdx + 6) % 7]}}`, `\\text{${names[(startIdx + 3) % 7]}}`],
           (k) => `\\text{Día ${((targetIdx + k) % 7) + 1}}`
         ),
-        explanation: `Dividimos los ${days}$ días entre $7$ para reducir módulo $7$: $${days} = 7(${cycles}) + ${rem} \\implies ${days} \\equiv ${rem} \\pmod 7$ Avanzando ${rem}$ días desde **${names[startIdx]}** obtenemos **${names[targetIdx]}**.`
+        explanation: `Dividimos los $${days}$ días entre $7$ para reducir módulo $7$: $${days} = 7(${cycles}) + ${rem} \\implies ${days} \\equiv ${rem} \\pmod 7$ Avanzando $${rem}$ días desde **${names[startIdx]}** obtenemos **${names[targetIdx]}**.`
       };
     },
 
@@ -3690,9 +3690,9 @@ window.MatInteractiva = window.MatInteractiva || {};
       return {
         calculator: 'none',
         isWordProblem: true,
-        question: `Actualmente la edad de un ingeniero es ${k}$ veces la de su aprendiz. Dentro de ${y}$ años la suma de sus edades será de ${pFut + hFut}$ años. ¿Cuál es la edad actual del aprendiz?`,
+        question: `Actualmente la edad de un ingeniero es $${k}$ veces la de su aprendiz. Dentro de $${y}$ años la suma de sus edades será de $${pFut + hFut}$ años. ¿Cuál es la edad actual del aprendiz?`,
         options: this.buildUniqueOptions(`${h}\\text{ años}`, [`${p}\\text{ años}`, `${h + 2}\\text{ años}`, `${diff}\\text{ años}`], (s) => `${h + s * 3}\\text{ años}`),
-        explanation: `Sea $x$ la edad actual del aprendiz; el ingeniero tiene ${k}x$. En ${y}$ años tendrán $(x + ${y})$ y $(${k}x + ${y})$: $(x + ${y}) + (${k}x + ${y}) = ${pFut + hFut} \\implies ${k + 1}x + ${2 * y} = ${pFut + hFut} \\implies x = ${h}\\text{ años}$`
+        explanation: `Sea $x$ la edad actual del aprendiz; el ingeniero tiene $${k}x$. En $${y}$ años tendrán $(x + ${y})$ y $(${k}x + ${y})$: $(x + ${y}) + (${k}x + ${y}) = ${pFut + hFut} \\implies ${k + 1}x + ${2 * y} = ${pFut + hFut} \\implies x = ${h}\\text{ años}$`
       };
     },
 
@@ -3704,9 +3704,9 @@ window.MatInteractiva = window.MatInteractiva || {};
       return {
         calculator: 'basic',
         isWordProblem: true,
-        question: `Una tostadora combina café arábica de ${p1}\\text{ MXN/kg}$ con café robusta de ${p2}\\text{ MXN/kg}$ para preparar un lote total de ${totalKg}\\text{ kg}$ cuyo valor acumulado es de ${totalCost}\\text{ MXN}$. ¿Cuántos kilogramos de café arábica (${p1}\\text{ MXN/kg}$) se emplearon?`,
+        question: `Una tostadora combina café arábica de $${p1}\\text{ MXN/kg}$ con café robusta de $${p2}\\text{ MXN/kg}$ para preparar un lote total de $${totalKg}\\text{ kg}$ cuyo valor acumulado es de $${totalCost}\\text{ MXN}$. ¿Cuántos kilogramos de café arábica ($${p1}\\text{ MXN/kg}$) se emplearon?`,
         options: this.buildUniqueOptions(`${x}\\text{ kg}`, [`${y}\\text{ kg}`, `${x + 4}\\text{ kg}`, `${Math.round(totalKg / 2)}\\text{ kg}`], (s) => `${x + s * 3}\\text{ kg}`),
-        explanation: `Planteamos el sistema $x + y = ${totalKg}$ y ${p1}x + ${p2}y = ${totalCost}$. Despejando $y = ${totalKg} - x$ y sustituyendo: $${p1}x + ${p2}(${totalKg} - x) = ${totalCost} \\implies ${p1 - p2}x = ${totalCost - p2 * totalKg} \\implies x = ${x}\\text{ kg}$`
+        explanation: `Planteamos el sistema $x $+ y = ${totalKg}$ y ${p1}x + ${p2}y = ${totalCost}$. Despejando $y = ${totalKg} - x$ y sustituyendo: $${p1}x + ${p2}(${totalKg} - x) = ${totalCost} \\implies ${p1 - p2}x = ${totalCost - p2 * totalKg} \\implies x = ${x}\\text{ kg}$`
       };
     },
 
@@ -3718,7 +3718,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       return {
         calculator: 'none',
         isWordProblem: true,
-        question: `Una placa rectangular de aluminio tiene un área de ${area}\\text{ cm}^2$. Si su largo mide ${diff}\\text{ cm}$ más que su ancho, ¿cuánto mide su ancho?`,
+        question: `Una placa rectangular de aluminio tiene un área de $${area}\\text{ cm}^2$. Si su largo mide $${diff}\\text{ cm}$ más que su ancho, ¿cuánto mide su ancho?`,
         options: this.buildUniqueOptions(`${w}\\text{ cm}`, [`${l}\\text{ cm}`, `${w + 2}\\text{ cm}`, `${Math.max(2, w - 3)}\\text{ cm}`], (k) => `${w + k * 2}\\text{ cm}`),
         explanation: `Si el ancho es $w$, el largo es $w + ${diff}$. Entonces $w(w + ${diff}) = ${area} \\implies w^2 + ${diff}w - ${area} = 0$. Factorizando: $(w + ${l})(w - ${w}) = 0$ Como la longitud es positiva, $w = ${w}\\text{ cm}$.`
       };
@@ -3735,7 +3735,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       return {
         calculator: 'basic',
         isWordProblem: true,
-        question: `Una lancha recorre ${safeDist}\\text{ km}$ río abajo (a favor de la corriente) y regresa los mismos ${safeDist}\\text{ km}$ río arriba en un tiempo total de ${totalTime}\\text{ h}$. Si la velocidad de la corriente es de ${vC}\\text{ km/h}$, ¿cuál es la rapidez de la lancha en aguas tranquilas?`,
+        question: `Una lancha recorre $${safeDist}\\text{ km}$ río abajo (a favor de la corriente) y regresa los mismos $${safeDist}\\text{ km}$ río arriba en un tiempo total de $${totalTime}\\text{ h}$. Si la velocidad de la corriente es de $${vC}\\text{ km/h}$, ¿cuál es la rapidez de la lancha en aguas tranquilas?`,
         options: this.buildUniqueOptions(`${vB}\\text{ km/h}`, [`${vB + vC}\\text{ km/h}`, `${vB - vC}\\text{ km/h}`, `${vB + 4}\\text{ km/h}`], (k) => `${vB + k * 2}\\text{ km/h}`),
         explanation: `Sea $v$ la rapidez en aguas tranquilas. Río abajo viaja a $v + ${vC}$ y río arriba a $v - ${vC}$. Planteamos: $\\frac{${safeDist}}{v + ${vC}} + \\frac{${safeDist}}{v - ${vC}} = ${totalTime}$ Verificando con $v = ${vB}$: $\\frac{${safeDist}}{${vB + vC}} + \\frac{${safeDist}}{${vB - vC}} = ${safeDist / (vB + vC)} + ${safeDist / (vB - vC)} = ${totalTime}\\text{ h}$.`
       };
@@ -3747,7 +3747,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       return {
         calculator: 'none',
         isWordProblem: true,
-        question: `La intensidad acústica en decibelios se define como $L = 10\\log_{10}\\left(\\frac{I}{I_0}\\right)$. Si el ruido de una turbina es ${ratio}$ veces mayor que el umbral de referencia $I_0$, ¿cuántos decibelios ($\\text{dB}$) produce?`,
+        question: `La intensidad acústica en decibelios se define como $L = 10\\log_{10}\\left(\\frac{I}{I_0}\\right)$. Si el ruido de una turbina es $${ratio}$ veces mayor que el umbral de referencia $I_0$, ¿cuántos decibelios ($\\text{dB}$) produce?`,
         options: this.buildUniqueOptions(`${10 * magDiff}\\text{ dB}`, [`${magDiff}\\text{ dB}`, `${Math.round(ratio / 10)}\\text{ dB}`, `${10 * (magDiff + 1)}\\text{ dB}`], (k) => `${10 * magDiff + k * 5}\\text{ dB}`),
         explanation: `Sustituimos $\\frac{I}{I_0} = ${ratio} = 10^{${magDiff}}$ en la ecuación logarítmica: $L = 10\\log_{10}(10^{${magDiff}}) = 10 \\cdot ${magDiff} = ${10 * magDiff}\\text{ dB}$`
       };
@@ -3779,18 +3779,18 @@ window.MatInteractiva = window.MatInteractiva || {};
         return {
           calculator: 'basic',
           isWordProblem: true,
-          question: `Un teatro vende boletos a ${baseP}\\text{ MXN}$ y logra una asistencia promedio de ${baseQ}$ personas. Por cada incremento de ${stepP}\\text{ MXN}$ en el boleto asisten ${dropQ}$ personas menos. ¿Cuál debe ser el **precio del boleto** para maximizar el ingreso total?`,
+          question: `Un teatro vende boletos $a ${baseP}\\text{ MXN}$ y logra una asistencia promedio de $${baseQ}$ personas. Por cada incremento de $${stepP}\\text{ MXN}$ en el boleto asisten $${dropQ}$ personas menos. ¿Cuál debe ser el **precio del boleto** para maximizar el ingreso total?`,
           options: this.buildUniqueOptions(`${pOpt}\\text{ MXN}`, [`${baseP + safeNT}\\text{ MXN}`, `${pOpt + 15}\\text{ MXN}`, `${baseP + stepP}\\text{ MXN}`], (s) => `${pOpt + s * 5}\\text{ MXN}`),
-          explanation: `Si realizamos $n$ aumentos de ${stepP}\\text{ MXN}$, el ingreso es $I(n) = (${baseP} + ${stepP}n)(${baseQ} - ${dropQ}n) = ${stepP * dropQ}(${baseP / stepP} + n)(${baseQ / dropQ} - n)$. Su vértice está en el punto medio de las raíces: $n^* = \\frac{-${baseP / stepP} + ${baseQ / dropQ}}{2} = ${safeNT}$ Por lo tanto, el precio óptimo es ${baseP} + ${stepP}(${safeNT}) = ${pOpt}\\text{ MXN}$.`
+          explanation: `Si realizamos $n$ aumentos de $${stepP}\\text{ MXN}$, el ingreso es $I(n) = (${baseP} + ${stepP}n)(${baseQ} - ${dropQ}n) = ${stepP * dropQ}(${baseP / stepP} + n)(${baseQ / dropQ} - n)$. Su vértice está en el punto medio de las raíces: $n^* = \\frac{-${baseP / stepP} + ${baseQ / dropQ}}{2} = ${safeNT}$ Por lo tanto, el precio óptimo es $${baseP} + ${stepP}(${safeNT}) = ${pOpt}\\text{ MXN}$.`
         };
       }
       const pOpt = p0 + dP * nOpt;
       return {
         calculator: 'basic',
         isWordProblem: true,
-        question: `Un servicio mensual cuesta ${p0}\\text{ MXN}$ con ${q0}$ clientes activos. Un estudio estima que por cada ${dP}\\text{ MXN}$ de aumento se pierde $1$ cliente. ¿Qué precio mensual maximiza el ingreso?`,
+        question: `Un servicio mensual cuesta $${p0}\\text{ MXN}$ con $${q0}$ clientes activos. Un estudio estima que por cada $${dP}\\text{ MXN}$ de aumento se pierde $1$ cliente. ¿Qué precio mensual maximiza el ingreso?`,
         options: this.buildUniqueOptions(`${pOpt}\\text{ MXN}`, [`${p0 + nOpt}\\text{ MXN}`, `${pOpt + 20}\\text{ MXN}`, `${pOpt - 10}\\text{ MXN}`], (s) => `${pOpt + s * 15}\\text{ MXN}`),
-        explanation: `El ingreso tras $n$ aumentos es $I(n) = (${p0} + ${dP}n)(${q0} - n)$. Igualando la derivada o hallando el punto medio de sus raíces $n_1 = ${r1}$ y $n_2 = ${r2}$: $n^* = \\frac{${r1} + ${r2}}{2} = ${nOpt}$ El precio óptimo es ${p0} + ${dP}(${nOpt}) = ${pOpt}\\text{ MXN}$.`
+        explanation: `El ingreso tras $n$ aumentos es $I(n) = (${p0} + ${dP}n)(${q0} - n)$. Igualando la derivada o hallando el punto medio de sus raíces $n_1 = ${r1}$ y $n_2 = ${r2}$: $n^* = \\frac{${r1} + ${r2}}{2} = ${nOpt}$ El precio óptimo es $${p0} + ${dP}(${nOpt}) = ${pOpt}\\text{ MXN}$.`
       };
     },
 
@@ -3800,7 +3800,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       return {
         calculator: 'none',
         isWordProblem: true,
-        question: `Una escalera rígida de ${c}\\text{ m}$ se apoya sobre un muro vertical de forma que su pie dista ${a}\\text{ m}$ de la base de la pared. ¿A qué altura del muro alcanza el extremo superior de la escalera?`,
+        question: `Una escalera rígida de $${c}\\text{ m}$ se apoya sobre un muro vertical de forma que su pie dista $${a}\\text{ m}$ de la base de la pared. ¿A qué altura del muro alcanza el extremo superior de la escalera?`,
         options: this.buildUniqueOptions(`${b}\\text{ m}`, [`${c - a}\\text{ m}`, `${a + b}\\text{ m}`, `${Math.round((a + c) / 2)}\\text{ m}`], (k) => `${b + k * 2}\\text{ m}`),
         explanation: `La escalera forma un triángulo rectángulo cuya hipotenusa es $c = ${c}\\text{ m}$ y la base es $a = ${a}\\text{ m}$. Por el Teorema de Pitágoras: $h = \\sqrt{${c}^2 - ${a}^2} = \\sqrt{${c * c} - ${a * a}} = \\sqrt{${b * b}} = ${b}\\text{ m}$`
       };
@@ -3812,7 +3812,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       return {
         calculator: 'none',
         isWordProblem: true,
-        question: `A cierta hora del día, un poste vertical de ${hVar}\\text{ m}$ proyecta una sombra de ${sVar}\\text{ m}$ sobre el suelo plano. En el mismo instante, una antena cercana proyecta una sombra de ${sTorre}\\text{ m}$. ¿Cuál es la altura de la antena?`,
+        question: `A cierta hora del día, un poste vertical de $${hVar}\\text{ m}$ proyecta una sombra de $${sVar}\\text{ m}$ sobre el suelo plano. En el mismo instante, una antena cercana proyecta una sombra de $${sTorre}\\text{ m}$. ¿Cuál es la altura de la antena?`,
         options: this.buildUniqueOptions(`${hTorre}\\text{ m}`, [`${hTorre + hVar}\\text{ m}`, `${sTorre + hVar}\\text{ m}`, `${Math.max(4, hTorre - k)}\\text{ m}`], (step) => `${hTorre + step * 3}\\text{ m}`),
         explanation: `Los rayos solares paralelos forman triángulos semejantes por el Teorema de Tales: $\\frac{H}{${sTorre}} = \\frac{${hVar}}{${sVar}} \\implies H = ${hVar} \\cdot \\frac{${sTorre}}{${sVar}} = ${hVar} \\times ${k} = ${hTorre}\\text{ m}$`
       };
@@ -3824,7 +3824,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       return {
         calculator: 'none',
         isWordProblem: true,
-        question: `Alrededor de una glorieta circular de ${r}\\text{ m}$ de radio se construye una andador concéntrico de ${ancho}\\text{ m}$ de ancho uniforme. ¿Cuál es el área exacta de la superficie del andador?`,
+        question: `Alrededor de una glorieta circular de $${r}\\text{ m}$ de radio se construye una andador concéntrico de $${ancho}\\text{ m}$ de ancho uniforme. ¿Cuál es el área exacta de la superficie del andador?`,
         options: this.buildUniqueOptions(`${areaNum}\\pi\\text{ m}^2`, [`${ancho * ancho}\\pi\\text{ m}^2`, `${R * R}\\pi\\text{ m}^2`, `${2 * areaNum}\\pi\\text{ m}^2`], (k) => `${areaNum + k * 4}\\pi\\text{ m}^2`),
         explanation: `El radio exterior del andador es $R = ${r} + ${ancho} = ${R}\\text{ m}$. El área corresponde a la diferencia de dos círculos concéntricos (corona circular): $A = \\pi(R^2 - r^2) = \\pi(${R}^2 - ${r}^2) = \\pi(${R * R} - ${r * r}) = ${areaNum}\\pi\\text{ m}^2$`
       };
@@ -3837,7 +3837,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       return {
         calculator: 'basic',
         isWordProblem: true,
-        question: `Una tolva industrial tiene forma de cono circular recto con un radio interior de ${r}\\text{ m}$ y una altura de ${h}\\text{ m}$. ¿Cuál es su capacidad volumétrica exacta en $\\text{m}^3$?`,
+        question: `Una tolva industrial tiene forma de cono circular recto con un radio interior de $${r}\\text{ m}$ y una altura de $${h}\\text{ m}$. ¿Cuál es su capacidad volumétrica exacta en $\\text{m}^3$?`,
         options: this.buildUniqueOptions(`${vol}\\pi\\text{ m}^3`, [`${r * r * h}\\pi\\text{ m}^3`, `${vol * 2}\\pi\\text{ m}^3`, `${r * h}\\pi\\text{ m}^3`], (k) => `${vol + k * 3}\\pi\\text{ m}^3`),
         explanation: `El volumen de un cono recto equivale a la tercera parte del cilindro con igual base y altura: $V = \\frac{1}{3}\\pi r^2 h = \\frac{1}{3}\\pi(${r})^2(${h}) = ${vol}\\pi\\text{ m}^3$`
       };
@@ -3850,7 +3850,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       return {
         calculator: 'basic',
         isWordProblem: true,
-        question: `Un terreno triangular cerrado mide $a = ${a}\\text{ m}$, $b = ${b}\\text{ m}$ y $c = ${c}\\text{ m}$ de perímetro. Si cada metro cuadrado de pasto cuesta ${precioM2}\\text{ MXN}$, ¿cuánto costará empastar exactamente todo el terreno?`,
+        question: `Un terreno triangular cerrado mide $a = ${a}\\text{ m}$, $b = ${b}\\text{ m}$ y $c = ${c}\\text{ m}$ de perímetro. Si cada metro cuadrado de pasto cuesta $${precioM2}\\text{ MXN}$, ¿cuánto costará empastar exactamente todo el terreno?`,
         options: this.buildUniqueOptions(`${totalCost}\\text{ MXN}`, [`${area * 100}\\text{ MXN}`, `${s * precioM2}\\text{ MXN}`, `${totalCost + 2 * precioM2}\\text{ MXN}`], (k) => `${totalCost + k * precioM2}\\text{ MXN}`),
         explanation: `Hallamos el semiperímetro $s = \\frac{${a}+${b}+${c}}{2} = ${s}\\text{ m}$ y aplicamos la fórmula de Herón: $A = \\sqrt{${s}(${s - a})(${s - b})(${s - c})} = ${area}\\text{ m}^2$ Multiplicando por el costo unitario: $\\text{Costo} = ${area} \\times ${precioM2} = ${totalCost}\\text{ MXN}$`
       };
@@ -3862,7 +3862,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       return {
         calculator: 'none',
         isWordProblem: true,
-        question: `En la sección circular de una tubería de radio $R = ${R}\\text{ cm}$, el nivel de agua forma una cuerda horizontal de ${chord}\\text{ cm}$ de longitud. ¿A qué distancia $d$ del centro de la tubería se encuentra la superficie del agua?`,
+        question: `En la sección circular de una tubería de radio $R = ${R}\\text{ cm}$, el nivel de agua forma una cuerda horizontal de $${chord}\\text{ cm}$ de longitud. ¿A qué distancia $d$ del centro de la tubería se encuentra la superficie del agua?`,
         options: this.buildUniqueOptions(`${d}\\text{ cm}`, [`${c}\\text{ cm}`, `${R - d}\\text{ cm}`, `${R + d}\\text{ cm}`], (k) => `${d + k * 2}\\text{ cm}`),
         explanation: `La perpendicular trazada desde el centro biseca la cuerda en dos segmentos de $\\frac{${chord}}{2} = ${c}\\text{ cm}$, formando con el radio $R = ${R}$ un triángulo rectángulo: $d = \\sqrt{R^2 - c^2} = \\sqrt{${R}^2 - ${c}^2} = \\sqrt{${R * R - c * c}} = ${d}\\text{ cm}$`
       };
@@ -3875,7 +3875,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       return {
         calculator: 'none',
         isWordProblem: true,
-        question: `Para salvar un desnivel vertical de ${h}\\text{ m}$ se instala una rampa recta inclinada $30^\\circ$ respecto a la horizontal. ¿Cuál es exactamente la longitud de la rampa?`,
+        question: `Para salvar un desnivel vertical de $${h}\\text{ m}$ se instala una rampa recta inclinada $30^\\circ$ respecto a la horizontal. ¿Cuál es exactamente la longitud de la rampa?`,
         options: this.buildUniqueOptions(`${L}\\text{ m}`, [`${h}\\sqrt{3}\\text{ m}`, `${h}\\sqrt{2}\\text{ m}`, `${3 * h}\\text{ m}`], (k) => `${L + k * 2}\\text{ m}`),
         explanation: `El desnivel es el cateto opuesto al ángulo de $30^\\circ$ y la rampa es la hipotenusa $L$: $\\sin(30^\\circ) = \\frac{${h}}{L} \\implies \\frac{1}{2} = \\frac{${h}}{L} \\implies L = ${L}\\text{ m}$`
       };
@@ -3888,7 +3888,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       return {
         calculator: 'none',
         isWordProblem: true,
-        question: `Un topógrafo mide el ángulo de elevación hacia la cima de una torre y obtiene $30^\\circ$. Luego camina ${d}\\text{ m}$ en línea recta hacia la base y el ángulo pasa a $60^\\circ$. ¿Cuál es exactamente la altura $h$ de la torre?`,
+        question: `Un topógrafo mide el ángulo de elevación hacia la cima de una torre y obtiene $30^\\circ$. Luego camina $${d}\\text{ m}$ en línea recta hacia la base y el ángulo pasa a $60^\\circ$. ¿Cuál es exactamente la altura $h$ de la torre?`,
         options: this.buildUniqueOptions(`${k}\\sqrt{3}\\text{ m}`, [`${d}\\sqrt{3}\\text{ m}`, `${k}\\text{ m}`, `${d}\\text{ m}`], (s) => `${k + s}\\sqrt{3}\\text{ m}`),
         explanation: `En el segundo punto $x = \\frac{h}{\\tan 60^\\circ} = \\frac{h}{\\sqrt{3}}$. En el primero $x + ${d} = \\frac{h}{\\tan 30^\\circ} = h\\sqrt{3}$. Restando: $${d} = h\\left(\\sqrt{3} - \\frac{1}{\\sqrt{3}}\\right) = \\frac{2h}{\\sqrt{3}} \\implies h = ${k}\\sqrt{3}\\text{ m}$`
       };
@@ -3899,7 +3899,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       return {
         calculator: 'none',
         isWordProblem: true,
-        question: `Desde lo alto de un faro a ${h}\\text{ m}$ sobre el nivel del mar, el ángulo de depresión hacia un velero es de $45^\\circ$. ¿A qué distancia horizontal de la base del faro se encuentra el velero?`,
+        question: `Desde lo alto de un faro $a ${h}\\text{ m}$ sobre el nivel del mar, el ángulo de depresión hacia un velero es de $45^\\circ$. ¿A qué distancia horizontal de la base del faro se encuentra el velero?`,
         options: this.buildUniqueOptions(`${h}\\text{ m}`, [`${h}\\sqrt{2}\\text{ m}`, `${2 * h}\\text{ m}`, `${Math.round(h / 2)}\\text{ m}`], (k) => `${h + k * 5}\\text{ m}`),
         explanation: `Por ángulos alternos internos entre paralelas horizontales, el ángulo de elevación desde el velero es $45^\\circ$. Como $\\tan(45^\\circ) = 1$: $\\tan(45^\\circ) = \\frac{${h}}{d} = 1 \\implies d = ${h}\\text{ m}$`
       };
@@ -3914,7 +3914,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       return {
         calculator: 'none',
         isWordProblem: true,
-        question: `Dos cables tiran de un anclaje aplicando fuerzas de ${f1}\\text{ N}$ y ${f2}\\text{ N}$ que forman entre sí un ángulo de $120^\\circ$. ¿Cuál es exactamente la magnitud de la fuerza resultante?`,
+        question: `Dos cables tiran de un anclaje aplicando fuerzas de $${f1}\\text{ N}$ y $${f2}\\text{ N}$ que forman entre sí un ángulo de $120^\\circ$. ¿Cuál es exactamente la magnitud de la fuerza resultante?`,
         options: this.buildUniqueOptions(`${rRes}\\text{ N}`, [`${f1 + f2}\\text{ N}`, `${Math.abs(f1 - f2)}\\text{ N}`, `${rRes + 2}\\text{ N}`], (k) => `${rRes + k + 3}\\text{ N}`),
         explanation: `Por regla del paralelogramo y Ley de los Cosenos con $\\cos(120^\\circ) = -\\frac{1}{2}$ (o ángulo suplementario $60^\\circ$ en el triángulo vectorial): $R^2 = ${f1}^2 + ${f2}^2 + 2(${f1})(${f2})\\cos(120^\\circ) = ${f1 * f1} + ${f2 * f2} - ${f1 * f2} = ${rRes * rRes} \\implies R = ${rRes}\\text{ N}$`
       };
@@ -3927,7 +3927,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       return {
         calculator: 'basic',
         isWordProblem: true,
-        question: `Dos linderos de un jardín triangular miden ${a}\\text{ m}$ y ${b}\\text{ m}$ y forman un ángulo interior de $30^\\circ$. ¿Cuál es el área exacta del jardín?`,
+        question: `Dos linderos de un jardín triangular miden $$${a}\\text{ m}$ y ${b}\\text{ m}$ y forman un ángulo interior de $30^\\circ$. ¿Cuál es el área exacta del jardín?`,
         options: this.buildUniqueOptions(`${area}\\text{ m}^2`, [`${2 * area}\\text{ m}^2`, `${a * b}\\text{ m}^2`, `${area + a}\\text{ m}^2`], (k) => `${area + k * 3}\\text{ m}^2`),
         explanation: `Usamos la fórmula trigonométrica $A = \\frac{1}{2}ab\\sin(C)$ con $\\sin(30^\\circ) = \\frac{1}{2}$: $A = \\frac{1}{2}(${a})(${b})\\left(\\frac{1}{2}\\right) = ${area}\\text{ m}^2$`
       };
@@ -3941,9 +3941,9 @@ window.MatInteractiva = window.MatInteractiva || {};
       return {
         calculator: 'none',
         isWordProblem: true,
-        question: `La posición de un pistón armónico sigue la ley $y(t) = ${amp}\\sin(${w}t)$ (con $t$ en segundos). ¿Cuál es el **primer instante positivo** $t \\gt 0$ en que el pistón alcanza su amplitud máxima de ${amp}\\text{ cm}$?`,
+        question: `La posición de un pistón armónico sigue la ley $y(t) = ${amp}\\sin(${w}t)$ (con $t$ en segundos). ¿Cuál es el **primer instante positivo** $t \\gt 0$ en que el pistón alcanza su amplitud máxima de $${amp}\\text{ cm}$?`,
         options: this.buildUniqueOptions(`${tAns}\\text{ s}`, [`\\frac{\\pi}{${w}}\\text{ s}`, `\\frac{\\pi}{${4 * w}}\\text{ s}`, `\\frac{2\\pi}{${w}}\\text{ s}`], (k) => `\\frac{${k + 2}\\pi}{${2 * w}}\\text{ s}`),
-        explanation: `Igualamos $y(t) = ${amp}$: ${amp}\\sin(${w}t) = ${amp} \\implies \\sin(${w}t) = 1$. El menor ángulo positivo donde $\\sin(\\theta) = 1$ es $\\theta = \\frac{\\pi}{2}$: $${w}t = \\frac{\\pi}{2} \\implies t = ${tAns}\\text{ s}$`
+        explanation: `Igualamos $y(t) = ${amp}$: $${amp}\\sin(${w}t) = ${amp} \\implies \\sin(${w}t) = 1$. El menor ángulo positivo donde $\\sin(\\theta) = 1$ es $\\theta = \\frac{\\pi}{2}$: $${w}t = \\frac{\\pi}{2} \\implies t = ${tAns}\\text{ s}$`
       };
     },
 
@@ -4006,7 +4006,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       return {
         calculator: 'none',
         isWordProblem: true,
-        question: `Una antena parabólica tiene un diámetro de apertura de ${diam}\\text{ m}$ y una profundidad central de ${prof}\\text{ m}$. Tomando el vértice en el origen $(0,0)$ con ecuación $x^2 = 4py$, ¿a qué altura sobre el vértice debe colocarse el receptor en el foco?`,
+        question: `Una antena parabólica tiene un diámetro de apertura de $${diam}\\text{ m}$ y una profundidad central de $${prof}\\text{ m}$. Tomando el vértice en el origen $(0,0)$ con ecuación $x^2 = 4py$, ¿a qué altura sobre el vértice debe colocarse el receptor en el foco?`,
         options: this.buildUniqueOptions(`${p}\\text{ m}`, [`${4 * p}\\text{ m}`, `${2 * p}\\text{ m}`, `${p + 2}\\text{ m}`], (k) => `${p + k + 2}\\text{ m}`),
         explanation: `El borde de la antena pasa por el punto $(x, y) = (${x}, ${prof})$ (radio mitad del diámetro). Sustituyendo en $x^2 = 4py$: $(${x})^2 = 4p(${prof}) \\implies ${x * x} = ${4 * prof}p \\implies p = \\frac{${x * x}}{${4 * prof}} = ${p}\\text{ m}$`
       };
@@ -4024,7 +4024,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       return {
         calculator: 'none',
         isWordProblem: true,
-        question: `Un puente tiene un arco semielíptico con una luz (ancho) total en la base de ${2 * a}\\text{ m}$ y una altura máxima central de ${b}\\text{ m}$. ¿Cuál es la altura del arco a una distancia de ${distCenter}\\text{ m}$ del centro?`,
+        question: `Un puente tiene un arco semielíptico con una luz (ancho) total en la base de $${2 * a}\\text{ m}$ y una altura máxima central de $${b}\\text{ m}$. ¿Cuál es la altura del arco a una distancia de $${distCenter}\\text{ m}$ del centro?`,
         options: this.buildUniqueOptions(`${heightAtD}\\text{ m}`, [`${b - distCenter}\\text{ m}`, `${3 * m}\\text{ m}`, `${heightAtD + 2}\\text{ m}`], (s) => `${heightAtD + s}\\text{ m}`),
         explanation: `La ecuación de la elipse centrada en el origen es $\\frac{x^2}{${a}^2} + \\frac{y^2}{${b}^2} = 1$. Evaluamos en $x = ${distCenter}$ ($\\frac{x}{a} = \\frac{3}{5}$): $\\frac{9}{25} + \\frac{y^2}{${b * b}} = 1 \\implies \\frac{y^2}{${b * b}} = \\frac{16}{25} \\implies y = \\frac{4}{5}(${b}) = ${heightAtD}\\text{ m}$`
       };
@@ -4038,7 +4038,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       return {
         calculator: 'none',
         isWordProblem: true,
-        question: `Un ducto recto sigue la trayectoria ${A0}x ${this.signTerm(B, 'y')} ${this.signTerm(C)} = 0$. ¿Cuál es la distancia perpendicular mínima desde una estación de bombeo situada en $(${x0}, ${y0})$ hasta el ducto?`,
+        question: `Un ducto recto sigue la trayectoria $${A0}x ${this.signTerm(B, 'y')} ${this.signTerm(C)} = 0$. ¿Cuál es la distancia perpendicular mínima desde una estación de bombeo situada en $(${x0}, ${y0})$ hasta el ducto?`,
         options: this.buildUniqueOptions(`${d}\\text{ u}`, [`${d * n}\\text{ u}`, `${n}\\text{ u}`, `${d + 3}\\text{ u}`], (k) => `${d + k}\\text{ u}`),
         explanation: `Aplicamos la distancia punto-recta $d = \\frac{|Ax_0 + By_0 + C|}{\\sqrt{A^2+B^2}}$: $d = \\frac{|${A0}(${x0}) ${this.signTerm(B)}(${y0}) ${this.signTerm(C)}|}{\\sqrt{${A0}^2 + (${B})^2}} = \\frac{${d * n}}{${n}} = ${d}\\text{ u}$`
       };
@@ -4053,13 +4053,13 @@ window.MatInteractiva = window.MatInteractiva || {};
       return {
         calculator: 'basic',
         isWordProblem: true,
-        question: `Una empresa cobra un cargo fijo de ${baseFee}\\text{ MXN}$ más ${rate1}\\text{ MXN}$ por cada $\\text{m}^3$ de los primeros ${cut}\\text{ m}^3$ consumidos, y ${rate2}\\text{ MXN}$ por cada $\\text{m}^3$ adicional excedente. ¿Cuánto pagará un usuario que consume ${cons}\\text{ m}^3$?`,
+        question: `Una empresa cobra un cargo fijo de $${baseFee}\\text{ MXN}$ más $${rate1}\\text{ MXN}$ por cada $\\text{m}^3$ de los primeros $${cut}\\text{ m}^3$ consumidos, $y ${rate2}\\text{ MXN}$ por cada $\\text{m}^3$ adicional excedente. ¿Cuánto pagará un usuario que consume $${cons}\\text{ m}^3$?`,
         options: this.buildUniqueOptions(
           `${total}\\text{ MXN}`,
           [`${baseFee + cons * rate2}\\text{ MXN}`, `${baseFee + cons * rate1}\\text{ MXN}`, `${cons * rate2}\\text{ MXN}`],
           (k) => `${total + k * 10}\\text{ MXN}`
         ),
-        explanation: `Evaluamos el segundo tramo (${cons} \\gt ${cut}$): los primeros ${cut}\\text{ m}^3$ cuestan ${cut}(${rate1}) = ${cut * rate1}\\text{ MXN}$, y los ${cons - cut}\\text{ m}^3$ excedentes cuestan ${cons - cut}(${rate2}) = ${(cons - cut) * rate2}\\text{ MXN}$. Sumando el cargo fijo: $C(${cons}) = ${baseFee} + ${cut * rate1} + ${(cons - cut) * rate2} = ${total}\\text{ MXN}$`
+        explanation: `Evaluamos el segundo tramo ($${cons} \\gt ${cut}$): los primeros $${cut}\\text{ m}^3$ cuestan $${cut}(${rate1}) = ${cut * rate1}\\text{ MXN}$, y los $${cons - cut}\\text{ m}^3$ excedentes cuestan $${cons - cut}(${rate2}) = ${(cons - cut) * rate2}\\text{ MXN}$. Sumando el cargo fijo: $C(${cons}) = ${baseFee} + ${cut * rate1} + ${(cons - cut) * rate2} = ${total}\\text{ MXN}$`
       };
     },
 
@@ -4085,7 +4085,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       return {
         calculator: 'basic',
         isWordProblem: true,
-        question: `El costo mensual de fabricación de $x$ sensores está modelado por $C(x) = ${a}x + ${b}\\text{ MXN}$. Usando la función inversa $C^{-1}(y)$, ¿cuántos sensores pueden fabricarse con un presupuesto exacto de ${T}\\text{ MXN}$?`,
+        question: `El costo mensual de fabricación de $x$ sensores está modelado por $C(x) = ${a}x + ${b}\\text{ MXN}$. Usando la función inversa $C^{-1}(y)$, ¿cuántos sensores pueden fabricarse con un presupuesto exacto de $${T}\\text{ MXN}$?`,
         options: this.buildUniqueOptions(`${xSol}`, [`${Math.round(T / a)}`, `${xSol + 2}`, `${Math.max(1, xSol - 3)}`], (k) => `${xSol + k * 2}`),
         explanation: `Invertimos la función lineal $y = ${a}x + ${b} \\implies C^{-1}(y) = \\frac{y - ${b}}{${a}}$. Evaluando en $y = ${T}$: $x = \\frac{${T} - ${b}}{${a}} = \\frac{${T - b}}{${a}} = ${xSol}\\text{ sensores}$`
       };
@@ -4116,7 +4116,7 @@ window.MatInteractiva = window.MatInteractiva || {};
         return {
           calculator: 'basic',
           isWordProblem: true,
-          question: `Un isótopo radiactivo tiene una vida media de ${safeT}$ días, por lo que su masa sigue $M(t) = ${safeP0}\\left(\\frac{1}{2}\\right)^{t/${safeT}}$. ¿Cuántos gramos quedarán tras ${safeK * safeT}$ días?`,
+          question: `Un isótopo radiactivo tiene una vida media de $${safeT}$ días, por lo que su masa sigue $M(t) = ${safeP0}\\left(\\frac{1}{2}\\right)^{t/${safeT}}$. ¿Cuántos gramos quedarán tras $${safeK * safeT}$ días?`,
           options: this.buildUniqueOptions(`${safeAns}\\text{ g}`, [`${safeP0 / 2}\\text{ g}`, `${safeAns * 2}\\text{ g}`, `${safeP0 / (safeK * 2)}\\text{ g}`], (s) => `${safeAns + s * 2}\\text{ g}`),
           explanation: `Transcurren $\\frac{${safeK * safeT}}{${safeT}} = ${safeK}$ semividas completas: $M(${safeK * safeT}) = ${safeP0}\\left(\\frac{1}{2}\\right)^{${safeK}} = \\frac{${safeP0}}{${Math.pow(2, safeK)}} = ${safeAns}\\text{ g}$`
         };
@@ -4124,7 +4124,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       return {
         calculator: 'basic',
         isWordProblem: true,
-        question: `Un isótopo radiactivo tiene una vida media de ${T}$ días según $M(t) = ${p0}\\left(\\frac{1}{2}\\right)^{t/${T}}$. ¿Cuántos gramos permanecerán tras ${tTotal}$ días?`,
+        question: `Un isótopo radiactivo tiene una vida media de $${T}$ días según $M(t) = ${p0}\\left(\\frac{1}{2}\\right)^{t/${T}}$. ¿Cuántos gramos permanecerán tras $${tTotal}$ días?`,
         options: this.buildUniqueOptions(`${ans}\\text{ g}`, [`${p0 / 2}\\text{ g}`, `${ans * 2}\\text{ g}`, `${ans + 4}\\text{ g}`], (s) => `${ans + s * 3}\\text{ g}`),
         explanation: `Dividiendo $t = ${tTotal}$ entre la vida media $T = ${T}$ obtenemos ${k} periodos de semidesintegración: $M(${tTotal}) = ${p0}\\left(\\frac{1}{2}\\right)^{${k}} = ${ans}\\text{ g}$`
       };
@@ -4180,7 +4180,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       return {
         calculator: 'none',
         isWordProblem: true,
-        question: `Una viga de ${L}\\text{ m}$ está apoyada sobre una pared vertical. Su base resbala alejándose de la pared a razón de $\\frac{dx}{dt} = ${dxDt}\\text{ m/s}$. En el instante en que la base está a $x = ${x}\\text{ m}$ de la pared (altura $y = ${y}\\text{ m}$), ¿a qué velocidad cambia la altura $\\frac{dy}{dt}$?`,
+        question: `Una viga de $${L}\\text{ m}$ está apoyada sobre una pared vertical. Su base resbala alejándose de la pared a razón de $\\frac{dx}{dt} = ${dxDt}\\text{ m/s}$. En el instante en que la base está a $x = ${x}\\text{ m}$ de la pared (altura $y = ${y}\\text{ m}$), ¿a qué velocidad cambia la altura $\\frac{dy}{dt}$?`,
         options: this.buildUniqueOptions(ans, [`${this.formatFrac(-dyNum, y)}\\text{ m/s}`, `${this.formatFrac(-y * dxDt, x)}\\text{ m/s}`, `-${dxDt}\\text{ m/s}`], (k) => `${this.formatFrac(dyNum - k, y)}\\text{ m/s}`),
         explanation: `Por Pitágoras $x^2 + y^2 = ${L}^2$. Derivando implícitamente respecto al tiempo $t$: $2x\\frac{dx}{dt} + 2y\\frac{dy}{dt} = 0 \\implies \\frac{dy}{dt} = -\\frac{x}{y}\\frac{dx}{dt}$ Sustituyendo $x = ${x},\\; y = ${y},\\; \\frac{dx}{dt} = ${dxDt}$: $\\frac{dy}{dt} = -\\frac{${x}}{${y}}(${dxDt}) = ${ans}$`
       };
@@ -4207,9 +4207,9 @@ window.MatInteractiva = window.MatInteractiva || {};
       return {
         calculator: 'basic',
         isWordProblem: true,
-        question: `De una lámina cuadrada metálica de ${L}\\text{ cm}$ de lado se recortan cuatro esquinas cuadradas iguales de lado $x$ y se doblan las pestañas para formar una caja sin tapa. ¿Qué tamaño de corte $x$ maximiza el volumen de la caja?`,
+        question: `De una lámina cuadrada metálica de $${L}\\text{ cm}$ de lado se recortan cuatro esquinas cuadradas iguales de lado $x$ y se doblan las pestañas para formar una caja sin tapa. ¿Qué tamaño de corte $x$ maximiza el volumen de la caja?`,
         options: this.buildUniqueOptions(`x = ${k}\\text{ cm}`, [`x = ${3 * k}\\text{ cm}`, `x = ${2 * k}\\text{ cm}`, `x = ${k + 2}\\text{ cm}`], (s) => `x = ${k + s * 3}\\text{ cm}`),
-        explanation: `La base mide ${L} - 2x$ y la altura es $x$, luego $V(x) = x(${L} - 2x)^2$ con $0 \\lt x \\lt ${3 * k}$. Derivando por regla del producto: $V'(x) = (${L} - 2x)(${L} - 6x) = 0$ Como $x = ${3 * k}$ anula la base, el máximo ocurre en $x = \\frac{${L}}{6} = ${k}\\text{ cm}$ ($V_{\\max} = ${vMax}\\text{ cm}^3$).`
+        explanation: `La base mide $${L} - 2x$ y la altura es $x$, luego $V(x) = x(${L} - 2x)^2$ con $0 \\lt x \\lt ${3 * k}$. Derivando por regla del producto: $V'(x) = (${L} - 2x)(${L} - 6x) = 0$ Como $x = ${3 * k}$ anula la base, el máximo ocurre en $x = \\frac{${L}}{6} = ${k}\\text{ cm}$ ($V_{\\max} = ${vMax}\\text{ cm}^3$).`
       };
     },
 
@@ -4233,7 +4233,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       return {
         calculator: 'none',
         isWordProblem: true,
-        question: `Un tanque recibe agua a una tasa instantánea de $Q(t) = ${3 * a}t^2 + ${2 * b}t$ litros por minuto. ¿Cuántos litros totales ingresan al tanque durante los primeros ${T}$ minutos ($0 \\le t \\le ${T}$)?`,
+        question: `Un tanque recibe agua a una tasa instantánea de $Q(t) = ${3 * a}t^2 + ${2 * b}t$ litros por minuto. ¿Cuántos litros totales ingresan al tanque durante los primeros $${T}$ minutos ($0 \\le t \\le ${T}$)?`,
         options: this.buildUniqueOptions(`${vol}\\text{ L}`, [`${3 * a * T * T + 2 * b * T}\\text{ L}`, `${vol + T}\\text{ L}`, `${Math.round(vol / 2)}\\text{ L}`], (k) => `${vol + k * 4}\\text{ L}`),
         explanation: `El volumen acumulado es la integral definida del caudal: $V = \\int_0^{${T}} (${3 * a}t^2 + ${2 * b}t)\\,dt = \\left[${a === 1 ? '' : a}t^3 + ${b === 1 ? '' : b}t^2\\right]_0^{${T}} = ${a}(${T})^3 + ${b}(${T})^2 = ${vol}\\text{ L}$`
       };
@@ -4289,7 +4289,7 @@ window.MatInteractiva = window.MatInteractiva || {};
         isWordProblem: true,
         question: `La fachada de una puerta parabólica queda limitada por la curva $y = ${H} - ${k === 1 ? '' : k}x^2$ y el suelo horizontal $y = 0$ (en metros). ¿Cuál es el área exacta de la puerta?`,
         options: this.buildUniqueOptions(`${area}\\text{ m}^2`, [`${area / 2}\\text{ m}^2`, `${2 * a * H}\\text{ m}^2`, `${area + H}\\text{ m}^2`], (s) => `${area + s * 4}\\text{ m}^2`),
-        explanation: `Cortes con el suelo: ${H} - ${k}x^2 = 0 \\implies x = \\pm ${a}$. Por simetría par en $[-${a}, ${a}]$: $A = 2\\int_0^{${a}} (${H} - ${k === 1 ? '' : k}x^2)\\,dx = 2\\left[${H}x - ${this.formatFrac(k, 3)}x^3\\right]_0^{${a}} = ${area}\\text{ m}^2$`
+        explanation: `Cortes con el suelo: $${H} - ${k}x^2 = 0 \\implies x = \\pm ${a}$. Por simetría par en $[-${a}, ${a}]$: $A = 2\\int_0^{${a}} (${H} - ${k === 1 ? '' : k}x^2)\\,dx = 2\\left[${H}x - ${this.formatFrac(k, 3)}x^3\\right]_0^{${a}} = ${area}\\text{ m}^2$`
       };
     },
 
@@ -4318,7 +4318,7 @@ window.MatInteractiva = window.MatInteractiva || {};
         isWordProblem: true,
         question: `Un circuito de dos mallas obedece la ecuación matricial de resistencias $R\\mathbf{I} = \\mathbf{V}$:\n$\\begin{pmatrix} ${a} & ${b} \\\\ ${c} & ${d} \\end{pmatrix}\\begin{pmatrix} I_1 \\\\ I_2 \\end{pmatrix} = \\begin{pmatrix} ${v1} \\\\ ${v2} \\end{pmatrix}$\nSi sabes que $I_1 = ${i1}\\text{ A}$, ¿cuánto vale la segunda corriente $I_2$?`,
         options: this.buildUniqueOptions(`${i2}\\text{ A}`, [`${i1}\\text{ A}`, `${i2 + 2}\\text{ A}`, `${Math.max(1, i2 - 2)}\\text{ A}`], (k) => `${i2 + k + 2}\\text{ A}`),
-        explanation: `De la primera fila del producto matricial obtenemos ${a}I_1 + ${b}I_2 = ${v1}$. Sustituyendo $I_1 = ${i1}$: $${a}(${i1}) + ${b}I_2 = ${v1} \\implies ${b}I_2 = ${v1 - a * i1} \\implies I_2 = ${i2}\\text{ A}$ Comprobamos en la fila 2: ${c}(${i1}) + ${d}(${i2}) = ${v2}$.`
+        explanation: `De la primera fila del producto matricial obtenemos $${a}I_1 + ${b}I_2 = ${v1}$. Sustituyendo $I_1 = ${i1}$: $${a}(${i1}) + ${b}I_2 = ${v1} \\implies ${b}I_2 = ${v1 - a * i1} \\implies I_2 = ${i2}\\text{ A}$ Comprobamos en la fila 2: $${c}(${i1}) + ${d}(${i2}) = ${v2}$.`
       };
     },
 
@@ -4346,7 +4346,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       return {
         calculator: 'none',
         isWordProblem: true,
-        question: `Una malla gráfica de área ${area0}\\text{ cm}^2$ se somete a una transformación lineal representada por la matriz:\n$T = \\begin{pmatrix} ${a} & ${b} \\\\ ${c} & ${d} \\end{pmatrix}$\n¿Cuál será el área de la región transformada?`,
+        question: `Una malla gráfica de área $${area0}\\text{ cm}^2$ se somete a una transformación lineal representada por la matriz:\n$T = \\begin{pmatrix} ${a} & ${b} \\\\ ${c} & ${d} \\end{pmatrix}$\n¿Cuál será el área de la región transformada?`,
         options: this.buildUniqueOptions(`${newArea}\\text{ cm}^2`, [`${area0 + det}\\text{ cm}^2`, `${det}\\text{ cm}^2`, `${(a + d) * area0}\\text{ cm}^2`], (k) => `${newArea + k * area0}\\text{ cm}^2`),
         explanation: `Toda transformación lineal escala el área por el valor absoluto de su determinante: $|\\det(T)| = |(${a})(${d}) - (${b})(${c})| = ${det}$ Por lo tanto, el área resultante es $|\\det(T)| \\cdot A_0 = ${det} \\times ${area0} = ${newArea}\\text{ cm}^2$.`
       };
@@ -4367,7 +4367,7 @@ window.MatInteractiva = window.MatInteractiva || {};
           [`P(${t}) = ${p0}e^{-${expVal}}`, `P(${t}) = ${p0}(1 + ${expVal})`, `P(${t}) = ${Math.round(p0 * rate)}e^{${t}}`],
           (k) => `P(${t}) = ${p0 + k * 50}e^{${expVal}}`
         ),
-        explanation: `Separando variables en $\\frac{dP}{P} = ${rate}\\,dt$ obtenemos $P(t) = P_0 e^{${rate}t}$. Con $P(0) = ${p0}$ y evaluando en $t = ${t}$ (${rate} \\times ${t} = ${expVal}$): $${ans}$`
+        explanation: `Separando variables en $\\frac{dP}{P} = ${rate}\\,dt$ obtenemos $P(t) = P_0 e^{${rate}t}$. Con $P(0) = ${p0}$ y evaluando en $t = ${t}$ ($${rate} \\times ${t} = ${expVal}$): $${ans}$`
       };
     },
 
@@ -4380,13 +4380,13 @@ window.MatInteractiva = window.MatInteractiva || {};
       return {
         calculator: 'none',
         isWordProblem: true,
-        question: `Según la Ley de Enfriamiento de Newton, una taza a $T(0) = ${t0}\\;^\\circ\\text{C}$ se enfría en una sala a ${tAmb}\\;^\\circ\\text{C}$ cumpliendo $\\frac{dT}{dt} = -${k}(T - ${tAmb})$. ¿Cuál es la función solución $T(t)$?`,
+        question: `Según la Ley de Enfriamiento de Newton, una taza a $T(0) = ${t0}\\;^\\circ\\text{C}$ se enfría en una sala $a ${tAmb}\\;^\\circ\\text{C}$ cumpliendo $\\frac{dT}{dt} = -${k}(T - ${tAmb})$. ¿Cuál es la función solución $T(t)$?`,
         options: this.buildUniqueOptions(
           ans,
           [`T(t) = ${t0}e^{-${k}t}`, `T(t) = ${tAmb} + ${t0}e^{-${k}t}`, `T(t) = ${tAmb} + ${diff}e^{${k}t}`],
           (s) => `T(t) = ${tAmb + s} + ${diff}e^{-${k}t}`
         ),
-        explanation: `La solución general de $T' + ${k}T = ${k}\\cdot ${tAmb}$ es $T(t) = ${tAmb} + Ce^{-${k}t}$. Aplicando $T(0) = ${tAmb} + C = ${t0}$, obtenemos $C = ${diff}$, quedando ${ans}$.`
+        explanation: `La solución general de $T' + ${k}T = ${k}\\cdot ${tAmb}$ es $T(t) = ${tAmb} + Ce^{-${k}t}$. Aplicando $T(0) = ${tAmb} + C = ${t0}$, obtenemos $C = ${diff}$, quedando $${ans}$.`
       };
     },
 
@@ -4408,7 +4408,7 @@ window.MatInteractiva = window.MatInteractiva || {};
           [`x(t) = C_1 e^{${-lo === 1 ? '' : -lo}t} + C_2 e^{${-hi === 1 ? '' : -hi}t}`, `x(t) = (C_1 + C_2 t)e^{${lo === -1 ? '-' : lo}t}`, `x(t) = C_1\\cos(${-lo}t) + C_2\\sin(${-hi}t)`],
           (k) => `x(t) = C_1 e^{${lo - k}t} + C_2 e^{${hi}t}`
         ),
-        explanation: `Resolvemos la ecuación característica $r^2 + ${p}r + ${q} = (r ${this.signTerm(-lo)})(r ${this.signTerm(-hi)}) = 0$, cuyas raíces son $r_1 = ${lo}$ y $r_2 = ${hi}$. Siendo reales negativas, el sistema es sobreamortiguado con solución ${ans}$.`
+        explanation: `Resolvemos la ecuación característica $r^2 + ${p}r + ${q} = (r ${this.signTerm(-lo)})(r ${this.signTerm(-hi)}) = 0$, cuyas raíces son $r_1 = ${lo}$ y $r_2 = ${hi}$. Siendo reales negativas, el sistema es sobreamortiguado con solución $${ans}$.`
       };
     }
 

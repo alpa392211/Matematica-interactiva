@@ -402,3 +402,11 @@ Este archivo documenta de forma acumulativa cada fase ejecutada, sus archivos mo
 
 
 
+
+---
+## v1.4.3 — PrepMat: enunciados legibles y ecuaciones sin cortes
+- **Qué cambió**:
+  - **Plantillas de preguntas ([js/tools/prepmat.js](../js/tools/prepmat.js))**: reparados ~107 casos donde faltaba el `$` de apertura (`${k}$ veces`) y quedaban textos como `vecesladesuaprendiz.Dentrode4` en pantalla; corregido `sin/cos/tan` sin barra invertida y un `$$` mal cerrado en ángulo doble.
+  - **Estilos ([css/tools.css](../css/tools.css))**: las fórmulas en línea de enunciados y explicaciones no se parten (`inline-block`, `nowrap`, `overflow-x: auto`); las de bloque se centran con desplazamiento horizontal; se respetan saltos de línea (`white-space: pre-line`).
+  - Verificado con auditoría automática de miles de preguntas generadas (sin `$` impares ni texto dentro de matemáticas).
+- **Verificación**: `node --test tests/` aprobado.
