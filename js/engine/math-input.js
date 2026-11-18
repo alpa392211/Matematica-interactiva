@@ -958,6 +958,10 @@ window.MatInteractiva = window.MatInteractiva || {};
           executeKeyOnController(ctrl, keyDef);
         });
       });
+
+      if (ns.App && typeof ns.App.refreshScrollStrips === 'function') {
+        ns.App.refreshScrollStrips(containerEl);
+      }
     }
 
     draw();

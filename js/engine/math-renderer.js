@@ -1041,9 +1041,13 @@ window.MatInteractiva = window.MatInteractiva || {};
       return '<div class="math-block">' + renderMath(mathContent.trim(), true) + '</div>';
     });
 
-    // 2. Expresiones matemáticas en línea $...$
-    out = out.replace(/\$([^$\n]+?)\$/g, function (_, mathContent) {
-      return '<span class="math-inline">' + renderMath(mathContent.trim(), false) + '</span>';
+    // 2. Expresiones matemáticas en línea $...$ (agrupando paréntesis/puntuación pegados)
+    out = out.replace(/([(\[«¿¡]+)?\$([^$\n]+?)\$([)\]».,;:!?%]+)?/g, function (_, openPunc, mathContent, closePunc) {
+      const inlineHtml = '<span class="math-inline">' + renderMath(mathContent.trim(), false) + '</span>';
+      if (openPunc || closePunc) {
+        return '<span class="math-inline-group">' + (openPunc || '') + inlineHtml + (closePunc || '') + '</span>';
+      }
+      return inlineHtml;
     });
 
     // 3. Negritas tipo Markdown **texto**

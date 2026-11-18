@@ -413,6 +413,9 @@ window.MatInteractiva = window.MatInteractiva || {};
       state.expanded = Boolean(nextExpanded);
       canvasCard.classList.toggle('is-graph-expanded', state.expanded);
       document.body.classList.toggle('has-expanded-graph', state.expanded);
+      if (ns.App && typeof ns.App.syncModalScrollLock === 'function') {
+        ns.App.syncModalScrollLock();
+      }
       if (state.expanded) {
         markGestureHintSeen();
         canvasCard.setAttribute('role', 'dialog');
@@ -716,6 +719,9 @@ window.MatInteractiva = window.MatInteractiva || {};
     const yMin = state.centerY - (height / 2) / state.scale;
     const yMax = state.centerY + (height / 2) / state.scale;
 
+    const originX = toScreenX(0);
+    const originY = toScreenY(0);
+
     // Cuadrícula secundaria y principal
     ctx.lineWidth = 1;
     ctx.strokeStyle = pal.grid;
@@ -723,7 +729,17 @@ window.MatInteractiva = window.MatInteractiva || {};
     const labelFontPx = Math.max(11, width < 420 ? 11 : 12);
     ctx.font = `${labelFontPx}px Inter, system-ui, sans-serif`;
 
+    const yLabelLeftSide = originX > width - 52;
+    const axisX = yLabelLeftSide
+      ? Math.min(width - 8, Math.max(40, originX - 8))
+      : Math.min(width - 42, Math.max(8, originX + 7));
+    const yColLeft = yLabelLeftSide ? axisX - 32 : axisX - 2;
+    const yColRight = yLabelLeftSide ? axisX + 2 : axisX + 32;
+    const axisY = Math.min(height - 10, Math.max(18, originY + 15));
+
     const firstGridX = Math.floor(xMin / gridStep) * gridStep;
+    let lastTickRight = -Infinity;
+    ctx.textAlign = 'center';
     for (let gx = firstGridX; gx <= xMax; gx += gridStep) {
       const sx = toScreenX(gx);
       ctx.beginPath();
@@ -732,12 +748,20 @@ window.MatInteractiva = window.MatInteractiva || {};
       ctx.stroke();
 
       if (Math.abs(gx) > 1e-6) {
-        const axisY = Math.min(height - 10, Math.max(16, toScreenY(0) + 15));
-        ctx.fillText(Number(gx.toFixed(3)).toString(), sx - 8, axisY);
+        const lbl = Number(gx.toFixed(3)).toString();
+        const halfW = (typeof ctx.measureText === 'function' ? ctx.measureText(lbl).width : lbl.length * 7) / 2;
+        if (sx - halfW < 14 || sx + halfW > width - 14) continue;
+        if (Math.abs(sx - originX) < halfW + 14) continue;
+        if (sx - halfW < yColRight + 4 && sx + halfW > yColLeft - 4) continue;
+        if (sx - halfW < lastTickRight + 8) continue;
+        ctx.fillText(lbl, sx, axisY);
+        lastTickRight = sx + halfW;
       }
     }
 
     const firstGridY = Math.floor(yMin / gridStep) * gridStep;
+    ctx.textAlign = yLabelLeftSide ? 'right' : 'left';
+    let lastTickY = Infinity;
     for (let gy = firstGridY; gy <= yMax; gy += gridStep) {
       const sy = toScreenY(gy);
       ctx.beginPath();
@@ -746,16 +770,19 @@ window.MatInteractiva = window.MatInteractiva || {};
       ctx.stroke();
 
       if (Math.abs(gy) > 1e-6) {
-        const axisX = Math.min(width - 34, Math.max(6, toScreenX(0) + 6));
-        ctx.fillText(Number(gy.toFixed(3)).toString(), axisX, sy + 4);
+        const lbl = Number(gy.toFixed(3)).toString();
+        if (sy < 18 || sy > height - 12) continue;
+        if (Math.abs(sy - originY) < 16) continue;
+        if (lastTickY - sy < 18) continue;
+        ctx.fillText(lbl, axisX, sy + 4);
+        lastTickY = sy;
       }
     }
+    ctx.textAlign = 'left';
 
     // Ejes cartesianos X e Y
     ctx.lineWidth = 1.6;
     ctx.strokeStyle = pal.axis;
-    const originX = toScreenX(0);
-    const originY = toScreenY(0);
 
     ctx.beginPath();
     ctx.moveTo(0, originY);

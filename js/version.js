@@ -10,12 +10,25 @@
 
   const APP_NAME = 'MateTic';
   const APP_TAGLINE = 'Matemáticas Interactivas';
-  const APP_VERSION = '1.5.2';
+  const APP_VERSION = '1.6.0';
   const APP_RELEASE_DATE = '2026-11-18';
   const STUDIO_NAME = 'ALPA Studio';
   const STUDIO_MEANING = '';
 
   const RELEASE_NOTES = [
+    {
+      version: '1.6.0',
+      date: '2026-11-18',
+      items: [
+        'Flechas indicadoras en barras deslizables: los selectores de temas, pestañas de lección, índices y teclados muestran una flecha hacia la derecha (›) cuando hay más opciones por deslizar.',
+        'Menú inicial más limpio: la pantalla de inicio destaca únicamente el botón Continuar y agrupa los demás accesos en un menú desplegable compacto.',
+        'Texto y fórmulas congruentes: los paréntesis y signos de puntuación junto a expresiones matemáticas permanecen unidos sin cortarse al saltar de renglón.',
+        'Gráficas ampliadas nítidas y sin recortes: reducida la transparencia en tarjetas, cabeceras, menús y gráficas expandidas (modo claro y oscuro) manteniendo todos los controles y etiquetas visibles.',
+        'Diseño adaptado a celular y tableta: ajustada la cabecera, barra lateral, botones flotantes y pestañas para pantallas medianas y móviles sin superposiciones ni desbordamientos.',
+        'Respuesta háptica universal: todos los botones, pestañas, interruptores y controles interactivos activan vibración táctil breve y uniforme cuando está disponible.',
+        'Avisos de confirmación al cambiar o salir: la aplicación solicita confirmación antes de cambiar durante un examen o sección de estudio activa y al intentar salir de MateTic.'
+      ]
+    },
     {
       version: '1.5.2',
       date: '2026-11-18',

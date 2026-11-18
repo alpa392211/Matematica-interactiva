@@ -518,6 +518,9 @@ window.MatInteractiva = window.MatInteractiva || {};
         });
         document.body.appendChild(backdrop);
         bindFnPanelEvents(backdrop);
+        if (ns.App && typeof ns.App.refreshScrollStrips === 'function') {
+          ns.App.refreshScrollStrips(backdrop);
+        }
         if (ns.App && typeof ns.App.syncModalScrollLock === 'function') {
           ns.App.syncModalScrollLock();
         }
@@ -530,6 +533,9 @@ window.MatInteractiva = window.MatInteractiva || {};
           desktopFnPanel.hidden = false;
           desktopFnPanel.innerHTML = renderFnPanelInner();
           bindFnPanelEvents(desktopFnPanel);
+          if (ns.App && typeof ns.App.refreshScrollStrips === 'function') {
+            ns.App.refreshScrollStrips(desktopFnPanel);
+          }
         }
       }
     }

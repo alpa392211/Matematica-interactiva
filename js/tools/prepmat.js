@@ -5299,10 +5299,25 @@ window.MatInteractiva = window.MatInteractiva || {};
       advanceExam(container);
     });
 
-    container.querySelector('#btn-pm-exit-exam')?.addEventListener('click', () => {
+    container.querySelector('#btn-pm-exit-exam')?.addEventListener('click', (ev) => {
       haptic('light');
-      uiState.view = 'config';
-      renderConfigView(container);
+      const proceedExit = () => {
+        abandonActiveExam();
+        renderConfigView(container);
+      };
+      if (ns.App && typeof ns.App.confirmAction === 'function') {
+        ns.App.confirmAction({
+          title: 'Examen en curso',
+          message: 'Estás realizando un examen en PrepMat. Si sales ahora perderás el progreso de esta evaluación.',
+          confirmText: 'Sí, salir del examen',
+          cancelText: 'Seguir en el examen',
+          danger: true,
+          returnFocusEl: ev.currentTarget,
+          onConfirm: proceedExit
+        });
+      } else {
+        proceedExit();
+      }
     });
 
     container.querySelector('#btn-pm-open-calc')?.addEventListener('click', (ev) => {
@@ -5519,6 +5534,17 @@ window.MatInteractiva = window.MatInteractiva || {};
     });
   }
 
+  function hasActiveExam() {
+    return Boolean(uiState.view === 'exam' && ExamEngine.currentExam);
+  }
+
+  function abandonActiveExam() {
+    clearTimerAndKeys();
+    uiState.view = 'config';
+    uiState.selectedOptionIndex = null;
+    ExamEngine.currentExam = null;
+  }
+
   function renderPrepMatView(container, presetConfig = null) {
     if (!container) return;
     if (presetConfig && typeof presetConfig === 'object') {
@@ -5540,6 +5566,8 @@ window.MatInteractiva = window.MatInteractiva || {};
     Storage: PrepMatStorage,
     QuestionGenerator,
     ExamEngine,
+    hasActiveExam,
+    abandonActiveExam,
     renderPrepMatView
   };
 })(window.MatInteractiva);

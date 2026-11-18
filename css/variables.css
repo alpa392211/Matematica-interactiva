@@ -11,12 +11,12 @@
      1. Paleta Base y Atmósfera (Modo Claro — Fondo Índigo Cristal por defecto)
      ------------------------------------------------------------------------ */
   --bg-body: #e6ebf5;
-  --bg-surface: rgba(255, 255, 255, 0.75);
-  --bg-surface-solid: rgba(255, 255, 255, 0.80);
-  --bg-surface-alt: rgba(241, 245, 249, 0.72);
-  --bg-surface-hover: rgba(238, 242, 255, 0.86);
-  --bg-sidebar: rgba(248, 250, 252, 0.52);
-  --bg-glass: rgba(255, 255, 255, 0.50);
+  --bg-surface: rgba(255, 255, 255, 0.94);
+  --bg-surface-solid: #ffffff;
+  --bg-surface-alt: rgba(241, 245, 249, 0.94);
+  --bg-surface-hover: rgba(238, 242, 255, 0.96);
+  --bg-sidebar: rgba(248, 250, 252, 0.92);
+  --bg-glass: rgba(255, 255, 255, 0.84);
 
   /* Halos ambientales */
   --lg-ambient-1: rgba(99, 102, 241, 0.25);
@@ -24,23 +24,24 @@
   --lg-ambient-3: rgba(129, 140, 248, 0.22);
 
   /* Parámetros ópticos Liquid Glass (Modo Normal) */
-  --lg-blur-nav: 28px;
-  --lg-blur-panel: 20px;
-  --lg-blur-modal: 32px;
-  --lg-blur-backdrop: 15px;
-  --lg-sat-nav: 190%;
-  --lg-sat-panel: 175%;
+  --lg-blur-nav: 24px;
+  --lg-blur-panel: 18px;
+  --lg-blur-modal: 28px;
+  --lg-blur-backdrop: 14px;
+  --lg-sat-nav: 170%;
+  --lg-sat-panel: 160%;
   --lg-sheen-opacity: 0.72;
 
-  /* Superficies traslúcidas flotantes + velo protector (scrim) */
-  --lg-header-bg: rgba(255, 255, 255, 0.54);
-  --lg-header-scrim: linear-gradient(180deg, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0.24) 100%);
-  --lg-sidebar-bg: rgba(248, 250, 252, 0.56);
-  --lg-sidebar-scrim: linear-gradient(180deg, rgba(255, 255, 255, 0.50) 0%, rgba(248, 250, 252, 0.30) 100%);
-  --lg-modal-bg: rgba(255, 255, 255, 0.68);
-  --lg-modal-scrim: linear-gradient(180deg, rgba(255, 255, 255, 0.44) 0%, rgba(248, 250, 252, 0.32) 100%);
-  --lg-popover-bg: rgba(255, 255, 255, 0.84);
-  --lg-backdrop-bg: rgba(15, 23, 42, 0.34);
+  /* Superficies con transparencia reducida + velo protector (WCAG AA) */
+  --lg-header-bg: rgba(255, 255, 255, 0.90);
+  --lg-header-scrim: linear-gradient(180deg, rgba(255, 255, 255, 0.78) 0%, rgba(255, 255, 255, 0.62) 100%);
+  --lg-sidebar-bg: rgba(248, 250, 252, 0.92);
+  --lg-sidebar-scrim: linear-gradient(180deg, rgba(255, 255, 255, 0.80) 0%, rgba(248, 250, 252, 0.68) 100%);
+  --lg-modal-bg: rgba(255, 255, 255, 0.97);
+  --lg-modal-scrim: linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(248, 250, 252, 0.82) 100%);
+  --lg-popover-bg: rgba(255, 255, 255, 0.98);
+  --lg-backdrop-bg: rgba(15, 23, 42, 0.56);
+  --lg-expanded-graph-bg: #f8fafc;
 
   /* Píldoras discretas y activas en cristal */
   --lg-pill-idle-bg: rgba(255, 255, 255, 0.46);
@@ -159,26 +160,27 @@
 html[data-theme="dark"] {
   color-scheme: dark;
 
-  --bg-body: #070b15;
-  --bg-surface: rgba(15, 23, 42, 0.72);
-  --bg-surface-solid: rgba(15, 23, 42, 0.78);
-  --bg-surface-alt: rgba(30, 41, 59, 0.68);
-  --bg-surface-hover: rgba(49, 46, 129, 0.44);
-  --bg-sidebar: rgba(15, 23, 42, 0.54);
-  --bg-glass: rgba(15, 23, 42, 0.50);
+    --bg-body: #070b15;
+    --bg-surface: rgba(15, 23, 42, 0.94);
+    --bg-surface-solid: #0f172a;
+    --bg-surface-alt: rgba(30, 41, 59, 0.92);
+    --bg-surface-hover: rgba(49, 46, 129, 0.56);
+    --bg-sidebar: rgba(15, 23, 42, 0.92);
+    --bg-glass: rgba(15, 23, 42, 0.86);
 
-  --lg-ambient-1: rgba(99, 102, 241, 0.28);
-  --lg-ambient-2: rgba(245, 158, 11, 0.14);
-  --lg-ambient-3: rgba(139, 92, 246, 0.24);
+    --lg-ambient-1: rgba(99, 102, 241, 0.28);
+    --lg-ambient-2: rgba(245, 158, 11, 0.14);
+    --lg-ambient-3: rgba(139, 92, 246, 0.24);
 
-  --lg-header-bg: rgba(15, 23, 42, 0.56);
-  --lg-header-scrim: linear-gradient(180deg, rgba(15, 23, 42, 0.44) 0%, rgba(15, 23, 42, 0.26) 100%);
-  --lg-sidebar-bg: rgba(15, 23, 42, 0.58);
-  --lg-sidebar-scrim: linear-gradient(180deg, rgba(15, 23, 42, 0.46) 0%, rgba(15, 23, 42, 0.30) 100%);
-  --lg-modal-bg: rgba(15, 23, 42, 0.72);
-  --lg-modal-scrim: linear-gradient(180deg, rgba(15, 23, 42, 0.52) 0%, rgba(15, 23, 42, 0.38) 100%);
-  --lg-popover-bg: rgba(15, 23, 42, 0.88);
-  --lg-backdrop-bg: rgba(2, 6, 23, 0.56);
+    --lg-header-bg: rgba(15, 23, 42, 0.90);
+    --lg-header-scrim: linear-gradient(180deg, rgba(15, 23, 42, 0.80) 0%, rgba(15, 23, 42, 0.68) 100%);
+    --lg-sidebar-bg: rgba(15, 23, 42, 0.92);
+    --lg-sidebar-scrim: linear-gradient(180deg, rgba(15, 23, 42, 0.82) 0%, rgba(15, 23, 42, 0.72) 100%);
+    --lg-modal-bg: rgba(15, 23, 42, 0.97);
+    --lg-modal-scrim: linear-gradient(180deg, rgba(15, 23, 42, 0.90) 0%, rgba(15, 23, 42, 0.84) 100%);
+    --lg-popover-bg: rgba(15, 23, 42, 0.98);
+    --lg-backdrop-bg: rgba(2, 6, 23, 0.74);
+    --lg-expanded-graph-bg: #0b1120;
 
   --lg-pill-idle-bg: rgba(255, 255, 255, 0.048);
   --lg-pill-idle-border: rgba(255, 255, 255, 0.11);
@@ -262,25 +264,26 @@ html[data-theme="dark"] {
     color-scheme: dark;
 
     --bg-body: #070b15;
-    --bg-surface: rgba(15, 23, 42, 0.72);
-    --bg-surface-solid: rgba(15, 23, 42, 0.78);
-    --bg-surface-alt: rgba(30, 41, 59, 0.68);
-    --bg-surface-hover: rgba(49, 46, 129, 0.44);
-    --bg-sidebar: rgba(15, 23, 42, 0.54);
-    --bg-glass: rgba(15, 23, 42, 0.50);
+    --bg-surface: rgba(15, 23, 42, 0.94);
+    --bg-surface-solid: #0f172a;
+    --bg-surface-alt: rgba(30, 41, 59, 0.92);
+    --bg-surface-hover: rgba(49, 46, 129, 0.56);
+    --bg-sidebar: rgba(15, 23, 42, 0.92);
+    --bg-glass: rgba(15, 23, 42, 0.86);
 
     --lg-ambient-1: rgba(99, 102, 241, 0.28);
     --lg-ambient-2: rgba(245, 158, 11, 0.14);
     --lg-ambient-3: rgba(139, 92, 246, 0.24);
 
-    --lg-header-bg: rgba(15, 23, 42, 0.56);
-    --lg-header-scrim: linear-gradient(180deg, rgba(15, 23, 42, 0.44) 0%, rgba(15, 23, 42, 0.26) 100%);
-    --lg-sidebar-bg: rgba(15, 23, 42, 0.58);
-    --lg-sidebar-scrim: linear-gradient(180deg, rgba(15, 23, 42, 0.46) 0%, rgba(15, 23, 42, 0.30) 100%);
-    --lg-modal-bg: rgba(15, 23, 42, 0.72);
-    --lg-modal-scrim: linear-gradient(180deg, rgba(15, 23, 42, 0.52) 0%, rgba(15, 23, 42, 0.38) 100%);
-    --lg-popover-bg: rgba(15, 23, 42, 0.88);
-    --lg-backdrop-bg: rgba(2, 6, 23, 0.56);
+    --lg-header-bg: rgba(15, 23, 42, 0.90);
+    --lg-header-scrim: linear-gradient(180deg, rgba(15, 23, 42, 0.80) 0%, rgba(15, 23, 42, 0.68) 100%);
+    --lg-sidebar-bg: rgba(15, 23, 42, 0.92);
+    --lg-sidebar-scrim: linear-gradient(180deg, rgba(15, 23, 42, 0.82) 0%, rgba(15, 23, 42, 0.72) 100%);
+    --lg-modal-bg: rgba(15, 23, 42, 0.97);
+    --lg-modal-scrim: linear-gradient(180deg, rgba(15, 23, 42, 0.90) 0%, rgba(15, 23, 42, 0.84) 100%);
+    --lg-popover-bg: rgba(15, 23, 42, 0.98);
+    --lg-backdrop-bg: rgba(2, 6, 23, 0.74);
+    --lg-expanded-graph-bg: #0b1120;
 
     --lg-pill-idle-bg: rgba(255, 255, 255, 0.048);
     --lg-pill-idle-border: rgba(255, 255, 255, 0.11);
@@ -538,6 +541,7 @@ body {
   color: var(--text-main);
   line-height: 1.6;
   overflow-x: hidden;
+  overflow-x: clip;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   position: relative;

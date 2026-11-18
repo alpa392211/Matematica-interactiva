@@ -142,16 +142,26 @@ window.MatInteractiva = window.MatInteractiva || {};
     );
   }
 
+  let lastTriggeredAt = 0;
+
   function trigger(patternName) {
     if (!canVibrate()) return false;
     const pattern = HAPTIC_PATTERNS[patternName];
     if (pattern === undefined) return false;
     try {
       const invoked = navigator.vibrate(pattern);
+      if (invoked !== false) {
+        lastTriggeredAt = typeof Date === 'function' ? Date.now() : 0;
+      }
       return invoked !== false;
     } catch (_) {
       return false;
     }
+  }
+
+  function wasRecentlyTriggered(windowMs = 110) {
+    if (!lastTriggeredAt || typeof Date !== 'function') return false;
+    return (Date.now() - lastTriggeredAt) <= windowMs;
   }
 
   // Inicializar estado desde localStorage al cargar el módulo
@@ -173,6 +183,7 @@ window.MatInteractiva = window.MatInteractiva || {};
     prefersReducedMotion,
     canVibrate,
     trigger,
+    wasRecentlyTriggered,
     light: () => trigger('light'),
     confirm: () => trigger('confirm'),
     correct: () => trigger('correct'),

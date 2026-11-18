@@ -271,6 +271,14 @@ window.MatInteractiva = window.MatInteractiva || {};
   let pendingAutoWhatsNew = false;
   let devOldNoticesUnlocked = false;
 
+  function clearExpandedGraphState() {
+    if (typeof document === 'undefined') return;
+    document.body.classList.remove('has-expanded-graph');
+    document.querySelectorAll('.is-graph-expanded').forEach((el) => {
+      el.classList.remove('is-graph-expanded');
+    });
+  }
+
   function syncFloatingMenuButton() {
     if (typeof document === 'undefined' || typeof window === 'undefined') return;
     const menuBtn = document.getElementById('btn-floating-open-sidebar');
@@ -280,7 +288,8 @@ window.MatInteractiva = window.MatInteractiva || {};
     const isMobile = window.innerWidth <= 900;
     const sidebarOpen = Boolean(document.getElementById('app-sidebar')?.classList.contains('open'));
     const exitedOpen = Boolean(document.getElementById('app-exited-overlay') && !document.getElementById('app-exited-overlay').hidden);
-    const hasOverlay = activeDialogStack.length > 0 || sidebarOpen || exitedOpen || document.documentElement.classList.contains('has-open-overlay');
+    const expandedGraph = Boolean(document.body.classList.contains('has-expanded-graph'));
+    const hasOverlay = activeDialogStack.length > 0 || sidebarOpen || exitedOpen || expandedGraph || document.documentElement.classList.contains('has-open-overlay');
 
     let scrolledPastHeader = false;
     if (isMobile && !hasOverlay) {
@@ -308,7 +317,7 @@ window.MatInteractiva = window.MatInteractiva || {};
   function getFocusableInside(container) {
     if (!container) return [];
     return [...container.querySelectorAll(
-      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), summary, [tabindex]:not([tabindex="-1"])'
     )].filter(el => !el.hasAttribute('hidden') && el.getClientRects().length > 0);
   }
 
@@ -318,7 +327,8 @@ window.MatInteractiva = window.MatInteractiva || {};
     if (typeof document === 'undefined') return;
     const sidebarOpen = Boolean(document.getElementById('app-sidebar')?.classList.contains('open'));
     const calcFnSheetOpen = Boolean(document.getElementById('calc-fn-mobile-sheet-backdrop'));
-    const hasOverlay = activeDialogStack.length > 0 || sidebarOpen || calcFnSheetOpen;
+    const expandedGraph = Boolean(document.body.classList.contains('has-expanded-graph'));
+    const hasOverlay = activeDialogStack.length > 0 || sidebarOpen || calcFnSheetOpen || expandedGraph;
     const wasLocked = document.documentElement.classList.contains('has-open-overlay');
 
     if (hasOverlay && !wasLocked) {
@@ -345,6 +355,92 @@ window.MatInteractiva = window.MatInteractiva || {};
     syncFloatingMenuButton();
   }
 
+  const SCROLL_STRIP_SELECTOR = [
+    '.topics-bar',
+    '.learning-tabs',
+    '.mvk-tabs-bar',
+    '.calc-fn-tabs',
+    '.map-filter-blocks',
+    '.lesson-toc-links'
+  ].join(', ');
+
+  function syncScrollStripArrows(shell, strip) {
+    if (!shell || !strip) return;
+    const maxScroll = Math.max(0, strip.scrollWidth - strip.clientWidth);
+    const canLeft = strip.scrollLeft > 4;
+    const canRight = maxScroll > 6 && (strip.scrollLeft < maxScroll - 4);
+    shell.classList.toggle('can-scroll-left', canLeft);
+    shell.classList.toggle('can-scroll-right', canRight);
+  }
+
+  function enhanceHorizontalScrollStrips(root) {
+    if (typeof document === 'undefined') return;
+    const scope = root && typeof root.querySelectorAll === 'function' ? root : document;
+    const strips = scope.querySelectorAll(SCROLL_STRIP_SELECTOR);
+    strips.forEach((strip) => {
+      if (!strip || !strip.parentElement) return;
+      let shell = strip.parentElement;
+      if (!shell.classList.contains('hscroll-shell')) {
+        shell = document.createElement('div');
+        shell.className = 'hscroll-shell';
+        if (strip.classList.contains('learning-tabs')) {
+          shell.classList.add('is-learning-tabs');
+        }
+        strip.parentElement.insertBefore(shell, strip);
+        shell.appendChild(strip);
+
+        const leftBtn = document.createElement('button');
+        leftBtn.type = 'button';
+        leftBtn.className = 'hscroll-arrow is-left';
+        leftBtn.setAttribute('aria-label', 'Deslizar opciones a la izquierda');
+        leftBtn.tabIndex = -1;
+        leftBtn.innerHTML = '‹';
+
+        const rightBtn = document.createElement('button');
+        rightBtn.type = 'button';
+        rightBtn.className = 'hscroll-arrow is-right';
+        rightBtn.setAttribute('aria-label', 'Deslizar opciones a la derecha');
+        rightBtn.tabIndex = -1;
+        rightBtn.innerHTML = '›';
+
+        leftBtn.addEventListener('click', () => {
+          haptic('light');
+          const step = Math.max(140, Math.round(strip.clientWidth * 0.65));
+          if (typeof strip.scrollBy === 'function') {
+            strip.scrollBy({ left: -step, behavior: 'smooth' });
+          } else {
+            strip.scrollLeft = Math.max(0, strip.scrollLeft - step);
+          }
+        });
+
+        rightBtn.addEventListener('click', () => {
+          haptic('light');
+          const step = Math.max(140, Math.round(strip.clientWidth * 0.65));
+          if (typeof strip.scrollBy === 'function') {
+            strip.scrollBy({ left: step, behavior: 'smooth' });
+          } else {
+            strip.scrollLeft += step;
+          }
+        });
+
+        shell.appendChild(leftBtn);
+        shell.appendChild(rightBtn);
+
+        strip.addEventListener('scroll', () => syncScrollStripArrows(shell, strip), { passive: true });
+        if (typeof ResizeObserver === 'function') {
+          const ro = new ResizeObserver(() => syncScrollStripArrows(shell, strip));
+          ro.observe(strip);
+          ro.observe(shell);
+        }
+      }
+
+      syncScrollStripArrows(shell, strip);
+      if (typeof requestAnimationFrame === 'function') {
+        requestAnimationFrame(() => syncScrollStripArrows(shell, strip));
+      }
+    });
+  }
+
   let overlayListenersBound = false;
 
   function bindGlobalButtonPhysicsAndScrollGuard() {
@@ -354,10 +450,15 @@ window.MatInteractiva = window.MatInteractiva || {};
     const BTN_SELECTOR = [
       'button',
       '[role="button"]',
+      '[role="tab"]',
+      '[role="switch"]',
+      'summary',
       '.btn',
       '.nav-item',
       '.topic-selector-btn',
       '.learning-tab-btn',
+      '.diff-pill',
+      '.lesson-toc-btn',
       '.calc-key',
       '.calc-fn-tab',
       '.calc-fn-chip',
@@ -369,7 +470,22 @@ window.MatInteractiva = window.MatInteractiva || {};
       '.prepmat-card-btn',
       '.prepmat-mode-tab',
       '.settings-bg-swatch-btn',
-      '.numerus-module-btn'
+      '.numerus-module-btn',
+      '.mvk-tab-btn',
+      '.mvk-key-btn',
+      '.mvk-close-btn',
+      '.keypad-chip',
+      '.solver-op-btn',
+      '.solver-example-chip',
+      '.editor-mode-btn',
+      '.editor-chip',
+      '.symbol-insert-btn',
+      '.map-topic-name',
+      '.map-topic-link-btn',
+      '.route-step-btn',
+      '.fs-nav-btn',
+      '.graph-gesture-dismiss',
+      '.hscroll-arrow'
     ].join(', ');
 
     const triggerSpringRebound = (el) => {
@@ -394,18 +510,32 @@ window.MatInteractiva = window.MatInteractiva || {};
     }, { passive: true });
 
     document.addEventListener('click', (ev) => {
+      const btn = ev.target && typeof ev.target.closest === 'function'
+        ? ev.target.closest(BTN_SELECTOR)
+        : null;
+      if (!btn || btn.disabled || btn.getAttribute('aria-disabled') === 'true') return;
       // Cubre activaciones por teclado (Enter / Espacio) o pruebas programáticas
       if (ev.detail === 0) {
-        const btn = ev.target && typeof ev.target.closest === 'function'
-          ? ev.target.closest(BTN_SELECTOR)
-          : null;
-        if (btn) triggerSpringRebound(btn);
+        triggerSpringRebound(btn);
+      }
+      // Garantiza respuesta háptica uniforme en todo botón/control interactivo sin duplicar
+      if (!ns.Haptics || typeof ns.Haptics.wasRecentlyTriggered !== 'function' || !ns.Haptics.wasRecentlyTriggered(110)) {
+        haptic('light');
       }
     });
 
     // Impide que deslizar sobre el fondo oscuro o cabeceras fijas haga scroll en la vista de abajo
     document.addEventListener('touchmove', (ev) => {
       if (!document.documentElement.classList.contains('has-open-overlay')) return;
+      if (document.body.classList.contains('has-expanded-graph')) {
+        const insideExpandedGraph = ev.target && typeof ev.target.closest === 'function'
+          ? ev.target.closest('.is-graph-expanded')
+          : null;
+        if (!insideExpandedGraph) {
+          ev.preventDefault();
+        }
+        return;
+      }
       const target = ev.target;
       if (!target || typeof target.closest !== 'function') {
         ev.preventDefault();
@@ -482,10 +612,335 @@ window.MatInteractiva = window.MatInteractiva || {};
     }
   }
 
+  let pendingConfirmCallback = null;
+  let confirmModalEventsBound = false;
+  let exitGuardEventsBound = false;
+
+  function closeConfirmModal() {
+    pendingConfirmCallback = null;
+    closeAccessibleDialog(document.getElementById('app-confirm-modal'));
+  }
+
+  function openAppConfirmDialog({
+    title = 'Confirmar acción',
+    message = '',
+    confirmText = 'Confirmar',
+    cancelText = 'Cancelar',
+    danger = false,
+    returnFocusEl = null,
+    onConfirm = null
+  } = {}) {
+    const confirmModal = document.getElementById('app-confirm-modal');
+    if (!confirmModal) {
+      if (typeof window !== 'undefined' && typeof window.confirm === 'function' && window.confirm(message)) {
+        if (typeof onConfirm === 'function') onConfirm();
+      }
+      return;
+    }
+    const confirmTitleEl = document.getElementById('app-confirm-title');
+    const confirmMsgEl = document.getElementById('app-confirm-message');
+    const confirmOkBtn = document.getElementById('btn-app-confirm-ok');
+    const confirmCancelBtn = document.getElementById('btn-app-confirm-cancel');
+
+    if (confirmTitleEl) confirmTitleEl.textContent = title;
+    if (confirmMsgEl) confirmMsgEl.textContent = message;
+    if (confirmOkBtn) {
+      confirmOkBtn.textContent = confirmText;
+      confirmOkBtn.classList.toggle('btn-danger-solid', Boolean(danger));
+      confirmOkBtn.classList.toggle('btn-primary', !danger);
+    }
+    if (confirmCancelBtn) confirmCancelBtn.textContent = cancelText;
+    pendingConfirmCallback = typeof onConfirm === 'function' ? onConfirm : null;
+    haptic('confirm');
+    openAccessibleDialog(confirmModal, {
+      returnFocusEl: returnFocusEl || document.activeElement,
+      initialFocusEl: confirmCancelBtn || confirmOkBtn
+    });
+  }
+
+  function bindConfirmModalEvents() {
+    if (confirmModalEventsBound || typeof document === 'undefined') return;
+    confirmModalEventsBound = true;
+    const confirmModal = document.getElementById('app-confirm-modal');
+    const confirmOkBtn = document.getElementById('btn-app-confirm-ok');
+    const confirmCancelBtn = document.getElementById('btn-app-confirm-cancel');
+    const confirmCloseBtn = document.getElementById('btn-close-confirm-modal');
+
+    confirmCancelBtn?.addEventListener('click', () => {
+      haptic('light');
+      closeConfirmModal();
+    });
+    confirmCloseBtn?.addEventListener('click', () => {
+      haptic('light');
+      closeConfirmModal();
+    });
+    confirmModal?.addEventListener('click', (ev) => {
+      if (ev.target === confirmModal) {
+        haptic('light');
+        closeConfirmModal();
+      }
+    });
+    confirmOkBtn?.addEventListener('click', () => {
+      const cb = pendingConfirmCallback;
+      closeConfirmModal();
+      if (typeof cb === 'function') cb();
+    });
+  }
+
+  function refreshCurrentView() {
+    updateHeaderStats();
+    renderSidebar();
+    if (appState.currentView === 'dashboard') {
+      navigateToDashboard();
+    } else if (appState.currentView === 'subject') {
+      openSubject(appState.activeSubjectId, appState.activeTopicId, appState.activeTab);
+    } else if (appState.currentView === 'tool') {
+      openTool(appState.activeToolId, appState.toolPresetExpr);
+    }
+  }
+
+  function resetDeveloperSessionState() {
+    devOldNoticesUnlocked = false;
+    const devInput = document.getElementById('dev-code-input');
+    const devFeedback = document.getElementById('settings-dev-feedback');
+    const devDetails = document.getElementById('settings-dev-details');
+    if (devInput) devInput.value = '';
+    if (devFeedback) {
+      devFeedback.textContent = '';
+      devFeedback.hidden = true;
+      devFeedback.classList.remove('is-success', 'is-error');
+    }
+    if (devDetails) devDetails.open = false;
+  }
+
+  function wipeAllAppData() {
+    if (ns.Storage && typeof ns.Storage.resetAllProgress === 'function') {
+      ns.Storage.resetAllProgress();
+    }
+    if (ns.PrepMatTool && ns.PrepMatTool.Storage && typeof ns.PrepMatTool.Storage.resetData === 'function') {
+      ns.PrepMatTool.Storage.resetData();
+    }
+    try {
+      window.localStorage.removeItem('mat_interactiva_editor_guide_seen_v1');
+    } catch (_) {}
+    if (ns.Preferences && typeof ns.Preferences.resetPreferences === 'function') {
+      ns.Preferences.resetPreferences({ includeUpdateNotice: true });
+    }
+    setThemeMode('auto');
+    if (ns.AmbientBackground && typeof ns.AmbientBackground.setEnabled === 'function') {
+      ns.AmbientBackground.setEnabled(true);
+    }
+    resetDeveloperSessionState();
+    syncPreferenceSwitches();
+    refreshCurrentView();
+    closeAccessibleDialog(document.getElementById('settings-modal'));
+    haptic('confirm');
+  }
+
+  function exitApplication() {
+    if (ns.PrepMatTool && typeof ns.PrepMatTool.abandonActiveExam === 'function' && ns.PrepMatTool.hasActiveExam?.()) {
+      ns.PrepMatTool.abandonActiveExam();
+    }
+    clearExpandedGraphState();
+    resetDeveloperSessionState();
+    while (activeDialogStack.length > 0) {
+      const top = activeDialogStack[activeDialogStack.length - 1];
+      closeAccessibleDialog(top.el);
+    }
+    closeMobileSidebar();
+    syncModalScrollLock();
+    const exitedOverlay = document.getElementById('app-exited-overlay');
+    if (exitedOverlay) {
+      exitedOverlay.hidden = false;
+    }
+    syncFloatingMenuButton();
+    try {
+      if (typeof window.close === 'function') {
+        window.close();
+      }
+    } catch (_) {}
+  }
+
+  function armExitBackGuard() {
+    if (typeof window === 'undefined' || !window.history || typeof window.history.pushState !== 'function') {
+      return;
+    }
+    try {
+      if (!window.history.state || !window.history.state.mateticExitGuard) {
+        window.history.pushState({ mateticExitGuard: true }, '');
+      }
+    } catch (_) {}
+  }
+
+  function requestAppExitConfirmation(returnFocusEl = null) {
+    const confirmModal = document.getElementById('app-confirm-modal');
+    if (confirmModal && activeDialogStack.some(d => d.el === confirmModal)) {
+      return;
+    }
+    const examActive = hasActivePrepMatExam() || hasActiveSubjectQuiz();
+    openAppConfirmDialog({
+      title: `Salir de ${getAppName()}`,
+      message: examActive
+        ? 'Tienes un examen o evaluación en curso. ¿Estás seguro de que quieres salir de la aplicación?'
+        : '¿Estás seguro de que quieres salir de la aplicación?',
+      confirmText: 'Sí, salir',
+      cancelText: 'Quedarme',
+      danger: examActive,
+      returnFocusEl: returnFocusEl || document.activeElement,
+      onConfirm: exitApplication
+    });
+  }
+
+  function bindAppExitGuardEvents() {
+    if (exitGuardEventsBound || typeof window === 'undefined') return;
+    exitGuardEventsBound = true;
+    armExitBackGuard();
+
+    window.addEventListener('beforeunload', (ev) => {
+      const exitedOverlay = document.getElementById('app-exited-overlay');
+      if (exitedOverlay && !exitedOverlay.hidden) return;
+      ev.preventDefault();
+      ev.returnValue = '';
+    });
+
+    window.addEventListener('popstate', () => {
+      const exitedOverlay = document.getElementById('app-exited-overlay');
+      if (exitedOverlay && !exitedOverlay.hidden) return;
+      armExitBackGuard();
+      requestAppExitConfirmation();
+    });
+  }
+
+  const NAV_TOOL_LABELS = {
+    prepmat: 'PrepMat · Exámenes',
+    formularios: 'Formularios Matemáticos',
+    graficador: 'Graficador de Funciones',
+    calculadora: 'Calculadora Científica',
+    editor: 'Editor de Expresiones',
+    solucionador: 'Resolución Guiada'
+  };
+
+  const NAV_TAB_LABELS = {
+    teoria: 'Teoría y Fórmulas',
+    ejemplos: 'Ejemplos y Errores',
+    ejercicios: 'Ejercicios de Práctica',
+    evaluacion: 'Evaluación Final'
+  };
+
+  function hasActivePrepMatExam() {
+    return Boolean(
+      appState.currentView === 'tool' &&
+      appState.activeToolId === 'prepmat' &&
+      ns.PrepMatTool &&
+      typeof ns.PrepMatTool.hasActiveExam === 'function' &&
+      ns.PrepMatTool.hasActiveExam()
+    );
+  }
+
+  function hasActiveSubjectQuiz() {
+    return Boolean(
+      appState.currentView === 'subject' &&
+      appState.activeTab === 'evaluacion' &&
+      appState.activeTopicId &&
+      !appState.quizSubmitted[appState.activeTopicId]
+    );
+  }
+
+  function willTargetChangeContext(target = {}) {
+    if (target.view === 'dashboard') {
+      return appState.currentView !== 'dashboard';
+    }
+    if (target.view === 'tool') {
+      if (hasActivePrepMatExam()) return true;
+      return appState.currentView !== 'tool' || (target.toolId && target.toolId !== appState.activeToolId);
+    }
+    if (target.view === 'subject') {
+      if (appState.currentView !== 'subject') return true;
+      if (target.subjectId && target.subjectId !== appState.activeSubjectId) return true;
+      if (target.topicId && target.topicId !== appState.activeTopicId) return true;
+      if (target.tab && target.tab !== appState.activeTab) return true;
+      return false;
+    }
+    return true;
+  }
+
+  function guardNavigation(target, onProceed, returnFocusEl = null) {
+    if (typeof onProceed !== 'function') return;
+    if (!willTargetChangeContext(target)) {
+      onProceed();
+      return;
+    }
+
+    if (hasActivePrepMatExam()) {
+      openAppConfirmDialog({
+        title: 'Examen en curso',
+        message: 'Estás realizando un examen en PrepMat. Si cambias de menú o sección ahora, perderás el avance de la sesión actual. ¿Deseas salir del examen?',
+        confirmText: 'Sí, salir y cambiar',
+        cancelText: 'Seguir en el examen',
+        danger: true,
+        returnFocusEl,
+        onConfirm: () => {
+          if (ns.PrepMatTool && typeof ns.PrepMatTool.abandonActiveExam === 'function') {
+            ns.PrepMatTool.abandonActiveExam();
+          }
+          onProceed();
+        }
+      });
+      return;
+    }
+
+    if (hasActiveSubjectQuiz()) {
+      openAppConfirmDialog({
+        title: 'Evaluación en curso',
+        message: 'Estás realizando la evaluación final de este tema. Si cambias de sección antes de calificar, dejarás esta evaluación sin terminar. ¿Deseas cambiar?',
+        confirmText: 'Sí, cambiar',
+        cancelText: 'Seguir en la evaluación',
+        danger: true,
+        returnFocusEl,
+        onConfirm: onProceed
+      });
+      return;
+    }
+
+    if (appState.currentView === 'subject') {
+      let destDesc = 'otra sección';
+      if (target.view === 'dashboard') {
+        destDesc = 'el Panel Principal';
+      } else if (target.view === 'tool') {
+        destDesc = NAV_TOOL_LABELS[target.toolId] || 'otra herramienta';
+      } else if (target.view === 'subject') {
+        if (
+          (!target.subjectId || target.subjectId === appState.activeSubjectId) &&
+          (!target.topicId || target.topicId === appState.activeTopicId) &&
+          target.tab && target.tab !== appState.activeTab
+        ) {
+          destDesc = `la pestaña ${NAV_TAB_LABELS[target.tab] || target.tab}`;
+        } else {
+          destDesc = 'otro tema o materia de estudio';
+        }
+      }
+
+      openAppConfirmDialog({
+        title: 'Cambiar de sección de estudio',
+        message: `Estás estudiando actualmente en esta sección. ¿Seguro que deseas cambiar a ${destDesc}?`,
+        confirmText: 'Sí, cambiar',
+        cancelText: 'Seguir estudiando',
+        danger: false,
+        returnFocusEl,
+        onConfirm: onProceed
+      });
+      return;
+    }
+
+    onProceed();
+  }
+
   function bindSettingsEvents() {
     const settingsModal = document.getElementById('settings-modal');
     const btnOpenSettings = document.getElementById('btn-open-settings');
     const btnCloseSettings = document.getElementById('btn-close-settings');
+
+    bindConfirmModalEvents();
 
     btnOpenSettings?.addEventListener('click', () => {
       closeMobileSidebar();
@@ -631,19 +1086,26 @@ window.MatInteractiva = window.MatInteractiva || {};
       });
     });
 
-    document.getElementById('btn-reset-preferences')?.addEventListener('click', () => {
-      if (!window.confirm('¿Restablecer preferencias de interfaz (vibración, fondo animado, tema automático y visibilidad del botón de tema)? Tu progreso y XP permanecerán intactos.')) {
-        return;
-      }
-      if (ns.Preferences && typeof ns.Preferences.resetPreferences === 'function') {
-        ns.Preferences.resetPreferences();
-      }
-      setThemeMode('auto');
-      if (ns.AmbientBackground && typeof ns.AmbientBackground.setEnabled === 'function') {
-        ns.AmbientBackground.setEnabled(true);
-      }
-      syncPreferenceSwitches();
-      haptic('confirm');
+    document.getElementById('btn-reset-preferences')?.addEventListener('click', (ev) => {
+      openAppConfirmDialog({
+        title: 'Restablecer preferencias',
+        message: '¿Restablecer preferencias de interfaz (vibración, fondo animado, tema automático y visibilidad del botón de tema)? Tu progreso y XP permanecerán intactos.',
+        confirmText: 'Sí, restablecer',
+        cancelText: 'Cancelar',
+        danger: false,
+        returnFocusEl: ev.currentTarget,
+        onConfirm: () => {
+          if (ns.Preferences && typeof ns.Preferences.resetPreferences === 'function') {
+            ns.Preferences.resetPreferences();
+          }
+          setThemeMode('auto');
+          if (ns.AmbientBackground && typeof ns.AmbientBackground.setEnabled === 'function') {
+            ns.AmbientBackground.setEnabled(true);
+          }
+          syncPreferenceSwitches();
+          haptic('confirm');
+        }
+      });
     });
 
     document.getElementById('btn-open-whats-new')?.addEventListener('click', () => {
@@ -680,139 +1142,6 @@ window.MatInteractiva = window.MatInteractiva || {};
       syncPwaAndOfflineUI();
     });
 
-    const confirmModal = document.getElementById('app-confirm-modal');
-    const confirmTitleEl = document.getElementById('app-confirm-title');
-    const confirmMsgEl = document.getElementById('app-confirm-message');
-    const confirmOkBtn = document.getElementById('btn-app-confirm-ok');
-    const confirmCancelBtn = document.getElementById('btn-app-confirm-cancel');
-    const confirmCloseBtn = document.getElementById('btn-close-confirm-modal');
-    let pendingConfirmCallback = null;
-
-    function closeConfirmModal() {
-      pendingConfirmCallback = null;
-      closeAccessibleDialog(confirmModal);
-    }
-
-    function openAppConfirmDialog({
-      title = 'Confirmar acción',
-      message = '',
-      confirmText = 'Confirmar',
-      cancelText = 'Cancelar',
-      danger = false,
-      returnFocusEl = null,
-      onConfirm = null
-    } = {}) {
-      if (!confirmModal) {
-        if (typeof window !== 'undefined' && typeof window.confirm === 'function' && window.confirm(message)) {
-          if (typeof onConfirm === 'function') onConfirm();
-        }
-        return;
-      }
-      if (confirmTitleEl) confirmTitleEl.textContent = title;
-      if (confirmMsgEl) confirmMsgEl.textContent = message;
-      if (confirmOkBtn) {
-        confirmOkBtn.textContent = confirmText;
-        confirmOkBtn.classList.toggle('btn-danger-solid', Boolean(danger));
-        confirmOkBtn.classList.toggle('btn-primary', !danger);
-      }
-      if (confirmCancelBtn) confirmCancelBtn.textContent = cancelText;
-      pendingConfirmCallback = typeof onConfirm === 'function' ? onConfirm : null;
-      haptic('confirm');
-      openAccessibleDialog(confirmModal, {
-        returnFocusEl: returnFocusEl || document.activeElement,
-        initialFocusEl: confirmCancelBtn || confirmOkBtn
-      });
-    }
-
-    confirmCancelBtn?.addEventListener('click', () => {
-      haptic('light');
-      closeConfirmModal();
-    });
-    confirmCloseBtn?.addEventListener('click', () => {
-      haptic('light');
-      closeConfirmModal();
-    });
-    confirmModal?.addEventListener('click', (ev) => {
-      if (ev.target === confirmModal) {
-        haptic('light');
-        closeConfirmModal();
-      }
-    });
-    confirmOkBtn?.addEventListener('click', () => {
-      const cb = pendingConfirmCallback;
-      closeConfirmModal();
-      if (typeof cb === 'function') cb();
-    });
-
-    function refreshCurrentView() {
-      updateHeaderStats();
-      renderSidebar();
-      if (appState.currentView === 'dashboard') {
-        navigateToDashboard();
-      } else if (appState.currentView === 'subject') {
-        openSubject(appState.activeSubjectId, appState.activeTopicId, appState.activeTab);
-      } else if (appState.currentView === 'tool') {
-        openTool(appState.activeToolId, appState.toolPresetExpr);
-      }
-    }
-
-    function resetDeveloperSessionState() {
-      devOldNoticesUnlocked = false;
-      const devInput = document.getElementById('dev-code-input');
-      const devFeedback = document.getElementById('settings-dev-feedback');
-      const devDetails = document.getElementById('settings-dev-details');
-      if (devInput) devInput.value = '';
-      if (devFeedback) {
-        devFeedback.textContent = '';
-        devFeedback.hidden = true;
-        devFeedback.classList.remove('is-success', 'is-error');
-      }
-      if (devDetails) devDetails.open = false;
-    }
-
-    function wipeAllAppData() {
-      if (ns.Storage && typeof ns.Storage.resetAllProgress === 'function') {
-        ns.Storage.resetAllProgress();
-      }
-      if (ns.PrepMatTool && ns.PrepMatTool.Storage && typeof ns.PrepMatTool.Storage.resetData === 'function') {
-        ns.PrepMatTool.Storage.resetData();
-      }
-      try {
-        window.localStorage.removeItem('mat_interactiva_editor_guide_seen_v1');
-      } catch (_) {}
-      if (ns.Preferences && typeof ns.Preferences.resetPreferences === 'function') {
-        ns.Preferences.resetPreferences({ includeUpdateNotice: true });
-      }
-      setThemeMode('auto');
-      if (ns.AmbientBackground && typeof ns.AmbientBackground.setEnabled === 'function') {
-        ns.AmbientBackground.setEnabled(true);
-      }
-      resetDeveloperSessionState();
-      syncPreferenceSwitches();
-      refreshCurrentView();
-      closeAccessibleDialog(settingsModal);
-      haptic('confirm');
-    }
-
-    function exitApplication() {
-      resetDeveloperSessionState();
-      while (activeDialogStack.length > 0) {
-        const top = activeDialogStack[activeDialogStack.length - 1];
-        closeAccessibleDialog(top.el);
-      }
-      closeMobileSidebar();
-      const exitedOverlay = document.getElementById('app-exited-overlay');
-      if (exitedOverlay) {
-        exitedOverlay.hidden = false;
-      }
-      syncFloatingMenuButton();
-      try {
-        if (typeof window.close === 'function') {
-          window.close();
-        }
-      } catch (_) {}
-    }
-
     document.getElementById('btn-wipe-all-data')?.addEventListener('click', (ev) => {
       openAppConfirmDialog({
         title: 'Borrar todos los datos',
@@ -826,15 +1155,7 @@ window.MatInteractiva = window.MatInteractiva || {};
     });
 
     document.getElementById('btn-exit-app')?.addEventListener('click', (ev) => {
-      openAppConfirmDialog({
-        title: 'Salir de MateTic',
-        message: '¿Estás seguro de que quieres salir de la aplicación?',
-        confirmText: 'Sí, salir',
-        cancelText: 'Quedarme',
-        danger: false,
-        returnFocusEl: ev.currentTarget,
-        onConfirm: exitApplication
-      });
+      requestAppExitConfirmation(ev.currentTarget);
     });
 
     document.getElementById('btn-reenter-app')?.addEventListener('click', () => {
@@ -842,6 +1163,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       resetDeveloperSessionState();
       const exitedOverlay = document.getElementById('app-exited-overlay');
       if (exitedOverlay) exitedOverlay.hidden = true;
+      armExitBackGuard();
       syncFloatingMenuButton();
       navigateToDashboard();
     });
@@ -1258,6 +1580,7 @@ window.MatInteractiva = window.MatInteractiva || {};
     syncPreferenceSwitches();
     bindSettingsEvents();
     bindGlobalButtonPhysicsAndScrollGuard();
+    bindAppExitGuardEvents();
     initPwaSupport();
     if (ns.AmbientBackground && typeof ns.AmbientBackground.init === 'function') {
       ns.AmbientBackground.init();
@@ -1358,24 +1681,30 @@ window.MatInteractiva = window.MatInteractiva || {};
       });
     });
 
-    navContainer.querySelector('[data-nav-dashboard]')?.addEventListener('click', () => {
+    navContainer.querySelector('[data-nav-dashboard]')?.addEventListener('click', (ev) => {
       closeMobileSidebar();
-      navigateToDashboard();
+      guardNavigation({ view: 'dashboard' }, () => navigateToDashboard(), ev.currentTarget);
     });
 
     navContainer.querySelectorAll('[data-nav-subject]').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', (ev) => {
         const subjId = btn.getAttribute('data-nav-subject');
+        const subjObj = curriculum.find(s => s.id === subjId);
+        const firstTopicId = subjObj && subjObj.topics[0] ? subjObj.topics[0].id : null;
         closeMobileSidebar();
-        openSubject(subjId);
+        guardNavigation(
+          { view: 'subject', subjectId: subjId, topicId: firstTopicId, tab: 'teoria' },
+          () => openSubject(subjId),
+          ev.currentTarget
+        );
       });
     });
 
     navContainer.querySelectorAll('[data-nav-tool]').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', (ev) => {
         const toolId = btn.getAttribute('data-nav-tool');
         closeMobileSidebar();
-        openTool(toolId);
+        guardNavigation({ view: 'tool', toolId }, () => openTool(toolId), ev.currentTarget);
       });
     });
   }
@@ -1475,15 +1804,16 @@ window.MatInteractiva = window.MatInteractiva || {};
         });
       }
     }
-    document.getElementById('btn-header-back')?.addEventListener('click', () => {
+    document.getElementById('btn-header-back')?.addEventListener('click', (ev) => {
       closeMobileSidebar();
-      navigateToDashboard();
+      guardNavigation({ view: 'dashboard' }, () => navigateToDashboard(), ev.currentTarget);
     });
     window.addEventListener('scroll', syncFloatingMenuButton, { passive: true });
     document.querySelector('.main-content')?.addEventListener('scroll', syncFloatingMenuButton, { passive: true });
     window.addEventListener('resize', () => {
       if (window.innerWidth > 900) closeMobileSidebar();
       syncFloatingMenuButton();
+      enhanceHorizontalScrollStrips(document);
     });
     syncFloatingMenuButton();
     document.addEventListener('keydown', (ev) => {
@@ -1539,8 +1869,14 @@ window.MatInteractiva = window.MatInteractiva || {};
               const sId = item.getAttribute('data-search-subj');
               const tId = item.getAttribute('data-search-topic');
               closeSearchDropdown();
-              searchInp.value = '';
-              openSubject(sId, tId);
+              guardNavigation(
+                { view: 'subject', subjectId: sId, topicId: tId, tab: 'teoria' },
+                () => {
+                  searchInp.value = '';
+                  openSubject(sId, tId);
+                },
+                searchInp
+              );
             });
           });
         }
@@ -1581,6 +1917,8 @@ window.MatInteractiva = window.MatInteractiva || {};
      2. Vista del Panel Principal (Dashboard de Aprendizaje y Progreso)
      ------------------------------------------------------------------------ */
   function navigateToDashboard() {
+    clearExpandedGraphState();
+    syncModalScrollLock();
     appState.currentView = 'dashboard';
     renderSidebar();
     updateHeaderStats();
@@ -1697,24 +2035,34 @@ window.MatInteractiva = window.MatInteractiva || {};
             animaciones paso a paso, graficador interactivo, resolución guiada y formularios imprimibles.
           </p>
           <div class="hero-actions">
-            <button type="button" class="btn btn-white" id="btn-hero-continue">
-              ▶ Continuar: ${lastSubj.name} — ${lastTopic.title}
-            </button>
-            <button type="button" class="btn btn-glass" id="btn-hero-map">
-              🗺️ Mapa Curricular (${curriculum.length} materias · ${stats.totalTopics} temas)
-            </button>
-            <button type="button" class="btn btn-glass" id="btn-hero-prepmat">
-              🎓 PrepMat · Exámenes
-            </button>
-            <button type="button" class="btn btn-glass" id="btn-hero-graph">
-              📈 Graficador
-            </button>
-            <button type="button" class="btn btn-glass" id="btn-hero-calc">
-              🧮 Calculadora
-            </button>
-            <button type="button" class="btn btn-glass" id="btn-hero-formulas">
-              📄 Formularios
-            </button>
+            <div class="hero-primary-row">
+              <button type="button" class="btn btn-white" id="btn-hero-continue">
+                ▶ Continuar: ${lastSubj.name} — ${lastTopic.title}
+              </button>
+            </div>
+            <details class="hero-more-menu" id="hero-more-menu">
+              <summary class="btn btn-glass hero-more-toggle" id="btn-hero-more-toggle">
+                <span>☰ Accesos rápidos y herramientas</span>
+                <span class="hero-more-chevron" aria-hidden="true">▾</span>
+              </summary>
+              <div class="hero-more-panel">
+                <button type="button" class="btn btn-glass" id="btn-hero-map">
+                  🗺️ Mapa Curricular (${curriculum.length} materias · ${stats.totalTopics} temas)
+                </button>
+                <button type="button" class="btn btn-glass" id="btn-hero-prepmat">
+                  🎓 PrepMat · Exámenes
+                </button>
+                <button type="button" class="btn btn-glass" id="btn-hero-graph">
+                  📈 Graficador
+                </button>
+                <button type="button" class="btn btn-glass" id="btn-hero-calc">
+                  🧮 Calculadora
+                </button>
+                <button type="button" class="btn btn-glass" id="btn-hero-formulas">
+                  📄 Formularios
+                </button>
+              </div>
+            </details>
           </div>
         </div>
       </section>
@@ -2103,16 +2451,25 @@ window.MatInteractiva = window.MatInteractiva || {};
     });
     makeKeyboardClickable(main, '.dash-tool-box[data-dash-tool]');
 
-    main.querySelector('#btn-reset-progress')?.addEventListener('click', () => {
-      if (window.confirm('¿Deseas reiniciar a cero tus estadísticas, ejercicios resueltos y puntos XP?')) {
-        ns.Storage.resetAllProgress();
-        appState.exerciseFeedback = {};
-        appState.quizSelections = {};
-        appState.quizSubmitted = {};
-        navigateToDashboard();
-      }
+    main.querySelector('#btn-reset-progress')?.addEventListener('click', (ev) => {
+      openAppConfirmDialog({
+        title: 'Reiniciar progreso',
+        message: '¿Deseas reiniciar a cero tus estadísticas, ejercicios resueltos y puntos XP?',
+        confirmText: 'Sí, reiniciar',
+        cancelText: 'Cancelar',
+        danger: true,
+        returnFocusEl: ev.currentTarget,
+        onConfirm: () => {
+          ns.Storage.resetAllProgress();
+          appState.exerciseFeedback = {};
+          appState.quizSelections = {};
+          appState.quizSubmitted = {};
+          navigateToDashboard();
+        }
+      });
     });
 
+    enhanceHorizontalScrollStrips(main);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -2120,6 +2477,8 @@ window.MatInteractiva = window.MatInteractiva || {};
      3. Vista de Materia y Estructura Didáctica de 9 Etapas por Tema
      ------------------------------------------------------------------------ */
   function openSubject(subjectId, topicId = null, tab = 'teoria') {
+    clearExpandedGraphState();
+    syncModalScrollLock();
     const curriculum = ns.Curriculum || [];
     const subj = curriculum.find(s => s.id === subjectId) || curriculum[0];
     const topic = (topicId && subj.topics.find(t => t.id === topicId)) || subj.topics[0];
@@ -2139,7 +2498,9 @@ window.MatInteractiva = window.MatInteractiva || {};
       <span aria-hidden="true">›</span>
       <strong>${topic.title}</strong>
     `);
-    document.getElementById('bc-home')?.addEventListener('click', navigateToDashboard);
+    document.getElementById('bc-home')?.addEventListener('click', (ev) => {
+      guardNavigation({ view: 'dashboard' }, () => navigateToDashboard(), ev.currentTarget);
+    });
 
     renderSubjectWorkspace(subj, topic);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -2205,43 +2566,57 @@ window.MatInteractiva = window.MatInteractiva || {};
       <div id="topic-tab-content"></div>
     `;
 
-    main.querySelector('#btn-topic-formula-sheet')?.addEventListener('click', () => {
-      openTool('formularios', subj.id);
+    main.querySelector('#btn-topic-formula-sheet')?.addEventListener('click', (ev) => {
+      guardNavigation({ view: 'tool', toolId: 'formularios' }, () => openTool('formularios', subj.id), ev.currentTarget);
     });
 
-    main.querySelector('#btn-topic-graph')?.addEventListener('click', () => {
-      openTool('graficador', topic.graphPreset);
+    main.querySelector('#btn-topic-graph')?.addEventListener('click', (ev) => {
+      guardNavigation({ view: 'tool', toolId: 'graficador' }, () => openTool('graficador', topic.graphPreset), ev.currentTarget);
     });
 
-    main.querySelector('#btn-topic-editor')?.addEventListener('click', () => {
-      openTool('editor');
+    main.querySelector('#btn-topic-editor')?.addEventListener('click', (ev) => {
+      guardNavigation({ view: 'tool', toolId: 'editor' }, () => openTool('editor'), ev.currentTarget);
     });
 
     main.querySelectorAll('[data-select-topic]').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', (ev) => {
         const newTopicId = btn.getAttribute('data-select-topic');
-        openSubject(subj.id, newTopicId, appState.activeTab);
+        guardNavigation(
+          { view: 'subject', subjectId: subj.id, topicId: newTopicId, tab: appState.activeTab },
+          () => openSubject(subj.id, newTopicId, appState.activeTab),
+          ev.currentTarget
+        );
       });
     });
 
     main.querySelectorAll('[data-tab]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        haptic('light');
-        appState.activeTab = btn.getAttribute('data-tab');
-        main.querySelectorAll('[data-tab]').forEach(b => {
-          b.classList.remove('active');
-          b.setAttribute('aria-selected', 'false');
-        });
-        btn.classList.add('active');
-        btn.setAttribute('aria-selected', 'true');
-        renderActiveTopicTab(subj, topic);
+      btn.addEventListener('click', (ev) => {
+        const nextTab = btn.getAttribute('data-tab');
+        guardNavigation(
+          { view: 'subject', subjectId: subj.id, topicId: topic.id, tab: nextTab },
+          () => {
+            haptic('light');
+            appState.activeTab = nextTab;
+            main.querySelectorAll('[data-tab]').forEach(b => {
+              b.classList.remove('active');
+              b.setAttribute('aria-selected', 'false');
+            });
+            btn.classList.add('active');
+            btn.setAttribute('aria-selected', 'true');
+            renderActiveTopicTab(subj, topic);
+          },
+          ev.currentTarget
+        );
       });
     });
 
+    enhanceHorizontalScrollStrips(main);
     renderActiveTopicTab(subj, topic);
   }
 
   function renderActiveTopicTab(subj, topic) {
+    clearExpandedGraphState();
+    syncModalScrollLock();
     const box = document.getElementById('topic-tab-content');
     if (!box) return;
 
@@ -2485,24 +2860,40 @@ window.MatInteractiva = window.MatInteractiva || {};
     });
 
     box.querySelectorAll('[data-theory-graph]').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', (ev) => {
         const key = btn.getAttribute('data-theory-graph');
         const payload = theoryGraphPayloads[key];
-        if (payload !== undefined) openTool('graficador', payload);
+        if (payload !== undefined) {
+          guardNavigation({ view: 'tool', toolId: 'graficador' }, () => openTool('graficador', payload), ev.currentTarget);
+        }
       });
     });
 
-    box.querySelector('#btn-go-examples')?.addEventListener('click', () => {
-      appState.activeTab = 'ejemplos';
-      renderSubjectWorkspace(subj, topic);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    box.querySelector('#btn-go-examples')?.addEventListener('click', (ev) => {
+      guardNavigation(
+        { view: 'subject', subjectId: subj.id, topicId: topic.id, tab: 'ejemplos' },
+        () => {
+          appState.activeTab = 'ejemplos';
+          renderSubjectWorkspace(subj, topic);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        },
+        ev.currentTarget
+      );
     });
 
-    box.querySelector('#btn-go-exercises-direct')?.addEventListener('click', () => {
-      appState.activeTab = 'ejercicios';
-      renderSubjectWorkspace(subj, topic);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    box.querySelector('#btn-go-exercises-direct')?.addEventListener('click', (ev) => {
+      guardNavigation(
+        { view: 'subject', subjectId: subj.id, topicId: topic.id, tab: 'ejercicios' },
+        () => {
+          appState.activeTab = 'ejercicios';
+          renderSubjectWorkspace(subj, topic);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        },
+        ev.currentTarget
+      );
     });
+
+    enhanceHorizontalScrollStrips(box);
   }
 
   /* --- Pestaña 2: Etapa 6 (Ejemplos Resueltos Paso a Paso) y Etapa 7 (Errores Frecuentes) --- */
@@ -2615,10 +3006,12 @@ window.MatInteractiva = window.MatInteractiva || {};
     `;
 
     box.querySelectorAll('[data-example-graph]').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', (ev) => {
         const idx = Number(btn.getAttribute('data-example-graph'));
         const payload = exampleGraphPayloads[idx];
-        if (payload) openTool('graficador', payload);
+        if (payload) {
+          guardNavigation({ view: 'tool', toolId: 'graficador' }, () => openTool('graficador', payload), ev.currentTarget);
+        }
       });
     });
 
@@ -2651,16 +3044,28 @@ window.MatInteractiva = window.MatInteractiva || {};
       });
     });
 
-    box.querySelector('#btn-back-theory')?.addEventListener('click', () => {
-      appState.activeTab = 'teoria';
-      renderSubjectWorkspace(subj, topic);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    box.querySelector('#btn-back-theory')?.addEventListener('click', (ev) => {
+      guardNavigation(
+        { view: 'subject', subjectId: subj.id, topicId: topic.id, tab: 'teoria' },
+        () => {
+          appState.activeTab = 'teoria';
+          renderSubjectWorkspace(subj, topic);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        },
+        ev.currentTarget
+      );
     });
 
-    box.querySelector('#btn-go-exercises')?.addEventListener('click', () => {
-      appState.activeTab = 'ejercicios';
-      renderSubjectWorkspace(subj, topic);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    box.querySelector('#btn-go-exercises')?.addEventListener('click', (ev) => {
+      guardNavigation(
+        { view: 'subject', subjectId: subj.id, topicId: topic.id, tab: 'ejercicios' },
+        () => {
+          appState.activeTab = 'ejercicios';
+          renderSubjectWorkspace(subj, topic);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        },
+        ev.currentTarget
+      );
     });
   }
 
@@ -3113,16 +3518,28 @@ window.MatInteractiva = window.MatInteractiva || {};
       });
     });
 
-    box.querySelector('#btn-back-examples')?.addEventListener('click', () => {
-      appState.activeTab = 'ejemplos';
-      renderSubjectWorkspace(subj, topic);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    box.querySelector('#btn-back-examples')?.addEventListener('click', (ev) => {
+      guardNavigation(
+        { view: 'subject', subjectId: subj.id, topicId: topic.id, tab: 'ejemplos' },
+        () => {
+          appState.activeTab = 'ejemplos';
+          renderSubjectWorkspace(subj, topic);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        },
+        ev.currentTarget
+      );
     });
 
-    box.querySelector('#btn-go-quiz')?.addEventListener('click', () => {
-      appState.activeTab = 'evaluacion';
-      renderSubjectWorkspace(subj, topic);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    box.querySelector('#btn-go-quiz')?.addEventListener('click', (ev) => {
+      guardNavigation(
+        { view: 'subject', subjectId: subj.id, topicId: topic.id, tab: 'evaluacion' },
+        () => {
+          appState.activeTab = 'evaluacion';
+          renderSubjectWorkspace(subj, topic);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        },
+        ev.currentTarget
+      );
     });
   }
 
@@ -3214,10 +3631,16 @@ window.MatInteractiva = window.MatInteractiva || {};
       </div>
     `;
 
-    box.querySelector('#btn-back-exercises')?.addEventListener('click', () => {
-      appState.activeTab = 'ejercicios';
-      renderSubjectWorkspace(subj, topic);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    box.querySelector('#btn-back-exercises')?.addEventListener('click', (ev) => {
+      guardNavigation(
+        { view: 'subject', subjectId: subj.id, topicId: topic.id, tab: 'ejercicios' },
+        () => {
+          appState.activeTab = 'ejercicios';
+          renderSubjectWorkspace(subj, topic);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        },
+        ev.currentTarget
+      );
     });
 
     box.querySelectorAll('[data-quiz-q]').forEach(btn => {
@@ -3266,6 +3689,8 @@ window.MatInteractiva = window.MatInteractiva || {};
      4. Vista de Herramientas Interactivas
      ------------------------------------------------------------------------ */
   function openTool(toolId, presetExpr = null) {
+    clearExpandedGraphState();
+    syncModalScrollLock();
     appState.currentView = 'tool';
     appState.activeToolId = toolId;
     appState.toolPresetExpr = presetExpr;
@@ -3289,7 +3714,9 @@ window.MatInteractiva = window.MatInteractiva || {};
       <span aria-hidden="true">›</span>
       <strong>${toolNames[toolId] || toolId}</strong>
     `);
-    document.getElementById('bc-home-tool')?.addEventListener('click', navigateToDashboard);
+    document.getElementById('bc-home-tool')?.addEventListener('click', (ev) => {
+      guardNavigation({ view: 'dashboard' }, () => navigateToDashboard(), ev.currentTarget);
+    });
 
     const main = document.getElementById('main-view-container');
     if (!main) return;
@@ -3308,6 +3735,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       ns.GuidedSolverTool.renderGuidedSolverView(main);
     }
 
+    enhanceHorizontalScrollStrips(main);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -3326,7 +3754,10 @@ window.MatInteractiva = window.MatInteractiva || {};
     openSubject,
     openTool,
     openQuickCalculator,
-    syncModalScrollLock
+    syncModalScrollLock,
+    confirmAction: openAppConfirmDialog,
+    refreshScrollStrips: enhanceHorizontalScrollStrips,
+    guardNavigation
   };
 
   document.addEventListener('DOMContentLoaded', init);

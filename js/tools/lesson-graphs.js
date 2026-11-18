@@ -478,6 +478,9 @@ window.MatInteractiva = window.MatInteractiva || {};
         expandBtn.hidden = true;
         closeExpandBtn.hidden = false;
         expandBtn.setAttribute('aria-expanded', 'true');
+        if (ns.App && typeof ns.App.syncModalScrollLock === 'function') {
+          ns.App.syncModalScrollLock();
+        }
         requestAnimationFrame(() => {
           closeExpandBtn?.focus();
           drawWidgetCanvas(root, state, widgetId);
@@ -490,6 +493,9 @@ window.MatInteractiva = window.MatInteractiva || {};
         expandBtn.hidden = false;
         closeExpandBtn.hidden = true;
         expandBtn.setAttribute('aria-expanded', 'false');
+        if (ns.App && typeof ns.App.syncModalScrollLock === 'function') {
+          ns.App.syncModalScrollLock();
+        }
         requestAnimationFrame(() => {
           expandBtn?.focus();
           drawWidgetCanvas(root, state, widgetId);
@@ -857,12 +863,26 @@ window.MatInteractiva = window.MatInteractiva || {};
     const yMin = state.centerY - (height / 2) / state.scale;
     const yMax = state.centerY + (height / 2) / state.scale;
 
+    // Ejes principales (calculados antes para evitar colisión con etiquetas)
+    const ox = toScreenX(0);
+    const oy = toScreenY(0);
+
     ctx.lineWidth = 1;
     ctx.strokeStyle = pal.grid;
     ctx.fillStyle = pal.tickText;
     ctx.font = '12px Inter, system-ui, sans-serif';
 
+    const yLabelLeftSide = ox > width - 52;
+    const axisX = yLabelLeftSide
+      ? Math.min(width - 8, Math.max(40, ox - 8))
+      : Math.min(width - 42, Math.max(8, ox + 7));
+    const yColLeft = yLabelLeftSide ? axisX - 32 : axisX - 2;
+    const yColRight = yLabelLeftSide ? axisX + 2 : axisX + 32;
+    const axisY = Math.min(height - 10, Math.max(18, oy + 15));
+
     const firstGx = Math.floor(xMin / gridStep) * gridStep;
+    let lastTickRight = -Infinity;
+    ctx.textAlign = 'center';
     for (let gx = firstGx; gx <= xMax; gx += gridStep) {
       const sx = toScreenX(gx);
       ctx.beginPath();
@@ -871,12 +891,19 @@ window.MatInteractiva = window.MatInteractiva || {};
       ctx.stroke();
       if (Math.abs(gx) > 1e-7) {
         const lbl = Number(gx.toFixed(3)).toString();
-        const axisY = Math.min(height - 10, Math.max(16, toScreenY(0) + 15));
-        ctx.fillText(lbl, Math.max(4, Math.min(width - 28, sx - 6)), axisY);
+        const halfW = (typeof ctx.measureText === 'function' ? ctx.measureText(lbl).width : lbl.length * 7) / 2;
+        if (sx - halfW < 14 || sx + halfW > width - 14) continue;
+        if (Math.abs(sx - ox) < halfW + 14) continue;
+        if (sx - halfW < yColRight + 4 && sx + halfW > yColLeft - 4) continue;
+        if (sx - halfW < lastTickRight + 8) continue;
+        ctx.fillText(lbl, sx, axisY);
+        lastTickRight = sx + halfW;
       }
     }
 
     const firstGy = Math.floor(yMin / gridStep) * gridStep;
+    ctx.textAlign = yLabelLeftSide ? 'right' : 'left';
+    let lastTickY = Infinity;
     for (let gy = firstGy; gy <= yMax; gy += gridStep) {
       const sy = toScreenY(gy);
       ctx.beginPath();
@@ -885,14 +912,16 @@ window.MatInteractiva = window.MatInteractiva || {};
       ctx.stroke();
       if (Math.abs(gy) > 1e-7) {
         const lbl = Number(gy.toFixed(3)).toString();
-        const axisX = Math.min(width - 34, Math.max(6, toScreenX(0) + 6));
-        ctx.fillText(lbl, axisX, Math.max(14, Math.min(height - 6, sy + 4)));
+        if (sy < 18 || sy > height - 12) continue;
+        if (Math.abs(sy - oy) < 16) continue;
+        if (lastTickY - sy < 18) continue;
+        ctx.fillText(lbl, axisX, sy + 4);
+        lastTickY = sy;
       }
     }
+    ctx.textAlign = 'left';
 
     // Ejes principales
-    const ox = toScreenX(0);
-    const oy = toScreenY(0);
     ctx.strokeStyle = pal.axis;
     ctx.lineWidth = 1.6;
     ctx.beginPath();
