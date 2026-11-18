@@ -2211,6 +2211,152 @@ body.has-expanded-graph .content-card {
 /* --------------------------------------------------------------------------
    PrepMat: Simulador Analítico de Exámenes (Bachillerato y Licenciatura)
    -------------------------------------------------------------------------- */
+.prepmat-hero-header {
+  position: relative;
+  overflow: hidden;
+  padding: 1.55rem 1.7rem;
+  margin-bottom: 1.25rem;
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  background:
+    radial-gradient(circle at 88% 16%, rgba(251, 191, 36, 0.26), transparent 44%),
+    radial-gradient(circle at 14% 90%, rgba(56, 189, 248, 0.20), transparent 45%),
+    linear-gradient(135deg, #1e1b4b 0%, #4338ca 52%, #0284c7 100%);
+  color: #ffffff;
+  box-shadow: 0 18px 40px -14px rgba(49, 46, 129, 0.48);
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.prepmat-hero-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.prepmat-brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  min-width: 0;
+}
+
+.prepmat-brand-emblem {
+  width: 50px;
+  height: 50px;
+  min-width: 50px;
+  border-radius: 15px;
+  background: linear-gradient(135deg, rgba(251, 191, 36, 0.30), rgba(255, 255, 255, 0.16));
+  border: 1.5px solid rgba(253, 224, 71, 0.56);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.55rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.36);
+}
+
+.prepmat-brand-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.18rem;
+  min-width: 0;
+}
+
+.prepmat-brand-eyebrow {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: rgba(224, 231, 255, 0.86);
+}
+
+.prepmat-wordmark-row {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+}
+
+.prepmat-wordmark {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: #ffffff;
+  text-shadow: 0 2px 10px rgba(15, 23, 42, 0.28);
+}
+
+.prepmat-edition-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.18rem 0.6rem;
+  border-radius: var(--radius-full);
+  background: rgba(251, 191, 36, 0.24);
+  border: 1px solid rgba(253, 224, 71, 0.62);
+  color: #fef08a;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.prepmat-level-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.34rem 0.82rem;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.30);
+  color: #f8fafc;
+  font-size: 0.76rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.prepmat-hero-title {
+  margin: 0;
+  font-size: clamp(1.18rem, 2.3vw, 1.52rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: #e0f2fe;
+}
+
+.prepmat-hero-desc {
+  margin: 0;
+  font-size: 0.91rem;
+  line-height: 1.55;
+  color: rgba(241, 245, 249, 0.92);
+  max-width: 72ch;
+}
+
+.prepmat-hero-desc strong {
+  color: #fef08a;
+}
+
+.prepmat-hero-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.15rem;
+}
+
+.prepmat-feature-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.28rem 0.72rem;
+  border-radius: var(--radius-full);
+  background: rgba(15, 23, 42, 0.26);
+  border: 1px solid rgba(255, 255, 255, 0.20);
+  color: #f8fafc;
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
 .prepmat-stats-strip {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));

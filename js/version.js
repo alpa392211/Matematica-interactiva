@@ -10,12 +10,25 @@
 
   const APP_NAME = 'MateTic';
   const APP_TAGLINE = 'Matemáticas Interactivas';
-  const APP_VERSION = '1.6.1';
+  const APP_VERSION = '1.7.0';
   const APP_RELEASE_DATE = '2026-11-18';
   const STUDIO_NAME = 'ALPA Studio';
   const STUDIO_MEANING = '';
 
   const RELEASE_NOTES = [
+    {
+      version: '1.7.0',
+      date: '2026-11-18',
+      items: [
+        'Navegación fluida dentro de una misma sección de estudio: cambiar entre Teoría, Ejemplos, Práctica o usar los botones internos ya no muestra avisos de confirmación; el aviso aparece únicamente al cambiar de tema, materia, examen en curso o herramienta.',
+        'PrepMat con nuevo encabezado insignia: logotipo destacado con emblema, distintivo Simulador PRO, nivel académico y cápsulas informativas de sus 9 ramas matemáticas.',
+        'Panel principal con tarjeta estelar para PrepMat: bloque superior destacado con llamada directa al simulador de exámenes.',
+        'Herramientas interactivas mejor organizadas en el panel principal: divididas claramente en Gráficas, Fórmulas y Notación y en Cálculo y Resolución Guiada.',
+        'Menú lateral renovado: PrepMat resaltado arriba con insignia PRO dorada y herramientas separadas por categoría para ubicar cada utilidad de un vistazo.',
+        'Menú rápido de inicio mejorado: acceso destacado a PrepMat con borde dorado sobre los demás accesos rápidos.',
+        'Verificación completa de navegación, contraste en modo claro/oscuro y diseño adaptable en teléfonos y tabletas.'
+      ]
+    },
     {
       version: '1.6.1',
       date: '2026-11-18',

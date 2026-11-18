@@ -744,13 +744,6 @@ window.MatInteractiva = window.MatInteractiva || {};
     solucionador: 'Resolución Guiada'
   };
 
-  const NAV_TAB_LABELS = {
-    teoria: 'Teoría y Fórmulas',
-    ejemplos: 'Ejemplos y Errores',
-    ejercicios: 'Ejercicios de Práctica',
-    evaluacion: 'Evaluación Final'
-  };
-
   function hasActivePrepMatExam() {
     return Boolean(
       appState.currentView === 'tool' &&
@@ -767,6 +760,15 @@ window.MatInteractiva = window.MatInteractiva || {};
       appState.activeTab === 'evaluacion' &&
       appState.activeTopicId &&
       !appState.quizSubmitted[appState.activeTopicId]
+    );
+  }
+
+  function isSameStudySection(target = {}) {
+    return Boolean(
+      appState.currentView === 'subject' &&
+      target.view === 'subject' &&
+      (!target.subjectId || target.subjectId === appState.activeSubjectId) &&
+      (!target.topicId || target.topicId === appState.activeTopicId)
     );
   }
 
@@ -790,7 +792,7 @@ window.MatInteractiva = window.MatInteractiva || {};
 
   function guardNavigation(target, onProceed, returnFocusEl = null) {
     if (typeof onProceed !== 'function') return;
-    if (!willTargetChangeContext(target)) {
+    if (!willTargetChangeContext(target) || isSameStudySection(target)) {
       onProceed();
       return;
     }
@@ -833,15 +835,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       } else if (target.view === 'tool') {
         destDesc = NAV_TOOL_LABELS[target.toolId] || 'otra herramienta';
       } else if (target.view === 'subject') {
-        if (
-          (!target.subjectId || target.subjectId === appState.activeSubjectId) &&
-          (!target.topicId || target.topicId === appState.activeTopicId) &&
-          target.tab && target.tab !== appState.activeTab
-        ) {
-          destDesc = `la pestaña ${NAV_TAB_LABELS[target.tab] || target.tab}`;
-        } else {
-          destDesc = 'otro tema o materia de estudio';
-        }
+        destDesc = 'otro tema o materia de estudio';
       }
 
       openAppConfirmDialog({
@@ -1510,14 +1504,29 @@ window.MatInteractiva = window.MatInteractiva || {};
     const navContainer = document.getElementById('sidebar-nav-container');
     if (!navContainer) return;
 
-    const toolsList = [
-      { id: 'prepmat', name: 'PrepMat · Exámenes', icon: '🎓' },
-      { id: 'formularios', name: 'Formularios matemáticos', icon: '📄' },
+    const visualToolsList = [
       { id: 'graficador', name: 'Graficador de funciones', icon: '📈' },
+      { id: 'formularios', name: 'Formularios matemáticos', icon: '📄' },
+      { id: 'editor', name: 'Editor de expresiones', icon: '∑' }
+    ];
+    const calcToolsList = [
       { id: 'calculadora', name: 'Calculadora científica', icon: '🧮' },
-      { id: 'editor', name: 'Editor de expresiones', icon: '∑' },
       { id: 'solucionador', name: 'Resolución guiada', icon: '🧭' }
     ];
+
+    const renderToolNavBtn = (t) => {
+      const isActive = appState.currentView === 'tool' && appState.activeToolId === t.id;
+      return `
+        <li>
+          <button class="nav-item ${isActive ? 'active' : ''}" data-nav-tool="${t.id}">
+            <span class="nav-icon">${t.icon}</span>
+            <span class="nav-label">${t.name}</span>
+          </button>
+        </li>
+      `;
+    };
+
+    const isPrepMatActive = appState.currentView === 'tool' && appState.activeToolId === 'prepmat';
 
     navContainer.innerHTML = `
       <div>
@@ -1551,20 +1560,24 @@ window.MatInteractiva = window.MatInteractiva || {};
         </ul>
       </div>
 
-      <div>
+      <div class="nav-tools-section">
         <div class="nav-section-title">Herramientas Interactivas</div>
+        <div class="nav-prepmat-featured-wrap">
+          <button class="nav-item nav-item-prepmat ${isPrepMatActive ? 'active' : ''}" data-nav-tool="prepmat">
+            <span class="nav-icon">🎓</span>
+            <span class="nav-label">PrepMat · Exámenes</span>
+            <span class="nav-badge nav-badge-prepmat">★ PRO</span>
+          </button>
+        </div>
+
+        <div class="nav-subsection-label">Gráficas y Referencia</div>
         <ul class="nav-list">
-          ${toolsList.map(t => {
-            const isActive = appState.currentView === 'tool' && appState.activeToolId === t.id;
-            return `
-              <li>
-                <button class="nav-item ${isActive ? 'active' : ''}" data-nav-tool="${t.id}">
-                  <span class="nav-icon">${t.icon}</span>
-                  <span class="nav-label">${t.name}</span>
-                </button>
-              </li>
-            `;
-          }).join('')}
+          ${visualToolsList.map(renderToolNavBtn).join('')}
+        </ul>
+
+        <div class="nav-subsection-label">Cálculo y Resolución</div>
+        <ul class="nav-list">
+          ${calcToolsList.map(renderToolNavBtn).join('')}
           <li>
             <button class="nav-item nav-item-cas" id="btn-sidebar-numerus-cas" type="button">
               <span class="nav-icon">⚛️</span>
@@ -1955,21 +1968,25 @@ window.MatInteractiva = window.MatInteractiva || {};
                 <span class="hero-more-chevron" aria-hidden="true">▾</span>
               </summary>
               <div class="hero-more-panel">
-                <button type="button" class="btn btn-glass" id="btn-hero-map">
-                  🗺️ Mapa Curricular (${curriculum.length} materias · ${stats.totalTopics} temas)
+                <button type="button" class="btn btn-hero-prepmat-featured" id="btn-hero-prepmat">
+                  <span class="hero-prepmat-label">🎓 PrepMat · Exámenes</span>
+                  <span class="hero-prepmat-tag">★ Destacado</span>
                 </button>
-                <button type="button" class="btn btn-glass" id="btn-hero-prepmat">
-                  🎓 PrepMat · Exámenes
-                </button>
-                <button type="button" class="btn btn-glass" id="btn-hero-graph">
-                  📈 Graficador
-                </button>
-                <button type="button" class="btn btn-glass" id="btn-hero-calc">
-                  🧮 Calculadora
-                </button>
-                <button type="button" class="btn btn-glass" id="btn-hero-formulas">
-                  📄 Formularios
-                </button>
+                <div class="hero-more-divider" aria-hidden="true"></div>
+                <div class="hero-more-links-grid">
+                  <button type="button" class="btn btn-glass" id="btn-hero-map">
+                    🗺️ Mapa Curricular (${curriculum.length} materias · ${stats.totalTopics} temas)
+                  </button>
+                  <button type="button" class="btn btn-glass" id="btn-hero-graph">
+                    📈 Graficador
+                  </button>
+                  <button type="button" class="btn btn-glass" id="btn-hero-calc">
+                    🧮 Calculadora
+                  </button>
+                  <button type="button" class="btn btn-glass" id="btn-hero-formulas">
+                    📄 Formularios
+                  </button>
+                </div>
               </div>
             </details>
           </div>
@@ -2226,31 +2243,77 @@ window.MatInteractiva = window.MatInteractiva || {};
       <!-- Laboratorio de Herramientas Interactivas -->
       <section class="content-card dash-section-card">
         <h2>🛠️ Laboratorio de Herramientas Interactivas</h2>
-        <p class="theory-paragraph">Instrumentos matemáticos listos para experimentar en cualquier momento:</p>
-        <div class="dash-tools-grid">
-          <div class="concept-box dash-tool-box" data-dash-tool="prepmat">
-            <div class="concept-box-title">🎓 PrepMat · Exámenes</div>
-            <div class="concept-box-body">Simulacros adaptativos en 9 ramas para Bachillerato y Licenciatura con desarrollo analítico y diagnóstico.</div>
+        <p class="theory-paragraph">Instrumentos matemáticos organizados por propósito para estudiar, graficar y evaluar:</p>
+
+        <button type="button" class="dash-prepmat-spotlight" data-dash-tool="prepmat">
+          <div class="dash-prepmat-spotlight-main">
+            <div class="dash-prepmat-spotlight-badges">
+              <span class="dash-prepmat-star-badge">★ HERRAMIENTA DESTACADA</span>
+              <span class="dash-prepmat-meta-pill">9 ramas · Bachillerato &amp; Licenciatura</span>
+            </div>
+            <div class="dash-prepmat-spotlight-title">🎓 PrepMat — Simulador Analítico de Exámenes</div>
+            <div class="dash-prepmat-spotlight-desc">
+              Evaluaciones adaptativas con reactivos únicos anti-repetición, temporizador, diagnóstico por áreas y desarrollo paso a paso.
+            </div>
           </div>
-          <div class="concept-box dash-tool-box" data-dash-tool="formularios">
-            <div class="concept-box-title">📄 Formularios Matemáticos</div>
-            <div class="concept-box-body">Hojas de referencia por tema y compendio general listas para imprimir en tamaño carta o PDF.</div>
+          <span class="dash-prepmat-spotlight-cta">Abrir PrepMat →</span>
+        </button>
+
+        <div class="dash-tools-group">
+          <div class="dash-tools-group-header">
+            <span class="dash-tools-group-title">📐 Gráficas, Fórmulas y Notación</span>
+            <span class="dash-tools-group-line" aria-hidden="true"></span>
           </div>
-          <div class="concept-box dash-tool-box" data-dash-tool="graficador">
-            <div class="concept-box-title">📈 Graficador de Funciones</div>
-            <div class="concept-box-body">Traza curvas múltiples, rectas tangentes, derivadas e integrales definidas sombreadas.</div>
+          <div class="dash-tools-grid">
+            <div class="concept-box dash-tool-box" data-dash-tool="graficador">
+              <div class="dash-tool-head">
+                <span class="dash-tool-icon" aria-hidden="true">📈</span>
+                <div class="concept-box-title">Graficador de Funciones</div>
+              </div>
+              <div class="concept-box-body">Traza curvas múltiples, rectas tangentes, derivadas e integrales definidas sombreadas.</div>
+              <span class="dash-tool-cta">Abrir herramienta ›</span>
+            </div>
+            <div class="concept-box dash-tool-box" data-dash-tool="formularios">
+              <div class="dash-tool-head">
+                <span class="dash-tool-icon" aria-hidden="true">📄</span>
+                <div class="concept-box-title">Formularios Matemáticos</div>
+              </div>
+              <div class="concept-box-body">Hojas de referencia por tema y compendio general listas para imprimir en tamaño carta o PDF.</div>
+              <span class="dash-tool-cta">Abrir herramienta ›</span>
+            </div>
+            <div class="concept-box dash-tool-box" data-dash-tool="editor">
+              <div class="dash-tool-head">
+                <span class="dash-tool-icon" aria-hidden="true">∑</span>
+                <div class="concept-box-title">Editor de Expresiones</div>
+              </div>
+              <div class="concept-box-body">Construye fórmulas con fracciones, raíces, límites, derivadas e integrales en tiempo real.</div>
+              <span class="dash-tool-cta">Abrir herramienta ›</span>
+            </div>
           </div>
-          <div class="concept-box dash-tool-box" data-dash-tool="calculadora">
-            <div class="concept-box-title">🧮 Calculadora Científica</div>
-            <div class="concept-box-body">Funciones trigonométricas en DEG/RAD, logaritmos, factoriales, memorias e historial.</div>
+        </div>
+
+        <div class="dash-tools-group">
+          <div class="dash-tools-group-header">
+            <span class="dash-tools-group-title">🧮 Cálculo y Resolución Guiada</span>
+            <span class="dash-tools-group-line" aria-hidden="true"></span>
           </div>
-          <div class="concept-box dash-tool-box" data-dash-tool="editor">
-            <div class="concept-box-title">∑ Editor de Expresiones</div>
-            <div class="concept-box-body">Construye fórmulas con fracciones, raíces, límites, derivadas e integrales en tiempo real.</div>
-          </div>
-          <div class="concept-box dash-tool-box" data-dash-tool="solucionador">
-            <div class="concept-box-title">🧭 Resolución Guiada</div>
-            <div class="concept-box-body">Ingresa tus propios ejercicios y desbloquea su procedimiento paso a paso.</div>
+          <div class="dash-tools-grid">
+            <div class="concept-box dash-tool-box" data-dash-tool="calculadora">
+              <div class="dash-tool-head">
+                <span class="dash-tool-icon" aria-hidden="true">🧮</span>
+                <div class="concept-box-title">Calculadora Científica</div>
+              </div>
+              <div class="concept-box-body">Funciones trigonométricas en DEG/RAD, logaritmos, factoriales, memorias e historial.</div>
+              <span class="dash-tool-cta">Abrir herramienta ›</span>
+            </div>
+            <div class="concept-box dash-tool-box" data-dash-tool="solucionador">
+              <div class="dash-tool-head">
+                <span class="dash-tool-icon" aria-hidden="true">🧭</span>
+                <div class="concept-box-title">Resolución Guiada</div>
+              </div>
+              <div class="concept-box-body">Ingresa tus propios ejercicios y desbloquea su procedimiento paso a paso.</div>
+              <span class="dash-tool-cta">Abrir herramienta ›</span>
+            </div>
           </div>
         </div>
       </section>

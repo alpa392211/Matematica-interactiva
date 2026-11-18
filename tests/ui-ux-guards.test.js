@@ -94,22 +94,36 @@ test('CSS y App garantizan transparencia reducida, menú inicial colapsable, fle
   assert.match(appCode, /className = 'hscroll-arrow is-right'/);
   assert.match(appCode, /has-expanded-graph/);
 
-  // Guardias de navegación interna (examen y estudio activo) sin bloqueo de salida/gesto atrás del navegador
+  // Guardias de navegación interna (solo al cambiar de sección de estudio o durante examen) sin bloqueo de salida/gesto atrás del navegador
+  assert.match(appCode, /function isSameStudySection\(/);
   assert.match(appCode, /function guardNavigation\(/);
+  assert.match(appCode, /!willTargetChangeContext\(target\)\s*\|\|\s*isSameStudySection\(target\)/);
   assert.doesNotMatch(appCode, /function bindAppExitGuardEvents\(/);
   assert.doesNotMatch(appCode, /armExitBackGuard/);
   assert.doesNotMatch(appCode, /app-exited-overlay/);
   assert.match(appCode, /wasRecentlyTriggered/);
+
+  // Rediseño de PrepMat y división de herramientas interactivas
+  const prepCode = fs.readFileSync(path.join(__dirname, '..', 'js', 'tools', 'prepmat.js'), 'utf8');
+  assert.match(prepCode, /class="prepmat-hero-header"/);
+  assert.match(appCode, /class="dash-prepmat-spotlight"/);
+  assert.match(appCode, /class="dash-tools-group"/);
+  assert.match(appCode, /class="nav-item nav-item-prepmat/);
+  assert.match(appCode, /class="nav-subsection-label"/);
+  assert.match(appCode, /class="btn btn-hero-prepmat-featured"/);
 
   // Reglas CSS de opacidad, gráficas expandidas sin transform atrapante, flechas sin sombra y tablet
   assert.match(varsCss, /--lg-expanded-graph-bg:/);
   assert.match(varsCss, /--bg-surface:\s*rgba\(255,\s*255,\s*255,\s*0\.94\)/);
   assert.match(layoutCss, /body\.has-expanded-graph \.floating-mobile-menu-btn/);
   assert.match(layoutCss, /animation:\s*lgViewTransitionIn[^\n]*backwards/);
+  assert.match(layoutCss, /\.nav-item-prepmat \.nav-badge-prepmat/);
   assert.match(toolsCss, /body\.has-expanded-graph \.main-wrapper/);
+  assert.match(toolsCss, /\.prepmat-hero-header/);
   assert.match(compCss, /\.hscroll-arrow\.is-right/);
   assert.doesNotMatch(compCss, /\.hscroll-arrow(?:\.is-left|\.is-right)?::before/);
   assert.match(compCss, /\.hscroll-arrow\s*\{[^}]*box-shadow:\s*none/);
   assert.match(compCss, /\.math-inline-group/);
+  assert.match(compCss, /\.dash-prepmat-spotlight/);
   assert.match(respCss, /@media \(min-width: 768px\) and \(max-width: 1180px\)/);
 });

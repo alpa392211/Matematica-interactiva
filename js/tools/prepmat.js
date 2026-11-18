@@ -4876,14 +4876,34 @@ window.MatInteractiva = window.MatInteractiva || {};
       : 0;
 
     container.innerHTML = `
-      <div class="tool-header-card">
-        <div class="hero-badge">🎓 Módulo PrepMat · Exámenes Bachillerato y Licenciatura</div>
-        <h1>PrepMat — Simulador Analítico de Exámenes</h1>
-        <p class="theory-paragraph no-margin">
+      <header class="prepmat-hero-header">
+        <div class="prepmat-hero-top">
+          <div class="prepmat-brand-lockup">
+            <div class="prepmat-brand-emblem" aria-hidden="true">🎓</div>
+            <div class="prepmat-brand-text">
+              <span class="prepmat-brand-eyebrow">MATETIC · EVALUACIÓN ADAPTATIVA</span>
+              <div class="prepmat-wordmark-row">
+                <span class="prepmat-wordmark">PrepMat</span>
+                <span class="prepmat-edition-pill">Simulador PRO</span>
+              </div>
+            </div>
+          </div>
+          <span class="prepmat-level-badge">Bachillerato &amp; Licenciatura</span>
+        </div>
+
+        <h1 class="prepmat-hero-title">Simulador Analítico de Exámenes</h1>
+        <p class="prepmat-hero-desc">
           Entrena con evaluaciones adaptativas de <strong>9 ramas matemáticas</strong>, generación paramétrica anti-repetición,
           curva progresiva de dificultad y justificación analítica paso a paso en cada reactivo.
         </p>
-      </div>
+
+        <div class="prepmat-hero-features">
+          <span class="prepmat-feature-chip">📚 9 ramas oficiales</span>
+          <span class="prepmat-feature-chip">⚡ Dificultad progresiva</span>
+          <span class="prepmat-feature-chip">♾️ Reactivos únicos</span>
+          <span class="prepmat-feature-chip">🧠 Desarrollo paso a paso</span>
+        </div>
+      </header>
 
       <div class="prepmat-stats-strip">
         <div class="prepmat-mini-stat">
