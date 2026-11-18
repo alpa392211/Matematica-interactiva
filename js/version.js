@@ -10,12 +10,25 @@
 
   const APP_NAME = 'MateTic';
   const APP_TAGLINE = 'Matemáticas Interactivas';
-  const APP_VERSION = '1.6.0';
+  const APP_VERSION = '1.6.1';
   const APP_RELEASE_DATE = '2026-11-18';
   const STUDIO_NAME = 'ALPA Studio';
   const STUDIO_MEANING = '';
 
   const RELEASE_NOTES = [
+    {
+      version: '1.6.1',
+      date: '2026-11-18',
+      items: [
+        'Eliminado todo el flujo redundante de salida de la app: quitado el botón Salir de Ajustes, la pantalla intermedia de despedida y la intercepción del gesto atrás o cierre de pestaña para evitar duplicaciones visuales al deslizar desde el borde en celular.',
+        'Botones de barras deslizables (‹ y ›) limpios y sin sombras encimadas: eliminadas las sombras y recuadros laterales que tapaban tarjetas y pastillas, usando ahora un desvanecido suave en el borde.',
+        'Pestañas de lección y selectores centrados: alineadas verticalmente las flechas laterales respecto a los temas y pestañas en modo claro y oscuro.',
+        'Derivadas: corregida la presentación de fórmulas y costos marginales para mostrar unidades monetarias limpias y expresiones matemáticas sin signos $ sueltos.',
+        'Fórmulas con paréntesis: evitado el recorte del último dígito en expresiones cortas dentro de botones y tarjetas (como a = 2 y a = 0).',
+        'Móvil horizontal: compactada la cabecera de gráficas expandidas para mostrar el plano cartesiano completo de inmediato sin necesidad de desplazarse.',
+        'Verificación visual e integral en teléfonos (vertical y horizontal) y tabletas sobre las 9 materias, 24 temas y 6 herramientas sin textos cortados ni desbordamientos.'
+      ]
+    },
     {
       version: '1.6.0',
       date: '2026-11-18',

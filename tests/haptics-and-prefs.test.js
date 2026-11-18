@@ -259,7 +259,8 @@ test('Datos, salida de app, códigos de desarrollador (06092109 / 23410908) y aj
   assert.match(html, /id="btn-floating-open-sidebar"/);
   assert.match(html, /id="btn-floating-open-quick-calc"/);
   assert.match(html, /id="btn-wipe-all-data"/);
-  assert.match(html, /id="btn-exit-app"/);
+  assert.doesNotMatch(html, /id="btn-exit-app"/);
+  assert.doesNotMatch(html, /id="app-exited-overlay"/);
   assert.match(html, /id="app-confirm-modal"/);
   assert.match(html, /id="settings-dev-details"/);
   assert.match(html, /Códigos de desarrollador/);

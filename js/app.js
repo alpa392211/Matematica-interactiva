@@ -287,9 +287,8 @@ window.MatInteractiva = window.MatInteractiva || {};
 
     const isMobile = window.innerWidth <= 900;
     const sidebarOpen = Boolean(document.getElementById('app-sidebar')?.classList.contains('open'));
-    const exitedOpen = Boolean(document.getElementById('app-exited-overlay') && !document.getElementById('app-exited-overlay').hidden);
     const expandedGraph = Boolean(document.body.classList.contains('has-expanded-graph'));
-    const hasOverlay = activeDialogStack.length > 0 || sidebarOpen || exitedOpen || expandedGraph || document.documentElement.classList.contains('has-open-overlay');
+    const hasOverlay = activeDialogStack.length > 0 || sidebarOpen || expandedGraph || document.documentElement.classList.contains('has-open-overlay');
 
     let scrolledPastHeader = false;
     if (isMobile && !hasOverlay) {
@@ -614,7 +613,6 @@ window.MatInteractiva = window.MatInteractiva || {};
 
   let pendingConfirmCallback = null;
   let confirmModalEventsBound = false;
-  let exitGuardEventsBound = false;
 
   function closeConfirmModal() {
     pendingConfirmCallback = null;
@@ -735,80 +733,6 @@ window.MatInteractiva = window.MatInteractiva || {};
     refreshCurrentView();
     closeAccessibleDialog(document.getElementById('settings-modal'));
     haptic('confirm');
-  }
-
-  function exitApplication() {
-    if (ns.PrepMatTool && typeof ns.PrepMatTool.abandonActiveExam === 'function' && ns.PrepMatTool.hasActiveExam?.()) {
-      ns.PrepMatTool.abandonActiveExam();
-    }
-    clearExpandedGraphState();
-    resetDeveloperSessionState();
-    while (activeDialogStack.length > 0) {
-      const top = activeDialogStack[activeDialogStack.length - 1];
-      closeAccessibleDialog(top.el);
-    }
-    closeMobileSidebar();
-    syncModalScrollLock();
-    const exitedOverlay = document.getElementById('app-exited-overlay');
-    if (exitedOverlay) {
-      exitedOverlay.hidden = false;
-    }
-    syncFloatingMenuButton();
-    try {
-      if (typeof window.close === 'function') {
-        window.close();
-      }
-    } catch (_) {}
-  }
-
-  function armExitBackGuard() {
-    if (typeof window === 'undefined' || !window.history || typeof window.history.pushState !== 'function') {
-      return;
-    }
-    try {
-      if (!window.history.state || !window.history.state.mateticExitGuard) {
-        window.history.pushState({ mateticExitGuard: true }, '');
-      }
-    } catch (_) {}
-  }
-
-  function requestAppExitConfirmation(returnFocusEl = null) {
-    const confirmModal = document.getElementById('app-confirm-modal');
-    if (confirmModal && activeDialogStack.some(d => d.el === confirmModal)) {
-      return;
-    }
-    const examActive = hasActivePrepMatExam() || hasActiveSubjectQuiz();
-    openAppConfirmDialog({
-      title: `Salir de ${getAppName()}`,
-      message: examActive
-        ? 'Tienes un examen o evaluación en curso. ¿Estás seguro de que quieres salir de la aplicación?'
-        : '¿Estás seguro de que quieres salir de la aplicación?',
-      confirmText: 'Sí, salir',
-      cancelText: 'Quedarme',
-      danger: examActive,
-      returnFocusEl: returnFocusEl || document.activeElement,
-      onConfirm: exitApplication
-    });
-  }
-
-  function bindAppExitGuardEvents() {
-    if (exitGuardEventsBound || typeof window === 'undefined') return;
-    exitGuardEventsBound = true;
-    armExitBackGuard();
-
-    window.addEventListener('beforeunload', (ev) => {
-      const exitedOverlay = document.getElementById('app-exited-overlay');
-      if (exitedOverlay && !exitedOverlay.hidden) return;
-      ev.preventDefault();
-      ev.returnValue = '';
-    });
-
-    window.addEventListener('popstate', () => {
-      const exitedOverlay = document.getElementById('app-exited-overlay');
-      if (exitedOverlay && !exitedOverlay.hidden) return;
-      armExitBackGuard();
-      requestAppExitConfirmation();
-    });
   }
 
   const NAV_TOOL_LABELS = {
@@ -1152,20 +1076,6 @@ window.MatInteractiva = window.MatInteractiva || {};
         returnFocusEl: ev.currentTarget,
         onConfirm: wipeAllAppData
       });
-    });
-
-    document.getElementById('btn-exit-app')?.addEventListener('click', (ev) => {
-      requestAppExitConfirmation(ev.currentTarget);
-    });
-
-    document.getElementById('btn-reenter-app')?.addEventListener('click', () => {
-      haptic('confirm');
-      resetDeveloperSessionState();
-      const exitedOverlay = document.getElementById('app-exited-overlay');
-      if (exitedOverlay) exitedOverlay.hidden = true;
-      armExitBackGuard();
-      syncFloatingMenuButton();
-      navigateToDashboard();
     });
 
     const devCodeInput = document.getElementById('dev-code-input');
@@ -1580,7 +1490,6 @@ window.MatInteractiva = window.MatInteractiva || {};
     syncPreferenceSwitches();
     bindSettingsEvents();
     bindGlobalButtonPhysicsAndScrollGuard();
-    bindAppExitGuardEvents();
     initPwaSupport();
     if (ns.AmbientBackground && typeof ns.AmbientBackground.init === 'function') {
       ns.AmbientBackground.init();

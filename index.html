@@ -314,7 +314,7 @@
         </section>
 
         <section class="settings-section" id="settings-sec-data" aria-labelledby="settings-sec-data-title">
-          <h2 class="settings-section-title" id="settings-sec-data-title">Datos y sesión</h2>
+          <h2 class="settings-section-title" id="settings-sec-data-title">Datos guardados</h2>
           <div class="settings-group-card">
             <div class="settings-control-row settings-wrappable-row">
               <div class="settings-control-text">
@@ -322,14 +322,6 @@
                 <span class="settings-control-note">Elimina XP, rachas, temas estudiados, historial de PrepMat y preferencias</span>
               </div>
               <button type="button" class="btn btn-danger-outline btn-sm" id="btn-wipe-all-data">🗑️ Borrar todo</button>
-            </div>
-
-            <div class="settings-control-row settings-wrappable-row">
-              <div class="settings-control-text">
-                <span class="settings-control-label">Salir de la app</span>
-                <span class="settings-control-note">Cierra la sesión actual de la aplicación tras confirmar</span>
-              </div>
-              <button type="button" class="btn btn-outline btn-sm" id="btn-exit-app">🚪 Salir de la app</button>
             </div>
           </div>
         </section>
@@ -589,7 +581,7 @@
     </div>
   </div>
 
-  <!-- Diálogo Accesible de Confirmación (Salir / Borrar datos) -->
+  <!-- Diálogo Accesible de Confirmación (Cambiar sección / Borrar datos) -->
   <div class="quick-modal-backdrop app-confirm-backdrop no-print" id="app-confirm-modal" role="alertdialog" aria-modal="true" aria-labelledby="app-confirm-title" aria-describedby="app-confirm-message" hidden>
     <div class="quick-modal-window app-confirm-window">
       <div class="quick-modal-header">
@@ -603,16 +595,6 @@
           <button type="button" class="btn btn-primary" id="btn-app-confirm-ok">Confirmar</button>
         </div>
       </div>
-    </div>
-  </div>
-
-  <!-- Pantalla tras salir de la aplicación -->
-  <div class="app-exited-overlay no-print" id="app-exited-overlay" role="dialog" aria-modal="true" aria-labelledby="app-exited-title" hidden>
-    <div class="app-exited-card">
-      <div class="app-exited-icon" aria-hidden="true">👋</div>
-      <h2 id="app-exited-title">Has salido de MateTic</h2>
-      <p>Tu sesión se cerró correctamente y los códigos temporales fueron eliminados. Ya puedes cerrar esta ventana o volver a entrar.</p>
-      <button type="button" class="btn btn-primary" id="btn-reenter-app">Volver a entrar a MateTic</button>
     </div>
   </div>
 

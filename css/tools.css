@@ -701,8 +701,8 @@ body.has-expanded-graph .content-card {
   gap: 0.45rem;
   overflow-x: auto;
   overflow-y: visible;
-  padding: 0.35rem 0.3rem 0.65rem;
-  margin: -0.25rem -0.2rem -0.35rem;
+  padding: 0.35rem 0.25rem;
+  margin: 0;
 }
 
 .calc-fn-tab {

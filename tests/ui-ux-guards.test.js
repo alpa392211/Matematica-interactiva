@@ -94,21 +94,22 @@ test('CSS y App garantizan transparencia reducida, menú inicial colapsable, fle
   assert.match(appCode, /className = 'hscroll-arrow is-right'/);
   assert.match(appCode, /has-expanded-graph/);
 
-  // Guardias de estudio, examen y salida (antes de salir de la app o cambiar sección)
+  // Guardias de navegación interna (examen y estudio activo) sin bloqueo de salida/gesto atrás del navegador
   assert.match(appCode, /function guardNavigation\(/);
-  assert.match(appCode, /function bindAppExitGuardEvents\(/);
-  assert.match(appCode, /beforeunload/);
-  assert.match(appCode, /popstate/);
-  assert.match(appCode, /requestAppExitConfirmation/);
+  assert.doesNotMatch(appCode, /function bindAppExitGuardEvents\(/);
+  assert.doesNotMatch(appCode, /armExitBackGuard/);
+  assert.doesNotMatch(appCode, /app-exited-overlay/);
   assert.match(appCode, /wasRecentlyTriggered/);
 
-  // Reglas CSS de opacidad, gráficas expandidas sin transform atrapante y tablet
+  // Reglas CSS de opacidad, gráficas expandidas sin transform atrapante, flechas sin sombra y tablet
   assert.match(varsCss, /--lg-expanded-graph-bg:/);
   assert.match(varsCss, /--bg-surface:\s*rgba\(255,\s*255,\s*255,\s*0\.94\)/);
   assert.match(layoutCss, /body\.has-expanded-graph \.floating-mobile-menu-btn/);
   assert.match(layoutCss, /animation:\s*lgViewTransitionIn[^\n]*backwards/);
   assert.match(toolsCss, /body\.has-expanded-graph \.main-wrapper/);
   assert.match(compCss, /\.hscroll-arrow\.is-right/);
+  assert.doesNotMatch(compCss, /\.hscroll-arrow(?:\.is-left|\.is-right)?::before/);
+  assert.match(compCss, /\.hscroll-arrow\s*\{[^}]*box-shadow:\s*none/);
   assert.match(compCss, /\.math-inline-group/);
   assert.match(respCss, /@media \(min-width: 768px\) and \(max-width: 1180px\)/);
 });

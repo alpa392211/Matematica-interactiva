@@ -718,8 +718,8 @@
   overflow-y: visible;
   scrollbar-width: none;
   scroll-behavior: smooth;
-  padding: 0.48rem 0.48rem 0.78rem;
-  margin: -0.23rem -0.35rem 0.15rem;
+  padding: 0.45rem 0.48rem;
+  margin: 0 0 0.25rem;
 }
 
 .topics-bar::-webkit-scrollbar,
@@ -837,10 +837,18 @@
 
 .hscroll-shell.is-learning-tabs {
   margin-bottom: 1.5rem;
+  background: var(--bg-surface);
+  border-radius: var(--radius-full);
+  border: 1px solid var(--lg-border-outer);
+  box-shadow: var(--shadow-glass-sm);
+  overflow: hidden;
 }
 
 .hscroll-shell.is-learning-tabs > .learning-tabs {
   margin-bottom: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
 }
 
 .hscroll-shell.can-scroll-right > .topics-bar,
@@ -849,7 +857,37 @@
 .hscroll-shell.can-scroll-right > .calc-fn-tabs,
 .hscroll-shell.can-scroll-right > .map-filter-blocks,
 .hscroll-shell.can-scroll-right > .lesson-toc-links {
-  padding-right: 2.65rem;
+  padding-right: 2.5rem;
+}
+
+.hscroll-shell.can-scroll-right:not(.can-scroll-left) > .topics-bar,
+.hscroll-shell.can-scroll-right:not(.can-scroll-left) > .learning-tabs,
+.hscroll-shell.can-scroll-right:not(.can-scroll-left) > .mvk-tabs-bar,
+.hscroll-shell.can-scroll-right:not(.can-scroll-left) > .calc-fn-tabs,
+.hscroll-shell.can-scroll-right:not(.can-scroll-left) > .map-filter-blocks,
+.hscroll-shell.can-scroll-right:not(.can-scroll-left) > .lesson-toc-links {
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 calc(100% - 48px), transparent calc(100% - 14px), transparent 100%);
+  mask-image: linear-gradient(90deg, #000 0%, #000 calc(100% - 48px), transparent calc(100% - 14px), transparent 100%);
+}
+
+.hscroll-shell.can-scroll-left:not(.can-scroll-right) > .topics-bar,
+.hscroll-shell.can-scroll-left:not(.can-scroll-right) > .learning-tabs,
+.hscroll-shell.can-scroll-left:not(.can-scroll-right) > .mvk-tabs-bar,
+.hscroll-shell.can-scroll-left:not(.can-scroll-right) > .calc-fn-tabs,
+.hscroll-shell.can-scroll-left:not(.can-scroll-right) > .map-filter-blocks,
+.hscroll-shell.can-scroll-left:not(.can-scroll-right) > .lesson-toc-links {
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, transparent 14px, #000 48px, #000 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, transparent 14px, #000 48px, #000 100%);
+}
+
+.hscroll-shell.can-scroll-left.can-scroll-right > .topics-bar,
+.hscroll-shell.can-scroll-left.can-scroll-right > .learning-tabs,
+.hscroll-shell.can-scroll-left.can-scroll-right > .mvk-tabs-bar,
+.hscroll-shell.can-scroll-left.can-scroll-right > .calc-fn-tabs,
+.hscroll-shell.can-scroll-left.can-scroll-right > .map-filter-blocks,
+.hscroll-shell.can-scroll-left.can-scroll-right > .lesson-toc-links {
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, transparent 14px, #000 48px, #000 calc(100% - 48px), transparent calc(100% - 14px), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, transparent 14px, #000 48px, #000 calc(100% - 48px), transparent calc(100% - 14px), transparent 100%);
 }
 
 @keyframes hscrollNudge {
@@ -857,7 +895,7 @@
     transform: translateY(-50%) translateX(0);
   }
   50% {
-    transform: translateY(-50%) translateX(3px);
+    transform: translateY(-50%) translateX(2px);
   }
 }
 
@@ -866,20 +904,26 @@
   top: 50%;
   transform: translateY(-50%);
   z-index: 6;
-  width: 34px;
-  height: 34px;
+  width: 30px;
+  height: 30px;
   border-radius: var(--radius-full);
-  border: 1px solid var(--primary-300);
+  border: 1.5px solid var(--primary-300);
   background: var(--bg-surface-solid);
   color: var(--primary-700);
-  box-shadow: var(--shadow-md);
+  box-shadow: none;
   display: none;
   align-items: center;
   justify-content: center;
-  font-size: 1.15rem;
+  font-size: 1.05rem;
   font-weight: 800;
   line-height: 1;
   cursor: pointer;
+  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.hscroll-arrow:hover {
+  background: var(--primary-50);
+  border-color: var(--primary-500);
 }
 
 .hscroll-arrow.is-left {
@@ -890,6 +934,14 @@
   right: 0.25rem;
 }
 
+.hscroll-shell.is-learning-tabs > .hscroll-arrow.is-left {
+  left: 0.35rem;
+}
+
+.hscroll-shell.is-learning-tabs > .hscroll-arrow.is-right {
+  right: 0.35rem;
+}
+
 .hscroll-shell.can-scroll-left > .hscroll-arrow.is-left {
   display: inline-flex;
 }
@@ -897,26 +949,6 @@
 .hscroll-shell.can-scroll-right > .hscroll-arrow.is-right {
   display: inline-flex;
   animation: hscrollNudge 1.8s ease-in-out infinite;
-}
-
-.hscroll-arrow::before {
-  content: '';
-  position: absolute;
-  top: -4px;
-  bottom: -4px;
-  width: 24px;
-  pointer-events: none;
-  z-index: -1;
-}
-
-.hscroll-arrow.is-right::before {
-  right: 100%;
-  background: linear-gradient(90deg, transparent, var(--bg-surface-solid));
-}
-
-.hscroll-arrow.is-left::before {
-  left: 100%;
-  background: linear-gradient(270deg, transparent, var(--bg-surface-solid));
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1095,12 +1127,17 @@
 }
 
 .math-inline-group {
-  display: inline;
+  display: inline-flex;
+  align-items: baseline;
+  max-width: 100%;
   white-space: nowrap;
+  vertical-align: baseline;
 }
 
-.math-inline-group .math-inline {
-  max-width: calc(100% - 1.35rem);
+.math-inline-group > .math-inline {
+  min-width: 0;
+  flex: 0 1 auto;
+  max-width: 100%;
 }
 
 .math-block {
@@ -4301,53 +4338,3 @@ html[data-theme="dark"] .settings-dev-feedback.is-error {
   flex-wrap: wrap;
 }
 
-/* Pantalla tras salir de la app */
-.app-exited-overlay[hidden] {
-  display: none !important;
-}
-
-.app-exited-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 1600;
-  background: var(--lg-backdrop-bg);
-  -webkit-backdrop-filter: blur(22px) saturate(140%);
-  backdrop-filter: blur(22px) saturate(140%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1.25rem;
-}
-
-.app-exited-card {
-  width: 100%;
-  max-width: 420px;
-  padding: 2rem 1.5rem;
-  border-radius: var(--radius-glass);
-  background: var(--lg-modal-scrim), var(--lg-modal-bg);
-  border: 1px solid var(--lg-border-outer);
-  box-shadow: var(--shadow-glass-lg);
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.85rem;
-}
-
-.app-exited-icon {
-  font-size: 2.4rem;
-  line-height: 1;
-}
-
-.app-exited-card h2 {
-  margin: 0;
-  font-size: 1.25rem;
-  color: var(--text-main);
-}
-
-.app-exited-card p {
-  margin: 0;
-  font-size: 0.9rem;
-  line-height: 1.55;
-  color: var(--text-secondary);
-}

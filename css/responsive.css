@@ -1121,7 +1121,31 @@
   }
   .grapher-canvas-card.is-graph-expanded .canvas-wrapper,
   .lesson-graph-card.is-graph-expanded .lesson-canvas-box {
-    height: clamp(190px, 50dvh, 260px);
+    height: clamp(185px, 52dvh, 250px);
+    min-height: 185px;
+  }
+  .lesson-graph-card.is-graph-expanded {
+    padding: 0.65rem 0.75rem;
+    gap: 0.45rem;
+  }
+  .lesson-graph-card.is-graph-expanded .lesson-graph-desc,
+  .lesson-graph-card.is-graph-expanded .didactic-step-badge {
+    display: none;
+  }
+  .lesson-graph-card.is-graph-expanded .lesson-graph-title {
+    font-size: 0.95rem;
+    margin: 0;
+  }
+  .lesson-graph-card.is-graph-expanded .lesson-graph-presets {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 0.1rem;
+  }
+  .lesson-graph-card.is-graph-expanded .lesson-graph-presets .btn {
+    flex-shrink: 0;
+    min-height: 36px;
+    padding: 0.28rem 0.65rem;
   }
   .graph-analysis-bar {
     grid-template-columns: repeat(2, minmax(0, 1fr));
