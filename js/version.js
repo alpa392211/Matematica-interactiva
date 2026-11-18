@@ -10,12 +10,25 @@
 
   const APP_NAME = 'MateTic';
   const APP_TAGLINE = 'Matemáticas Interactivas';
-  const APP_VERSION = '1.4.1';
+  const APP_VERSION = '1.4.2';
   const APP_RELEASE_DATE = '2026-11-17';
   const STUDIO_NAME = 'ALPA Studio';
   const STUDIO_MEANING = '';
 
   const RELEASE_NOTES = [
+    {
+      version: '1.4.2',
+      date: '2026-11-17',
+      items: [
+        'Eliminación total del recuadro azul táctil (-webkit-tap-highlight-color) al presionar botones, píldoras y controles en dispositivos móviles.',
+        'Limpieza global de resalte táctil en el menú lateral, selectores de PrepMat, botones del graficador y pestañas de estudio.',
+        'Supresión de contornos residuales de foco táctil en pantallas móviles (@media pointer: coarse) conservando intacta la navegación por teclado en escritorio.',
+        'Prevención de selección accidental de texto y menús emergentes táctiles (-webkit-touch-callout) al mantener pulsados botones interactivos.',
+        'Conservación íntegra de las animaciones Liquid Glass de presión (:active) y deslizadores líquidos sin interferencia del navegador móvil.',
+        'Compatibilidad reforzada con navegadores móviles basados en Chromium, WebKit y vistas web instaladas (PWA).',
+        'Sin cambios en la lógica ni en las funciones matemáticas, herramientas, simulador PrepMat ni almacenamiento local.'
+      ]
+    },
     {
       version: '1.4.1',
       date: '2026-11-17',
