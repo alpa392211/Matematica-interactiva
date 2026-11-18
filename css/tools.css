@@ -1539,9 +1539,9 @@ body.has-expanded-graph {
 
 .quick-modal-header {
   padding: 1rem 1.5rem;
-  background: linear-gradient(135deg, rgba(67, 56, 202, 0.92), rgba(79, 70, 229, 0.88));
-  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
-  color: #ffffff;
+  background: transparent;
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text-main);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1549,8 +1549,19 @@ body.has-expanded-graph {
   z-index: 1;
 }
 
+.quick-modal-header .btn-glass {
+  background: var(--lg-pill-bg);
+  color: var(--text-main);
+  border: 1px solid var(--lg-pill-border);
+}
+
+.quick-modal-header .btn-glass:hover {
+  background: var(--bg-surface-hover);
+}
+
 .quick-modal-title {
   font-size: 1rem;
+  color: var(--text-main);
 }
 
 .quick-modal-body {

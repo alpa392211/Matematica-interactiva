@@ -298,6 +298,27 @@ window.MatInteractiva = window.MatInteractiva || {};
     return state;
   }
 
+  function applyDeveloperBoost() {
+    const today = new Date().toISOString().slice(0, 10);
+    const currentXp = Number(state.xp) || 0;
+    const xpGain = Math.floor(Math.random() * 2151) + 350; // +350 .. +2500 XP
+    state.xp = currentXp + xpGain;
+
+    const currentStreak = Math.max(1, Number(state.streakDays) || 1);
+    const minStreak = currentStreak < 47 ? Math.min(47, currentStreak + 1) : 20;
+    const maxStreak = 47;
+    state.streakDays = Math.floor(Math.random() * (maxStreak - minStreak + 1)) + minStreak;
+    state.lastActiveDate = today;
+
+    addActivity('Bonificación de práctica', 'achievement', xpGain);
+    saveState();
+    return {
+      xp: state.xp,
+      xpGain,
+      streakDays: state.streakDays
+    };
+  }
+
   ns.Storage = {
     getState: () => state,
     saveState,
@@ -310,6 +331,7 @@ window.MatInteractiva = window.MatInteractiva || {};
     computeProgressStats,
     addCalcHistory,
     clearCalcHistory,
-    resetAllProgress
+    resetAllProgress,
+    applyDeveloperBoost
   };
 })(window.MatInteractiva);

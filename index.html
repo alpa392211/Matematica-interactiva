@@ -31,6 +31,16 @@
   <div class="app-layout">
     <!-- Overlay para menú móvil/tablet -->
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    <button
+      type="button"
+      class="floating-mobile-menu-btn no-print"
+      id="btn-floating-open-sidebar"
+      title="Abrir menú de navegación"
+      aria-label="Abrir menú de navegación"
+      aria-expanded="false"
+      aria-controls="app-sidebar"
+      aria-hidden="true"
+      tabindex="-1">☰</button>
 
     <!-- Barra Lateral de Navegación (Sidebar) -->
     <aside class="sidebar" id="app-sidebar" aria-label="Menú principal de materias y herramientas">
@@ -295,12 +305,53 @@
           </div>
         </section>
 
+        <section class="settings-section" id="settings-sec-data" aria-labelledby="settings-sec-data-title">
+          <h2 class="settings-section-title" id="settings-sec-data-title">Datos y sesión</h2>
+          <div class="settings-group-card">
+            <div class="settings-control-row settings-wrappable-row">
+              <div class="settings-control-text">
+                <span class="settings-control-label">Borrar todos los datos</span>
+                <span class="settings-control-note">Elimina XP, rachas, temas estudiados, historial de PrepMat y preferencias</span>
+              </div>
+              <button type="button" class="btn btn-danger-outline btn-sm" id="btn-wipe-all-data">🗑️ Borrar todo</button>
+            </div>
+
+            <div class="settings-control-row settings-wrappable-row">
+              <div class="settings-control-text">
+                <span class="settings-control-label">Salir de la app</span>
+                <span class="settings-control-note">Cierra la sesión actual de la aplicación tras confirmar</span>
+              </div>
+              <button type="button" class="btn btn-outline btn-sm" id="btn-exit-app">🚪 Salir de la app</button>
+            </div>
+          </div>
+        </section>
+
         <div class="settings-footer-actions">
           <button type="button" class="btn btn-outline settings-reset-btn" id="btn-reset-preferences">
             ↺ Restablecer preferencias
           </button>
           <span class="settings-reset-hint">Restaura únicamente estas preferencias; nunca borra tu progreso ni XP.</span>
         </div>
+
+        <details class="settings-dev-details" id="settings-dev-details">
+          <summary class="settings-dev-summary">Códigos de desarrollador</summary>
+          <div class="settings-dev-body">
+            <label class="settings-dev-label" for="dev-code-input">Ingresa un código de acceso temporal</label>
+            <div class="settings-dev-form">
+              <input
+                type="text"
+                inputmode="numeric"
+                autocomplete="off"
+                spellcheck="false"
+                class="settings-dev-input"
+                id="dev-code-input"
+                placeholder="Código numérico"
+                aria-label="Código de desarrollador">
+              <button type="button" class="btn btn-outline btn-sm" id="btn-apply-dev-code">Aplicar</button>
+            </div>
+            <p class="settings-dev-feedback" id="settings-dev-feedback" role="status" aria-live="polite" hidden></p>
+          </div>
+        </details>
       </div>
     </div>
   </div>
@@ -528,6 +579,33 @@
           </a>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Diálogo Accesible de Confirmación (Salir / Borrar datos) -->
+  <div class="quick-modal-backdrop app-confirm-backdrop no-print" id="app-confirm-modal" role="alertdialog" aria-modal="true" aria-labelledby="app-confirm-title" aria-describedby="app-confirm-message" hidden>
+    <div class="quick-modal-window app-confirm-window">
+      <div class="quick-modal-header">
+        <strong class="quick-modal-title" id="app-confirm-title">Confirmar acción</strong>
+        <button type="button" class="btn btn-glass btn-sm" id="btn-close-confirm-modal" aria-label="Cancelar">✕</button>
+      </div>
+      <div class="quick-modal-body app-confirm-body">
+        <p class="app-confirm-message" id="app-confirm-message"></p>
+        <div class="app-confirm-actions">
+          <button type="button" class="btn btn-outline" id="btn-app-confirm-cancel">Cancelar</button>
+          <button type="button" class="btn btn-primary" id="btn-app-confirm-ok">Confirmar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pantalla tras salir de la aplicación -->
+  <div class="app-exited-overlay no-print" id="app-exited-overlay" role="dialog" aria-modal="true" aria-labelledby="app-exited-title" hidden>
+    <div class="app-exited-card">
+      <div class="app-exited-icon" aria-hidden="true">👋</div>
+      <h2 id="app-exited-title">Has salido de MateTic</h2>
+      <p>Tu sesión se cerró correctamente y los códigos temporales fueron eliminados. Ya puedes cerrar esta ventana o volver a entrar.</p>
+      <button type="button" class="btn btn-primary" id="btn-reenter-app">Volver a entrar a MateTic</button>
     </div>
   </div>
 

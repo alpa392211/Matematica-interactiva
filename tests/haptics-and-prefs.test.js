@@ -195,3 +195,51 @@ test('v1.4.0: Preferences valida lightBgPreset/darkBgPreset y AmbientBackground 
   assert.notDeepEqual(dCosmos, dNebulosa);
   assert.notDeepEqual(dAbismo, dNebulosa);
 });
+
+test('Datos, salida de app, códigos de desarrollador (06092109 / 23410908) y ajustes UI móviles', () => {
+  const storageCode = fs.readFileSync(path.join(__dirname, '..', 'js', 'engine', 'storage.js'), 'utf8');
+  const mem = new Map();
+  const sandbox = {
+    console,
+    Math,
+    Date,
+    localStorage: {
+      getItem: (k) => (mem.has(k) ? mem.get(k) : null),
+      setItem: (k, v) => mem.set(k, String(v)),
+      removeItem: (k) => mem.delete(k)
+    },
+    window: null
+  };
+  sandbox.window = sandbox;
+  vm.runInNewContext(storageCode, sandbox);
+  const Storage = sandbox.window.MatInteractiva.Storage;
+
+  for (let i = 0; i < 15; i++) {
+    const prevXp = Storage.getState().xp;
+    const boosted = Storage.applyDeveloperBoost();
+    assert.ok(boosted.xp > prevXp, 'applyDeveloperBoost debe incrementar la XP');
+    assert.ok(boosted.streakDays >= 1 && boosted.streakDays <= 47, `La racha (${boosted.streakDays}) nunca debe superar 47 días`);
+  }
+
+  Storage.resetAllProgress();
+  assert.equal(Storage.getState().xp, 0);
+  assert.equal(Storage.getState().streakDays, 1);
+
+  const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+  const appCode = fs.readFileSync(path.join(__dirname, '..', 'js', 'app.js'), 'utf8');
+  const toolsCss = fs.readFileSync(path.join(__dirname, '..', 'css', 'tools.css'), 'utf8');
+  const componentsCss = fs.readFileSync(path.join(__dirname, '..', 'css', 'components.css'), 'utf8');
+
+  assert.match(html, /id="btn-floating-open-sidebar"/);
+  assert.match(html, /id="btn-wipe-all-data"/);
+  assert.match(html, /id="btn-exit-app"/);
+  assert.match(html, /id="app-confirm-modal"/);
+  assert.match(html, /id="settings-dev-details"/);
+  assert.match(html, /Códigos de desarrollador/);
+  assert.match(appCode, /06092109/);
+  assert.match(appCode, /23410908/);
+  assert.match(appCode, /devOldNoticesUnlocked/);
+  assert.match(toolsCss, /\.quick-modal-header\s*\{[^}]*background:\s*transparent/);
+  assert.match(componentsCss, /\.whats-new-modal-window\s*\{[^}]*overflow-x:\s*hidden/);
+  assert.match(componentsCss, /\.whats-new-items-grid\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)/);
+});

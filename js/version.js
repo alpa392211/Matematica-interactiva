@@ -10,12 +10,25 @@
 
   const APP_NAME = 'MateTic';
   const APP_TAGLINE = 'Matemáticas Interactivas';
-  const APP_VERSION = '1.4.3';
+  const APP_VERSION = '1.5.0';
   const APP_RELEASE_DATE = '2026-11-18';
   const STUDIO_NAME = 'ALPA Studio';
   const STUDIO_MEANING = '';
 
   const RELEASE_NOTES = [
+    {
+      version: '1.5.0',
+      date: '2026-11-18',
+      items: [
+        'Botón flotante de menú (☰) en celular: al bajar por la página sale desde la izquierda para mantener el menú siempre accesible y vuelve a ocultarse al subir.',
+        'Cabeceras uniformes en menús y ventanas emergentes (Ajustes, Novedades, NUMERUS CAS y calculadora rápida): la barra superior ahora comparte el mismo color del panel.',
+        'Aviso de actualización simplificado y vertical: muestra únicamente la última versión en una sola columna vertical sin desplazamiento lateral en celular.',
+        'Nueva sección Datos y sesión en Ajustes con opción para borrar todos los datos guardados (incluyendo XP, rachas, progreso en materias, PrepMat y preferencias).',
+        'Nuevo botón Salir de la app en Ajustes con aviso de confirmación previo antes de cerrar la sesión.',
+        'Opción discreta de Códigos de desarrollador en Ajustes con soporte temporal para desbloquear avisos anteriores (06092109) y potenciar XP y racha aleatoria hasta 47 días (23410908).',
+        'El desbloqueo de avisos anteriores se restablece automáticamente al salir o cerrar la aplicación.'
+      ]
+    },
     {
       version: '1.4.3',
       date: '2026-11-18',

@@ -231,6 +231,26 @@ window.MatInteractiva = window.MatInteractiva || {};
 
       this.saveData(data);
       return data;
+    },
+
+    resetData() {
+      const def = this.getDefaultData();
+      if (typeof window !== 'undefined' && window.localStorage) {
+        try {
+          window.localStorage.removeItem(STORAGE_KEY);
+        } catch (_) {}
+      }
+      return def;
+    },
+
+    applyDeveloperBoost(targetStreak) {
+      const data = this.getData();
+      const clampedStreak = Math.max(1, Math.min(47, Number(targetStreak) || (Math.floor(Math.random() * 45) + 3)));
+      data.streak = clampedStreak;
+      data.lastPracticeDate = getTodayString();
+      if (!data.examsCompleted) data.examsCompleted = Math.floor(Math.random() * 4) + 1;
+      this.saveData(data);
+      return data;
     }
   };
 

@@ -410,3 +410,12 @@ Este archivo documenta de forma acumulativa cada fase ejecutada, sus archivos mo
   - **Estilos ([css/tools.css](../css/tools.css))**: las fórmulas en línea de enunciados y explicaciones no se parten (`inline-block`, `nowrap`, `overflow-x: auto`); las de bloque se centran con desplazamiento horizontal; se respetan saltos de línea (`white-space: pre-line`).
   - Verificado con auditoría automática de miles de preguntas generadas (sin `$` impares ni texto dentro de matemáticas).
 - **Verificación**: `node --test tests/` aprobado.
+
+---
+## v1.5.0 — Menú móvil flotante, cabeceras uniformes, borrado total, salida y códigos de desarrollador
+- **Qué cambió**:
+  - **Botón de menú flotante en celular ([index.html](../index.html), [css/layout.css](../css/layout.css), [js/app.js](../js/app.js))**: agregado `#btn-floating-open-sidebar` que entra deslizándose desde la izquierda al bajar por debajo de la barra superior y se esconde al subir.
+  - **Cabeceras de modales uniformes ([css/tools.css](../css/tools.css), [css/components.css](../css/components.css))**: eliminada la barra morada/azul contrastante en `.quick-modal-header` y `.numerus-cas-header` para integrarse con el fondo del propio modal tanto en modo claro como en modo oscuro.
+  - **Novedades verticales y enfocadas ([js/app.js](../js/app.js), [css/components.css](../css/components.css))**: el aviso de actualización muestra por defecto solo la última versión en una sola columna vertical y bloquea el desplazamiento horizontal en móvil.
+  - **Datos, salida y códigos de desarrollador ([index.html](../index.html), [js/app.js](../js/app.js), [js/engine/storage.js](../js/engine/storage.js), [js/tools/prepmat.js](../js/tools/prepmat.js))**: añadida sección *Datos y sesión* con borrado completo (XP, rachas, progreso, PrepMat y preferencias) y botón *Salir de la app* con diálogo de confirmación (`#app-confirm-modal`) y pantalla de salida (`#app-exited-overlay`); añadida sección colapsable *Códigos de desarrollador* con `06092109` (desbloqueo temporal de sesión para avisos anteriores) y `23410908` (incremento aleatorio de XP y racha `<= 47` días).
+- **Verificación**: `node --test tests/*.test.js` aprobado.
