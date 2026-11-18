@@ -1,5 +1,5 @@
 /* ==========================================================================
-   MATEMÁTICA INTERACTIVA - Motor Matemático Simbólico y Numérico
+   MATETIC - Motor Matemático Simbólico y Numérico
    Archivo: js/engine/math-parser.js
    ========================================================================== */
 
@@ -154,8 +154,10 @@ window.MatInteractiva = window.MatInteractiva || {};
     // Barras de valor absoluto |expr| -> abs(expr)
     s = s.replace(/\|([^|]+)\|/g, 'abs($1)');
 
-    // Reemplazar símbolos Unicode comunes
+    // Reemplazar símbolos Unicode y LaTeX de grados comunes
     s = s
+      .replace(/\^\s*\{\s*\\circ\s*\}/g, '°')
+      .replace(/\\degree\b|\\circ\b/g, '°')
       .replace(/×|·/g, '*')
       .replace(/÷/g, '/')
       .replace(/−|–/g, '-')
@@ -184,8 +186,9 @@ window.MatInteractiva = window.MatInteractiva || {};
     // Multiplicación implícita:
     // 1) Número seguido de variable, función o paréntesis: 2x -> 2*x, 3(x+1) -> 3*(x+1)
     s = s.replace(/(\d+(\.\d+)?)\s*(?=[a-zA-Z(])/g, '$1*');
-    // 2) Cierre de paréntesis seguido de número, variable, función o apertura de paréntesis: (x+1)(x-1) -> (x+1)*(x-1)
+    // 2) Cierre de paréntesis o símbolo de grados seguido de número, variable, función o paréntesis
     s = s.replace(/\)\s*(?=[a-zA-Z0-9(])/g, ')*');
+    s = s.replace(/°\s*(?=[a-zA-Z0-9(])/g, '°*');
     // 3) Variable simple (x, y, t, a, b, pi, e) seguida de paréntesis o de otra variable simple
     s = s.replace(/\b(x|y|t|a|b|pi|e)\s*\(/g, '$1*(');
     s = s.replace(/\b(pi)\s*(?=[xytab])/gi, '$1*');
@@ -250,7 +253,7 @@ window.MatInteractiva = window.MatInteractiva || {};
         continue;
       }
 
-      if ('+-*/^!(),'.includes(ch)) {
+      if ('+-*/^!(),°'.includes(ch)) {
         tokens.push({ type: 'OP', value: ch });
         i++;
         continue;
@@ -260,6 +263,19 @@ window.MatInteractiva = window.MatInteractiva || {};
     }
 
     return tokens;
+  }
+
+  /**
+   * Cierra automáticamente paréntesis abiertos sin cerrar al final de una expresión.
+   */
+  function autoCloseParens(expr) {
+    const str = String(expr || '');
+    let open = 0;
+    for (let i = 0; i < str.length; i++) {
+      if (str[i] === '(') open++;
+      else if (str[i] === ')' && open > 0) open--;
+    }
+    return open > 0 ? str + ')'.repeat(open) : str;
   }
 
   function factorial(n) {
@@ -327,9 +343,9 @@ window.MatInteractiva = window.MatInteractiva || {};
 
     function parsePostfix() {
       let node = parsePrimary();
-      while (peek() && peek().type === 'OP' && peek().value === '!') {
-        consume();
-        node = { type: 'POSTFIX', op: '!', arg: node };
+      while (peek() && peek().type === 'OP' && (peek().value === '!' || peek().value === '°')) {
+        const op = consume().value;
+        node = { type: 'POSTFIX', op, arg: node };
       }
       return node;
     }
@@ -337,7 +353,7 @@ window.MatInteractiva = window.MatInteractiva || {};
     function parsePrimary() {
       const tok = peek();
       if (!tok) {
-        throw new Error('Expresión incompleta');
+        throw new Error('Expresión incompleta: falta un valor u operando');
       }
 
       if (tok.type === 'NUMBER') {
@@ -352,11 +368,17 @@ window.MatInteractiva = window.MatInteractiva || {};
 
       if (tok.type === 'FUNC') {
         const fnName = consume().value;
-        if (!peek() || peek().value !== '(') {
+        if (!peek()) {
+          throw new Error('Falta el argumento de ' + fnName);
+        }
+        if (peek().value !== '(') {
           const arg = parseUnary();
           return { type: 'CALL', fn: fnName, arg };
         }
         consume(); // '('
+        if (peek() && peek().type === 'OP' && peek().value === ')') {
+          throw new Error('Falta el argumento en ' + fnName + '()');
+        }
         const arg = parseAddSub();
         if (!peek() || peek().value !== ')') {
           throw new Error('Falta cerrar paréntesis en ' + fnName);
@@ -367,6 +389,9 @@ window.MatInteractiva = window.MatInteractiva || {};
 
       if (tok.type === 'OP' && tok.value === '(') {
         consume(); // '('
+        if (peek() && peek().type === 'OP' && peek().value === ')') {
+          throw new Error('Hay un paréntesis vacío ()');
+        }
         const inside = parseAddSub();
         if (!peek() || peek().value !== ')') {
           throw new Error('Paréntesis sin cerrar');
@@ -375,7 +400,7 @@ window.MatInteractiva = window.MatInteractiva || {};
         return inside;
       }
 
-      throw new Error('Token inesperado: ' + tok.value);
+      throw new Error('Símbolo inesperado: ' + tok.value);
     }
 
     const ast = parseAddSub();
@@ -405,6 +430,10 @@ window.MatInteractiva = window.MatInteractiva || {};
       case 'POSTFIX': {
         const v = evalAST(node.arg, vars, angleMode);
         if (node.op === '!') return factorial(v);
+        if (node.op === '°') {
+          // En modo RAD convierte grados a radianes; en modo DEG mantiene grados para no convertir doble
+          return angleMode === 'RAD' ? v * (Math.PI / 180) : v;
+        }
         return NaN;
       }
       case 'BINARY': {
@@ -554,6 +583,147 @@ window.MatInteractiva = window.MatInteractiva || {};
     if (!list.some(r => Math.abs(r - clean) < 1e-3)) {
       list.push(clean);
     }
+  }
+
+  function collectDenominatorNodes(node, out = []) {
+    if (!node || typeof node !== 'object') return out;
+    if (node.type === 'BINARY') {
+      if (node.op === '/') out.push(node.right);
+      collectDenominatorNodes(node.left, out);
+      collectDenominatorNodes(node.right, out);
+    } else if (node.type === 'UNARY' || node.type === 'POSTFIX' || node.type === 'CALL') {
+      collectDenominatorNodes(node.arg, out);
+    }
+    return out;
+  }
+
+  /**
+   * Detecta discontinuidades removibles (huecos 0/0) en el intervalo [xMin, xMax].
+   * Busca ceros en todos los denominadores del AST y verifica que ambos límites
+   * laterales existan, sean finitos y coincidan sin divergir.
+   */
+  function findRemovableDiscontinuities(expr, xMin = -10, xMax = 10, angleMode = 'RAD') {
+    let targetExpr = String(expr ?? '').trim();
+    if (!targetExpr) return [];
+
+    if (/^(limite|lim|derivada|deriv|d\/dx|integral|int)\s*\(/i.test(targetExpr) || /\\lim\b/.test(targetExpr)) {
+      const extracted = extractGrapherPayload(targetExpr);
+      if (extracted && extracted.expr) targetExpr = extracted.expr;
+    }
+
+    let ast;
+    try {
+      ast = parseToAST(targetExpr);
+    } catch (_) {
+      return [];
+    }
+
+    const denNodes = collectDenominatorNodes(ast, []);
+    if (!denNodes.length) return [];
+
+    const mainFn = (x) => {
+      try {
+        return evalAST(ast, { x, c: 0 }, angleMode);
+      } catch (_) {
+        return NaN;
+      }
+    };
+
+    const holes = [];
+    const subDivs = 240;
+    const step = (xMax - xMin) / subDivs;
+
+    for (const denNode of denNodes) {
+      const denFn = (x) => {
+        try {
+          return evalAST(denNode, { x, c: 0 }, angleMode);
+        } catch (_) {
+          return NaN;
+        }
+      };
+
+      const candidateXs = findRoots(denFn, xMin, xMax, subDivs);
+
+      // Refinar posibles raíces de multiplicidad par (ej. (x - 2)^2) mediante mínimos locales de |den(x)|
+      for (let i = 1; i < subDivs; i++) {
+        const xPrev = xMin + (i - 1) * step;
+        const xCurr = xMin + i * step;
+        const xNext = xMin + (i + 1) * step;
+        const aPrev = Math.abs(denFn(xPrev));
+        const aCurr = Math.abs(denFn(xCurr));
+        const aNext = Math.abs(denFn(xNext));
+        if (isFinite(aPrev) && isFinite(aCurr) && isFinite(aNext) &&
+            aCurr <= aPrev && aCurr <= aNext && aCurr < 0.25) {
+          let lo = xPrev;
+          let hi = xNext;
+          const phi = (Math.sqrt(5) - 1) / 2;
+          let m1 = hi - phi * (hi - lo);
+          let m2 = lo + phi * (hi - lo);
+          let f1 = Math.abs(denFn(m1));
+          let f2 = Math.abs(denFn(m2));
+          for (let it = 0; it < 28; it++) {
+            if (!isFinite(f1) || !isFinite(f2)) break;
+            if (f1 < f2) {
+              hi = m2;
+              m2 = m1;
+              f2 = f1;
+              m1 = hi - phi * (hi - lo);
+              f1 = Math.abs(denFn(m1));
+            } else {
+              lo = m1;
+              m1 = m2;
+              f1 = f2;
+              m2 = lo + phi * (hi - lo);
+              f2 = Math.abs(denFn(m2));
+            }
+          }
+          const xMinLocal = 0.5 * (lo + hi);
+          if (Math.abs(denFn(xMinLocal)) < 1e-5) {
+            addUniqueRoot(candidateXs, xMinLocal);
+          }
+        }
+      }
+
+      // Verificar también enteros del intervalo por exactitud
+      for (let xi = Math.ceil(xMin); xi <= Math.floor(xMax); xi++) {
+        const dv = denFn(xi);
+        if (isFinite(dv) && Math.abs(dv) < 1e-8) {
+          addUniqueRoot(candidateXs, xi);
+        }
+      }
+
+      for (const xr of candidateXs) {
+        const exactY = mainFn(xr);
+        const denAtX = denFn(xr);
+        // Solo considerar puntos donde el denominador efectivamente se anula o f(xr) no es finita
+        if (isFinite(exactY) && Math.abs(denAtX) > 1e-6) continue;
+
+        const yL1 = mainFn(xr - 1e-4);
+        const yR1 = mainFn(xr + 1e-4);
+        const yL2 = mainFn(xr - 1e-5);
+        const yR2 = mainFn(xr + 1e-5);
+
+        if (!isFinite(yL1) || !isFinite(yR1) || !isFinite(yL2) || !isFinite(yR2)) continue;
+        if (Math.abs(yL2) > 1e4 || Math.abs(yR2) > 1e4) continue;
+
+        // Comprobar coincidencia bilateral y estabilidad (descarta asíntotas y saltos)
+        const scaleTol = 1e-2 * Math.max(1, Math.abs(yL2));
+        if (Math.abs(yL2 - yR2) >= scaleTol) continue;
+
+        const stabTol = 0.25 * Math.max(1, Math.abs(yL2));
+        if (Math.abs(yL2 - yL1) > stabTol || Math.abs(yR2 - yR1) > stabTol) continue;
+
+        const avgY = 0.5 * (yL2 + yR2);
+        const cleanX = Math.abs(xr) < 1e-7 ? 0 : Number(xr.toFixed(4));
+        const cleanY = Math.abs(avgY) < 1e-6 ? 0 : Number(avgY.toFixed(4));
+
+        if (!holes.some(h => Math.abs(h.x - cleanX) < 1e-3 && Math.abs(h.y - cleanY) < 1e-3)) {
+          holes.push({ x: cleanX, y: cleanY });
+        }
+      }
+    }
+
+    return holes.sort((a, b) => a.x - b.x);
   }
 
   function formatNumber(n, decimals = 4) {
@@ -1193,6 +1363,7 @@ window.MatInteractiva = window.MatInteractiva || {};
 
   ns.MathParser = {
     normalizeExpression,
+    autoCloseParens,
     stripEquationPrefix,
     tokenize,
     parseToAST,
@@ -1201,6 +1372,7 @@ window.MatInteractiva = window.MatInteractiva || {};
     numericalDerivative,
     numericalIntegral,
     findRoots,
+    findRemovableDiscontinuities,
     formatNumber,
     checkStudentAnswer,
     analyzeEditorExpression,

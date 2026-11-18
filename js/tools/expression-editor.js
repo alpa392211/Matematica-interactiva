@@ -1,5 +1,5 @@
 /* ==========================================================================
-   MATEMÁTICA INTERACTIVA - Editor Guiado de Expresiones Matemáticas (Fase 1)
+   MATETIC - Editor Guiado de Expresiones Matemáticas (Fase 1)
    Archivo: js/tools/expression-editor.js
    Diseñado para estudiantes que nunca han utilizado un editor matemático ni
    conocen LaTeX. Incluye:

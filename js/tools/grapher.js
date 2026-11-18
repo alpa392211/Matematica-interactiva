@@ -1,5 +1,5 @@
 /* ==========================================================================
-   MATEMÁTICA INTERACTIVA - Graficador Interactivo de Funciones (Canvas 2D)
+   MATETIC - Graficador Interactivo de Funciones (Canvas 2D)
    Archivo: js/tools/grapher.js
    ========================================================================== */
 
@@ -7,6 +7,63 @@ window.MatInteractiva = window.MatInteractiva || {};
 
 (function (ns) {
   'use strict';
+
+  const vp = ns.GraphViewport || {};
+  const clampScale = vp.clampScale || ((s, min = 8, max = 260) => {
+    const n = Number(s);
+    return isFinite(n) ? Math.min(max, Math.max(min, n)) : 42;
+  });
+  const mathToScreen = vp.mathToScreen || ((mx, my, cx, cy, scale, w, h) => ({
+    px: w / 2 + (mx - cx) * scale,
+    py: h / 2 - (my - cy) * scale
+  }));
+  const screenToMath = vp.screenToMath || ((px, py, cx, cy, scale, w, h) => ({
+    mx: cx + (px - w / 2) / scale,
+    my: cy - (py - h / 2) / scale
+  }));
+  const computeOptimalGridStep = vp.computeOptimalGridStep || ((scale, minPx = 48) => {
+    const safeScale = Math.max(1e-4, Number(scale) || 42);
+    const rawStep = Math.max(1e-6, (Number(minPx) || 48) / safeScale);
+    const pow10 = Math.pow(10, Math.floor(Math.log10(rawStep)));
+    const norm = rawStep / pow10;
+    const mult = norm <= 1 ? 1 : norm <= 2 ? 2 : norm <= 5 ? 5 : 10;
+    return Number((mult * pow10).toPrecision(10));
+  });
+  const shouldSingleFingerPan = vp.shouldSingleFingerPan || ((expanded) => Boolean(expanded));
+  const applyPinchZoom = vp.applyPinchZoom || (({ scale, prevDist, nextDist, centerX, centerY, panDx = 0, panDy = 0, midPx, midPy, width, height, minScale = 8, maxScale = 260 }) => {
+    const sp = Math.max(1, Number(prevDist) || 1);
+    const sn = Math.max(1, Number(nextDist) || sp);
+    const ps = clampScale(scale, minScale, maxScale);
+    const nsScale = clampScale(ps * (sn / sp), minScale, maxScale);
+    const ax = typeof midPx === 'number' ? midPx : width / 2;
+    const ay = typeof midPy === 'number' ? midPy : height / 2;
+    const before = screenToMath(ax, ay, centerX, centerY, ps, width, height);
+    return {
+      scale: nsScale,
+      centerX: (before.mx - (ax - width / 2) / nsScale) - (Number(panDx) || 0) / nsScale,
+      centerY: (before.my + (ay - height / 2) / nsScale) + (Number(panDy) || 0) / nsScale
+    };
+  });
+  const getGraphThemePalette = vp.getGraphThemePalette || (() => ({
+    isDark: false,
+    bg: '#FFFFFF',
+    grid: '#E2E8F0',
+    axis: '#475569',
+    tickText: '#334155',
+    curvePrimary: '#2563EB',
+    curveSecondary: '#059669',
+    curveTertiary: '#7C3AED',
+    tangent: '#DC2626',
+    integralFill: 'rgba(37, 99, 235, 0.16)',
+    pointStroke: '#FFFFFF',
+    holeFill: '#FFFFFF',
+    tooltipBg: 'rgba(15, 23, 42, 0.92)',
+    tooltipBorder: '#2563EB',
+    tooltipText: '#FFFFFF'
+  }));
+  const drawPointTooltip = vp.drawPointTooltip || (() => {});
+  const hasSeenGestureHint = vp.hasSeenGestureHint || (() => false);
+  const markGestureHintSeen = vp.markGestureHintSeen || (() => {});
 
   const state = {
     functions: [
@@ -26,8 +83,13 @@ window.MatInteractiva = window.MatInteractiva || {};
     hoverMathY: null,
     isDragging: false,
     dragStartX: 0,
-    dragStartY: 0
+    dragStartY: 0,
+    expanded: false
   };
+
+  let activeKeyHandler = null;
+  let activeThemeObserver = null;
+  let activeResizeObserver = null;
 
   function applyPayloadToGrapherState(rawPreset) {
     if (!rawPreset) return;
@@ -117,7 +179,7 @@ window.MatInteractiva = window.MatInteractiva || {};
               <p>Visualiza múltiples curvas, rectas tangentes, derivadas, áreas de integrales definidas y raíces reales en tiempo real.</p>
             </div>
           </div>
-          <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+          <div class="grapher-presets-row">
             <button class="btn btn-outline btn-sm" data-preset="x^3 - 3*x">Cúbica</button>
             <button class="btn btn-outline btn-sm" data-preset="sin(x)">Trigonométrica</button>
             <button class="btn btn-outline btn-sm" data-preset="exp(0.5*x)">Exponencial</button>
@@ -131,8 +193,8 @@ window.MatInteractiva = window.MatInteractiva || {};
         <!-- Panel Lateral de Controles -->
         <div class="grapher-sidebar">
           <div>
-            <h3 style="font-size:0.95rem; font-weight:700; margin-bottom:0.65rem;">Funciones a Graficar</h3>
-            <div style="display:flex; flex-direction:column; gap:0.55rem;" id="graph-fn-list">
+            <h3 class="grapher-section-title">Funciones a Graficar</h3>
+            <div class="grapher-fn-list" id="graph-fn-list">
               ${state.functions.map((fn, idx) => `
                 <div class="function-input-row">
                   <input type="checkbox" data-fn-toggle="${idx}" ${fn.visible ? 'checked' : ''} title="Mostrar/Ocultar" />
@@ -144,62 +206,87 @@ window.MatInteractiva = window.MatInteractiva || {};
             </div>
           </div>
 
-          <div style="border-top:1px solid var(--border-light); padding-top:0.9rem;">
-            <h3 style="font-size:0.92rem; font-weight:700; margin-bottom:0.55rem;">Análisis de Cálculo sobre f(x)</h3>
-            <label style="display:flex; align-items:center; gap:0.5rem; font-size:0.84rem; margin-bottom:0.5rem; cursor:pointer;">
+          <div class="grapher-section-block">
+            <h3 class="grapher-section-title">Análisis de Cálculo sobre f(x)</h3>
+            <label class="grapher-check-row">
               <input type="checkbox" id="chk-show-deriv" ${state.showDerivative ? 'checked' : ''} />
               <span>${ns.MathRenderer.formatRichText('Trazar Recta Tangente en $x_0$:')}</span>
             </label>
-            <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.85rem;">
-              <span style="font-family:var(--font-math); font-size:0.9rem;">x₀ =</span>
+            <div class="grapher-x0-row">
+              <span class="grapher-x0-label">x₀ =</span>
               <input type="number" step="0.1" id="inp-tangent-x" class="fn-input" value="${state.tangentX}" />
             </div>
 
-            <label style="display:flex; align-items:center; gap:0.5rem; font-size:0.84rem; margin-bottom:0.5rem; cursor:pointer;">
+            <label class="grapher-check-row">
               <input type="checkbox" id="chk-show-int" ${state.showIntegral ? 'checked' : ''} />
               <span>${ns.MathRenderer.formatRichText('Sombrear Integral Definida $\\int_a^b f(x)\\,dx$:')}</span>
             </label>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.5rem;">
+            <div class="grapher-int-bounds-grid">
               <div>
-                <small style="color:var(--text-muted);">Límite inf. (a)</small>
-                <input type="number" step="0.5" id="inp-int-a" class="fn-input" style="width:100%;" value="${state.integralA}" />
+                <small class="grapher-int-label">Límite inf. (a)</small>
+                <input type="number" step="0.5" id="inp-int-a" class="fn-input" value="${state.integralA}" />
               </div>
               <div>
-                <small style="color:var(--text-muted);">Límite sup. (b)</small>
-                <input type="number" step="0.5" id="inp-int-b" class="fn-input" style="width:100%;" value="${state.integralB}" />
+                <small class="grapher-int-label">Límite sup. (b)</small>
+                <input type="number" step="0.5" id="inp-int-b" class="fn-input" value="${state.integralB}" />
               </div>
             </div>
           </div>
 
-          <div style="border-top:1px solid var(--border-light); padding-top:0.9rem;">
-            <h3 style="font-size:0.92rem; font-weight:700; margin-bottom:0.5rem;">Tabla de Valores de f(x)</h3>
-            <div id="graph-table-box" style="max-height:190px; overflow-y:auto; font-size:0.8rem;"></div>
+          <div class="grapher-section-block">
+            <h3 class="grapher-section-title">Tabla de Valores de f(x)</h3>
+            <div id="graph-table-box" class="grapher-table-box"></div>
           </div>
         </div>
 
         <!-- Lienzo Cartesiano y Resultados -->
-        <div class="grapher-canvas-card">
+        <div class="grapher-canvas-card" id="grapher-canvas-card">
           <div class="grapher-toolbar">
-            <div style="font-size:0.84rem; color:var(--text-muted);">
-              💡 Arrastra el lienzo para desplazarte y usa la rueda del ratón para hacer zoom.
+            <div class="grapher-help-text">
+              💡 Ratón o 2 dedos mueven y hacen zoom; en móvil usa <strong>Expandir</strong> para mover con 1 dedo.
             </div>
-            <div style="display:flex; gap:0.4rem;">
-              <button class="btn btn-outline btn-sm" id="btn-zoom-in">＋ Acercar</button>
-              <button class="btn btn-outline btn-sm" id="btn-zoom-out">－ Alejar</button>
-              <button class="btn btn-outline btn-sm" id="btn-reset-view">🎯 Centrar (0,0)</button>
+            <div class="grapher-zoom-actions">
+              <button type="button" class="btn btn-outline btn-sm" id="btn-zoom-in" title="Acercar">＋ Acercar</button>
+              <button type="button" class="btn btn-outline btn-sm" id="btn-zoom-out" title="Alejar">－ Alejar</button>
+              <button type="button" class="btn btn-outline btn-sm" id="btn-reset-view">🎯 Restablecer vista</button>
+              <button type="button" class="btn btn-primary btn-sm" id="btn-expand-graph" aria-expanded="false">⛶ Expandir</button>
+              <button type="button" class="btn btn-outline btn-sm graph-close-expand-btn" id="btn-close-expand-graph" hidden>✕ Cerrar</button>
             </div>
+          </div>
+
+          <div class="graph-live-bar" id="graph-live-bar" aria-live="polite">
+            Toca o mueve el cursor sobre la gráfica para leer coordenadas.
+          </div>
+
+          <div class="graph-gesture-hint" id="graph-gesture-hint" ${hasSeenGestureHint() ? 'hidden' : ''}>
+            <span>💡 En móvil: 1 dedo desplaza la página · 2 dedos mueven y hacen zoom · Pulsa <strong>Expandir</strong> para mover con 1 dedo.</span>
+            <button type="button" class="graph-gesture-dismiss" id="btn-dismiss-gesture-hint" aria-label="Ocultar pista de gestos">✕</button>
           </div>
 
           <div class="canvas-wrapper" id="graph-canvas-wrap">
             <canvas id="math-graph-canvas"></canvas>
-            <div class="graph-coords-badge" id="graph-coords-badge">x: 0.00, y: 0.00</div>
           </div>
 
           <div class="graph-analysis-bar" id="graph-analysis-bar"></div>
+
+          <details class="precision-notice no-print">
+            <summary class="precision-notice-summary">ⓘ Resultados aproximados</summary>
+            <div class="precision-notice-body">
+              <ul class="precision-notice-list">
+                <li><strong>Precisión numérica:</strong> los cálculos usan coma flotante IEEE 754 de doble precisión (~15–16 dígitos) y los valores en pantalla se redondean a 3–4 decimales, por lo que pueden aparecer residuos diminutos (p. ej. <code>0.1 + 0.2</code>).</li>
+                <li><strong>Derivadas e integrales numéricas:</strong> <code>f'(x₀)</code> se estima por diferencias finitas centradas de 5 puntos (paso <code>h = 10⁻⁵</code>) y la integral definida mediante la regla compuesta de Simpson (<code>n = 200</code> subintervalos); no son cálculos simbólicos y pierden exactitud cerca de singularidades, asíntotas o puntos no derivables.</li>
+                <li><strong>Muestreo gráfico:</strong> la curva se dibuja evaluando cada <code>1.5 px</code>, por lo que oscilaciones rápidas o detalles muy finos pueden quedar omitidos; huecos removibles (<code>0/0</code>), raíces reales (bisección en 250 subintervalos) y cortes por asíntotas se detectan con criterios numéricos aproximados.</li>
+                <li><strong>Restricciones de dominio:</strong> valores fuera del dominio real (raíces pares de negativos, <code>ln(x)</code> con <code>x ≤ 0</code>, división entre <code>0</code>) no se grafican.</li>
+                <li><strong>Uso de estudio:</strong> para exámenes, ingeniería o decisiones importantes, verifica siempre con un método analítico o un sistema CAS certificado.</li>
+              </ul>
+            </div>
+          </details>
         </div>
       </div>
     `;
 
+    state.expanded = false;
+    document.body.classList.remove('has-expanded-graph');
     bindGrapherEvents(container);
     drawGraph();
     updateAnalysisAndTable();
@@ -308,26 +395,153 @@ window.MatInteractiva = window.MatInteractiva || {};
       });
     });
 
-    // Botones de zoom y vista
+    // Botones de zoom, restablecer vista y modo Expandir
+    const canvasCard = container.querySelector('#grapher-canvas-card');
+    const expandBtn = container.querySelector('#btn-expand-graph');
+    const closeExpandBtn = container.querySelector('#btn-close-expand-graph');
+    const dismissHintBtn = container.querySelector('#btn-dismiss-gesture-hint');
+    const liveBar = container.querySelector('#graph-live-bar');
+
+    const updateLiveBar = (txt) => {
+      if (liveBar && liveBar.textContent !== txt) {
+        liveBar.textContent = txt;
+      }
+    };
+
+    const setExpanded = (nextExpanded) => {
+      if (!canvasCard) return;
+      state.expanded = Boolean(nextExpanded);
+      canvasCard.classList.toggle('is-graph-expanded', state.expanded);
+      document.body.classList.toggle('has-expanded-graph', state.expanded);
+      if (state.expanded) {
+        markGestureHintSeen();
+        canvasCard.setAttribute('role', 'dialog');
+        canvasCard.setAttribute('aria-modal', 'true');
+        canvasCard.setAttribute('aria-label', 'Graficador interactivo en pantalla completa');
+        if (expandBtn) {
+          expandBtn.hidden = true;
+          expandBtn.setAttribute('aria-expanded', 'true');
+        }
+        if (closeExpandBtn) closeExpandBtn.hidden = false;
+        requestAnimationFrame(() => {
+          closeExpandBtn?.focus();
+          drawGraph();
+        });
+      } else {
+        canvasCard.removeAttribute('role');
+        canvasCard.removeAttribute('aria-modal');
+        canvasCard.removeAttribute('aria-label');
+        if (expandBtn) {
+          expandBtn.hidden = false;
+          expandBtn.setAttribute('aria-expanded', 'false');
+        }
+        if (closeExpandBtn) closeExpandBtn.hidden = true;
+        requestAnimationFrame(() => {
+          expandBtn?.focus();
+          drawGraph();
+        });
+      }
+    };
+
+    expandBtn?.addEventListener('click', () => {
+      if (ns.Haptics) ns.Haptics.confirm();
+      setExpanded(true);
+    });
+
+    closeExpandBtn?.addEventListener('click', () => {
+      if (ns.Haptics) ns.Haptics.confirm();
+      setExpanded(false);
+    });
+
+    dismissHintBtn?.addEventListener('click', () => {
+      if (ns.Haptics) ns.Haptics.light();
+      markGestureHintSeen();
+    });
+
+    if (activeKeyHandler) {
+      document.removeEventListener('keydown', activeKeyHandler, true);
+      activeKeyHandler = null;
+    }
+    activeKeyHandler = (ev) => {
+      if (!state.expanded || !canvasCard || !document.body.contains(canvasCard)) return;
+      if (ev.key === 'Escape') {
+        ev.preventDefault();
+        ev.stopPropagation();
+        setExpanded(false);
+        return;
+      }
+      if (ev.key === 'Tab') {
+        const focusables = Array.from(canvasCard.querySelectorAll(
+          'button:not([hidden]):not([disabled]), input:not([disabled]), summary, [href]'
+        )).filter(el => el.offsetParent !== null);
+        if (!focusables.length) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        if (ev.shiftKey && document.activeElement === first) {
+          ev.preventDefault();
+          last.focus();
+        } else if (!ev.shiftKey && document.activeElement === last) {
+          ev.preventDefault();
+          first.focus();
+        }
+      }
+    };
+    document.addEventListener('keydown', activeKeyHandler, true);
+
     container.querySelector('#btn-zoom-in')?.addEventListener('click', () => {
-      state.scale = Math.min(250, state.scale * 1.25);
+      if (ns.Haptics) ns.Haptics.light();
+      state.scale = clampScale(state.scale * 1.25);
       drawGraph();
     });
     container.querySelector('#btn-zoom-out')?.addEventListener('click', () => {
-      state.scale = Math.max(10, state.scale / 1.25);
+      if (ns.Haptics) ns.Haptics.light();
+      state.scale = clampScale(state.scale / 1.25);
       drawGraph();
     });
     container.querySelector('#btn-reset-view')?.addEventListener('click', () => {
+      if (ns.Haptics) ns.Haptics.light();
       state.centerX = 0;
       state.centerY = 0;
       state.scale = 42;
+      state.hoverMathX = null;
+      state.hoverMathY = null;
+      updateLiveBar('Vista restablecida en el origen (0, 0).');
       drawGraph();
     });
 
-    // Interacción con el Canvas (Arrastre, Rueda y Coordenadas)
+    // Interacción con el Canvas (Arrastre, Rueda y Gestos móviles)
+    const canvasWrap = container.querySelector('#graph-canvas-wrap');
     const canvas = container.querySelector('#math-graph-canvas');
-    const badge = container.querySelector('#graph-coords-badge');
     if (!canvas) return;
+
+    if (activeResizeObserver) {
+      activeResizeObserver.disconnect();
+      activeResizeObserver = null;
+    }
+    if (typeof ResizeObserver === 'function' && canvasWrap) {
+      activeResizeObserver = new ResizeObserver(() => {
+        if (!document.body.contains(canvas)) {
+          activeResizeObserver.disconnect();
+          return;
+        }
+        drawGraph();
+      });
+      activeResizeObserver.observe(canvasWrap);
+    }
+
+    if (activeThemeObserver) {
+      activeThemeObserver.disconnect();
+      activeThemeObserver = null;
+    }
+    if (typeof MutationObserver === 'function') {
+      activeThemeObserver = new MutationObserver(() => {
+        if (document.body.contains(canvas)) drawGraph();
+      });
+      activeThemeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['data-theme']
+      });
+    }
 
     canvas.addEventListener('mousedown', (e) => {
       state.isDragging = true;
@@ -353,13 +567,10 @@ window.MatInteractiva = window.MatInteractiva || {};
         state.dragStartY = e.clientY;
         drawGraph();
       } else {
-        const mathX = state.centerX + (px - rect.width / 2) / state.scale;
-        const mathY = state.centerY - (py - rect.height / 2) / state.scale;
-        state.hoverMathX = mathX;
-        state.hoverMathY = mathY;
-        if (badge) {
-          badge.textContent = `x: ${mathX.toFixed(2)}, y: ${mathY.toFixed(2)}`;
-        }
+        const pt = screenToMath(px, py, state.centerX, state.centerY, state.scale, rect.width, rect.height);
+        state.hoverMathX = pt.mx;
+        state.hoverMathY = pt.my;
+        updateLiveBar(`Cursor en el plano: x = ${pt.mx.toFixed(2)}, y = ${pt.my.toFixed(2)}`);
         drawGraph();
       }
     });
@@ -372,45 +583,89 @@ window.MatInteractiva = window.MatInteractiva || {};
     canvas.addEventListener('wheel', (e) => {
       e.preventDefault();
       const factor = e.deltaY < 0 ? 1.15 : 0.87;
-      state.scale = Math.min(260, Math.max(8, state.scale * factor));
+      state.scale = clampScale(state.scale * factor);
       drawGraph();
     }, { passive: false });
 
-    // Gestos táctiles: un dedo desplaza, dos dedos hacen zoom (pellizco)
+    // Gestos táctiles:
+    // - Embebido: 1 dedo desplaza la página; 2 dedos mueven + zoom sobre el plano
+    // - Expandido: 1 dedo desplaza el plano; 2 dedos mueven + zoom
     let touchMode = null;
     let lastTouchX = 0;
     let lastTouchY = 0;
     let lastPinchDist = 0;
+    let lastMidX = 0;
+    let lastMidY = 0;
     const pinchDistance = (t) => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+    const pinchMid = (t, rect) => ({
+      x: ((t[0].clientX + t[1].clientX) * 0.5) - rect.left,
+      y: ((t[0].clientY + t[1].clientY) * 0.5) - rect.top
+    });
 
     canvas.addEventListener('touchstart', (e) => {
+      const rect = canvas.getBoundingClientRect();
       if (e.touches.length === 1) {
-        touchMode = 'pan';
-        lastTouchX = e.touches[0].clientX;
-        lastTouchY = e.touches[0].clientY;
+        const t = e.touches[0];
+        const pt = screenToMath(t.clientX - rect.left, t.clientY - rect.top, state.centerX, state.centerY, state.scale, rect.width, rect.height);
+        state.hoverMathX = pt.mx;
+        state.hoverMathY = pt.my;
+        updateLiveBar(`Punto tocado: x = ${pt.mx.toFixed(2)}, y = ${pt.my.toFixed(2)}`);
+        if (shouldSingleFingerPan(state.expanded)) {
+          touchMode = 'pan';
+          lastTouchX = t.clientX;
+          lastTouchY = t.clientY;
+        } else {
+          touchMode = 'read';
+        }
+        drawGraph();
       } else if (e.touches.length === 2) {
         touchMode = 'pinch';
         lastPinchDist = pinchDistance(e.touches);
+        const mid = pinchMid(e.touches, rect);
+        lastMidX = mid.x;
+        lastMidY = mid.y;
+        markGestureHintSeen();
       }
     }, { passive: true });
 
     canvas.addEventListener('touchmove', (e) => {
-      if (touchMode === 'pan' && e.touches.length === 1) {
+      const rect = canvas.getBoundingClientRect();
+      if (touchMode === 'pan' && e.touches.length === 1 && shouldSingleFingerPan(state.expanded)) {
         e.preventDefault();
-        const dx = e.touches[0].clientX - lastTouchX;
-        const dy = e.touches[0].clientY - lastTouchY;
+        const t = e.touches[0];
+        const dx = t.clientX - lastTouchX;
+        const dy = t.clientY - lastTouchY;
         state.centerX -= dx / state.scale;
         state.centerY += dy / state.scale;
-        lastTouchX = e.touches[0].clientX;
-        lastTouchY = e.touches[0].clientY;
+        lastTouchX = t.clientX;
+        lastTouchY = t.clientY;
+        const pt = screenToMath(t.clientX - rect.left, t.clientY - rect.top, state.centerX, state.centerY, state.scale, rect.width, rect.height);
+        state.hoverMathX = pt.mx;
+        state.hoverMathY = pt.my;
         drawGraph();
       } else if (e.touches.length === 2) {
         e.preventDefault();
         const dist = pinchDistance(e.touches);
-        if (lastPinchDist > 0) {
-          state.scale = Math.min(260, Math.max(8, state.scale * (dist / lastPinchDist)));
-        }
+        const mid = pinchMid(e.touches, rect);
+        const next = applyPinchZoom({
+          scale: state.scale,
+          prevDist: lastPinchDist || dist,
+          nextDist: dist,
+          centerX: state.centerX,
+          centerY: state.centerY,
+          panDx: mid.x - lastMidX,
+          panDy: mid.y - lastMidY,
+          midPx: mid.x,
+          midPy: mid.y,
+          width: rect.width,
+          height: rect.height
+        });
+        state.scale = next.scale;
+        state.centerX = next.centerX;
+        state.centerY = next.centerY;
         lastPinchDist = dist;
+        lastMidX = mid.x;
+        lastMidY = mid.y;
         drawGraph();
       }
     }, { passive: false });
@@ -422,40 +677,40 @@ window.MatInteractiva = window.MatInteractiva || {};
 
   // Redibujar el lienzo al girar el teléfono o cambiar el tamaño de la ventana
   let resizeFrame = null;
-  window.addEventListener('resize', () => {
+  const scheduleRedraw = () => {
     if (resizeFrame) cancelAnimationFrame(resizeFrame);
     resizeFrame = requestAnimationFrame(() => drawGraph());
-  });
+  };
+  if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+    window.addEventListener('resize', scheduleRedraw);
+    window.addEventListener('orientationchange', scheduleRedraw);
+  }
 
   function drawGraph() {
     const canvas = document.getElementById('math-graph-canvas');
     if (!canvas) return;
     const rect = canvas.parentElement.getBoundingClientRect();
-    const dpr = window.devicePixelRatio || 1;
-    const width = rect.width || 680;
-    const height = rect.height || 480;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const width = Math.max(120, rect.width || 680);
+    const height = Math.max(120, rect.height || 480);
 
-    canvas.width = width * dpr;
-    canvas.height = height * dpr;
+    canvas.width = Math.round(width * dpr);
+    canvas.height = Math.round(height * dpr);
 
     const ctx = canvas.getContext('2d');
+    const pal = getGraphThemePalette();
     ctx.save();
     ctx.scale(dpr, dpr);
 
-    // Fondo blanco limpio
-    ctx.fillStyle = '#FFFFFF';
+    // Fondo adaptable al tema claro/oscuro con contraste AA
+    ctx.fillStyle = pal.bg;
     ctx.fillRect(0, 0, width, height);
 
-    const toScreenX = (x) => width / 2 + (x - state.centerX) * state.scale;
-    const toScreenY = (y) => height / 2 - (y - state.centerY) * state.scale;
-    const toMathX = (px) => state.centerX + (px - width / 2) / state.scale;
+    const toScreenX = (x) => mathToScreen(x, 0, state.centerX, state.centerY, state.scale, width, height).px;
+    const toScreenY = (y) => mathToScreen(0, y, state.centerX, state.centerY, state.scale, width, height).py;
+    const toMathX = (px) => screenToMath(px, 0, state.centerX, state.centerY, state.scale, width, height).mx;
 
-    // Determinar paso de cuadrícula según nivel de zoom
-    let gridStep = 1;
-    if (state.scale < 20) gridStep = 5;
-    else if (state.scale < 35) gridStep = 2;
-    else if (state.scale > 95) gridStep = 0.5;
-
+    const gridStep = computeOptimalGridStep(state.scale, width < 480 ? 48 : 54);
     const xMin = toMathX(0);
     const xMax = toMathX(width);
     const yMin = state.centerY - (height / 2) / state.scale;
@@ -463,9 +718,10 @@ window.MatInteractiva = window.MatInteractiva || {};
 
     // Cuadrícula secundaria y principal
     ctx.lineWidth = 1;
-    ctx.strokeStyle = '#F1F5F9';
-    ctx.fillStyle = '#64748B';
-    ctx.font = '11px Inter, sans-serif';
+    ctx.strokeStyle = pal.grid;
+    ctx.fillStyle = pal.tickText;
+    const labelFontPx = Math.max(11, width < 420 ? 11 : 12);
+    ctx.font = `${labelFontPx}px Inter, system-ui, sans-serif`;
 
     const firstGridX = Math.floor(xMin / gridStep) * gridStep;
     for (let gx = firstGridX; gx <= xMax; gx += gridStep) {
@@ -476,8 +732,8 @@ window.MatInteractiva = window.MatInteractiva || {};
       ctx.stroke();
 
       if (Math.abs(gx) > 1e-6) {
-        const axisY = Math.min(height - 16, Math.max(14, toScreenY(0) + 14));
-        ctx.fillText(Number(gx.toFixed(2)).toString(), sx - 8, axisY);
+        const axisY = Math.min(height - 10, Math.max(16, toScreenY(0) + 15));
+        ctx.fillText(Number(gx.toFixed(3)).toString(), sx - 8, axisY);
       }
     }
 
@@ -490,14 +746,14 @@ window.MatInteractiva = window.MatInteractiva || {};
       ctx.stroke();
 
       if (Math.abs(gy) > 1e-6) {
-        const axisX = Math.min(width - 28, Math.max(6, toScreenX(0) + 6));
-        ctx.fillText(Number(gy.toFixed(2)).toString(), axisX, sy + 4);
+        const axisX = Math.min(width - 34, Math.max(6, toScreenX(0) + 6));
+        ctx.fillText(Number(gy.toFixed(3)).toString(), axisX, sy + 4);
       }
     }
 
     // Ejes cartesianos X e Y
     ctx.lineWidth = 1.6;
-    ctx.strokeStyle = '#94A3B8';
+    ctx.strokeStyle = pal.axis;
     const originX = toScreenX(0);
     const originY = toScreenY(0);
 
@@ -526,7 +782,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       const pxEnd = Math.min(width, toScreenX(b));
 
       if (pxEnd > pxStart) {
-        ctx.fillStyle = 'rgba(37, 99, 235, 0.16)';
+        ctx.fillStyle = pal.integralFill;
         ctx.beginPath();
         ctx.moveTo(pxStart, originY);
         for (let px = pxStart; px <= pxEnd; px += 2) {
@@ -542,9 +798,13 @@ window.MatInteractiva = window.MatInteractiva || {};
       }
     }
 
-    // 2. Trazar cada función activa
-    for (const fnObj of state.functions) {
+    // 2. Trazar cada función activa y sus discontinuidades removibles (huecos)
+    const detectedHolesByFn = [];
+    const themeCurveColors = [pal.curvePrimary, pal.curveSecondary, pal.curveTertiary];
+    for (let idx = 0; idx < state.functions.length; idx++) {
+      const fnObj = state.functions[idx];
       if (!fnObj.visible || !fnObj.expr.trim()) continue;
+      const curveColor = themeCurveColors[idx] || fnObj.color;
       let compiled;
       try {
         compiled = ns.MathParser.compileFunction(fnObj.expr, 'RAD');
@@ -552,7 +812,14 @@ window.MatInteractiva = window.MatInteractiva || {};
         continue;
       }
 
-      ctx.strokeStyle = fnObj.color;
+      const holes = typeof ns.MathParser.findRemovableDiscontinuities === 'function'
+        ? ns.MathParser.findRemovableDiscontinuities(fnObj.expr, xMin, xMax, 'RAD')
+        : [];
+      if (holes.length) {
+        detectedHolesByFn.push({ color: curveColor, holes });
+      }
+
+      ctx.strokeStyle = curveColor;
       ctx.lineWidth = 2.6;
       ctx.beginPath();
       let penDown = false;
@@ -560,6 +827,12 @@ window.MatInteractiva = window.MatInteractiva || {};
 
       for (let px = 0; px <= width; px += 1.5) {
         const mx = toMathX(px);
+        const nearHole = holes.some(h => Math.abs(mx - h.x) * state.scale < 5);
+        if (nearHole) {
+          penDown = false;
+          prevY = null;
+          continue;
+        }
         const my = compiled(mx);
         if (!isFinite(my) || Math.abs(my) > 1e5) {
           penDown = false;
@@ -582,6 +855,22 @@ window.MatInteractiva = window.MatInteractiva || {};
       ctx.stroke();
     }
 
+    // Dibujar círculos abiertos sobre todas las discontinuidades removibles detectadas
+    for (const entry of detectedHolesByFn) {
+      for (const h of entry.holes) {
+        const hx = toScreenX(h.x);
+        const hy = toScreenY(h.y);
+        if (hx < -10 || hx > width + 10 || hy < -10 || hy > height + 10) continue;
+        ctx.fillStyle = pal.holeFill;
+        ctx.strokeStyle = entry.color;
+        ctx.lineWidth = 2.4;
+        ctx.beginPath();
+        ctx.arc(hx, hy, 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+      }
+    }
+
     // 3. Trazar Recta Tangente o Punto de Límite en x0 sobre f(x)
     if (primaryFn) {
       const x0 = state.tangentX;
@@ -599,7 +888,7 @@ window.MatInteractiva = window.MatInteractiva || {};
 
       if (state.showDerivative && isFinite(y0) && isFinite(slope)) {
         ctx.save();
-        ctx.strokeStyle = '#DC2626';
+        ctx.strokeStyle = pal.tangent;
         ctx.lineWidth = 1.8;
         ctx.setLineDash([6, 4]);
         ctx.beginPath();
@@ -615,8 +904,8 @@ window.MatInteractiva = window.MatInteractiva || {};
 
       if (isFinite(y0)) {
         // Punto de evaluación o límite en x0
-        ctx.fillStyle = isHole ? '#FFFFFF' : '#DC2626';
-        ctx.strokeStyle = '#DC2626';
+        ctx.fillStyle = isHole ? pal.holeFill : pal.tangent;
+        ctx.strokeStyle = pal.tangent;
         ctx.lineWidth = 2.2;
         ctx.beginPath();
         ctx.arc(toScreenX(x0), toScreenY(y0), 5.5, 0, Math.PI * 2);
@@ -625,18 +914,28 @@ window.MatInteractiva = window.MatInteractiva || {};
       }
     }
 
-    // 4. Punto interactivo bajo el cursor sobre f(x)
+    // 4. Punto interactivo bajo el cursor o toque sobre f(x) con tooltip desplazado
     if (primaryFn && state.hoverMathX !== null) {
       const hx = state.hoverMathX;
       const hy = primaryFn(hx);
       if (isFinite(hy)) {
         const sx = toScreenX(hx);
         const sy = toScreenY(hy);
-        if (sy >= 0 && sy <= height) {
-          ctx.fillStyle = '#1E40AF';
+        if (sx >= 0 && sx <= width && sy >= 0 && sy <= height) {
+          ctx.fillStyle = pal.curvePrimary;
+          ctx.strokeStyle = pal.pointStroke;
+          ctx.lineWidth = 2;
           ctx.beginPath();
-          ctx.arc(sx, sy, 4.5, 0, Math.PI * 2);
+          ctx.arc(sx, sy, 5, 0, Math.PI * 2);
           ctx.fill();
+          ctx.stroke();
+          const tip = `(${ns.MathParser.formatNumber(hx, 2)}, ${ns.MathParser.formatNumber(hy, 2)})`;
+          drawPointTooltip(ctx, sx, sy, tip, width, height, pal);
+          const liveBar = document.getElementById('graph-live-bar');
+          const txt = `En la curva: x = ${ns.MathParser.formatNumber(hx, 3)} | f(x) = ${ns.MathParser.formatNumber(hy, 3)}`;
+          if (liveBar && liveBar.textContent !== txt) {
+            liveBar.textContent = txt;
+          }
         }
       }
     }
@@ -666,7 +965,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       const limR = fn(x0 + 1e-5);
       if (isFinite(limL) && isFinite(limR) && Math.abs(limL - limR) < 1e-2 * Math.max(1, Math.abs(limL))) {
         const limAvg = 0.5 * (limL + limR);
-        evalDisplayHtml = `Lím<sub>x→${x0}</sub> = <b>${ns.MathParser.formatNumber(limAvg)}</b> <small style="color:var(--text-muted);">(0/0)</small>`;
+        evalDisplayHtml = `Lím<sub>x→${x0}</sub> = <b>${ns.MathParser.formatNumber(limAvg)}</b> <small class="analysis-note-muted">(0/0)</small>`;
       }
     }
     const dfx0 = ns.MathParser.numericalDerivative(fn, x0);
@@ -680,11 +979,11 @@ window.MatInteractiva = window.MatInteractiva || {};
       </div>
       <div class="analysis-stat-box">
         <strong>Derivada f'(x₀) (Pendiente)</strong>
-        f'(${x0}) = <b style="color:var(--danger-600);">${ns.MathParser.formatNumber(dfx0)}</b>
+        f'(${x0}) = <b class="analysis-val-deriv">${ns.MathParser.formatNumber(dfx0)}</b>
       </div>
       <div class="analysis-stat-box">
         <strong>Integral ∫ f(x)dx en [${state.integralA}, ${state.integralB}]</strong>
-        Área neta = <b style="color:var(--primary-700);">${ns.MathParser.formatNumber(areaVal)}</b>
+        Área neta = <b class="analysis-val-int">${ns.MathParser.formatNumber(areaVal)}</b>
       </div>
       <div class="analysis-stat-box">
         <strong>Raíces reales en [-10, 10]</strong>
@@ -694,12 +993,12 @@ window.MatInteractiva = window.MatInteractiva || {};
 
     // Generar tabla de valores alrededor de x = -3 a 3
     let rowsHtml = `
-      <table style="width:100%; border-collapse:collapse; text-align:center;">
+      <table class="grapher-table">
         <thead>
-          <tr style="background:var(--primary-50); color:var(--primary-900);">
-            <th style="padding:0.35rem; border-bottom:1px solid var(--border-light);">x</th>
-            <th style="padding:0.35rem; border-bottom:1px solid var(--border-light);">f(x)</th>
-            <th style="padding:0.35rem; border-bottom:1px solid var(--border-light);">f'(x)</th>
+          <tr>
+            <th>x</th>
+            <th>f(x)</th>
+            <th>f'(x)</th>
           </tr>
         </thead>
         <tbody>
@@ -717,10 +1016,10 @@ window.MatInteractiva = window.MatInteractiva || {};
       }
       const dy = ns.MathParser.numericalDerivative(fn, x);
       rowsHtml += `
-        <tr style="border-bottom:1px solid var(--border-light);">
-          <td style="padding:0.3rem; font-weight:600;">${x}</td>
-          <td style="padding:0.3rem; font-family:var(--font-mono);">${yCell}</td>
-          <td style="padding:0.3rem; font-family:var(--font-mono); color:var(--text-muted);">${ns.MathParser.formatNumber(dy, 3)}</td>
+        <tr>
+          <td>${x}</td>
+          <td>${yCell}</td>
+          <td>${ns.MathParser.formatNumber(dy, 3)}</td>
         </tr>
       `;
     }
@@ -730,6 +1029,12 @@ window.MatInteractiva = window.MatInteractiva || {};
 
   ns.GrapherTool = {
     renderGrapherView,
-    drawGraph
+    drawGraph,
+    clampScale,
+    mathToScreen,
+    screenToMath,
+    computeOptimalGridStep,
+    shouldSingleFingerPan,
+    applyPinchZoom
   };
 })(window.MatInteractiva);

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   MATEMÁTICA INTERACTIVA - Sistema de Progreso y Almacenamiento Local
+   MATETIC - Sistema de Progreso y Almacenamiento Local
    Archivo: js/engine/storage.js
    ========================================================================== */
 

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   MATEMÁTICA INTERACTIVA - Formularios Matemáticos de Estudio e Impresión
+   MATETIC - Formularios Matemáticos de Estudio e Impresión
    Archivo: js/tools/formula-sheets.js
    Fase 5A: Arquitectura completa, Modalidad A (Por Tema) y Modalidad B
    (Compendio General con Índice), Módulos 1 a 5 exhaustivos y estructura base 6 a 9.
@@ -1217,6 +1217,10 @@ window.MatInteractiva = window.MatInteractiva || {};
       `;
     }
 
+    const appName = (ns.Version && ns.Version.APP_NAME) || 'MateTic';
+    const appTagline = (ns.Version && ns.Version.APP_TAGLINE) || 'Matemáticas Interactivas';
+    const studioName = (ns.Version && ns.Version.STUDIO_NAME) || 'ALPA Studio';
+
     return `
       <div class="fs-printable-sheet" id="fs-printable-sheet">
         <!-- Membrete Académico Oficial (Visible en Pantalla y Encabezado de Impresión Carta) -->
@@ -1225,8 +1229,8 @@ window.MatInteractiva = window.MatInteractiva || {};
             <div class="fs-letterhead-brand">
               <span class="fs-letterhead-logo">∫π</span>
               <div>
-                <div class="fs-letterhead-org">MATEMÁTICA INTERACTIVA · ACADEMIA DE CIENCIAS EXACTAS</div>
-                <div class="fs-letterhead-doc-type">FORMULARIO MATEMÁTICO DE ESTUDIO Y CONSULTA OFICIAL</div>
+                <div class="fs-letterhead-org">${appName.toUpperCase()} · ${appTagline.toUpperCase()}</div>
+                <div class="fs-letterhead-doc-type">FORMULARIO MATEMÁTICO DE ESTUDIO Y CONSULTA · ${studioName.toUpperCase()}</div>
               </div>
             </div>
             <div class="fs-letterhead-meta">
@@ -1307,8 +1311,8 @@ window.MatInteractiva = window.MatInteractiva || {};
 
         <!-- Pie de página académico para impresión -->
         <footer class="fs-print-footer">
-          <span>Matemática Interactiva — Formulario Académico de Estudio y Consulta</span>
-          <span>Notación simbólica estandarizada · Impresión en formato Carta (Letter)</span>
+          <span>${appName} (${appTagline}) — Formulario Académico de Estudio y Consulta</span>
+          <span>${studioName} · Impresión en formato Carta (Letter)</span>
         </footer>
       </div>
     `;

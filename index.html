@@ -3,22 +3,31 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Matemática Interactiva - Plataforma educativa especializada en matemáticas desde Aritmética hasta Cálculo Diferencial e Integral." />
-  <title>Matemática Interactiva | Plataforma Educativa de Matemáticas</title>
+  <meta name="description" content="MateTic (Matemáticas Interactivas) - Plataforma educativa especializada en matemáticas desde Aritmética hasta Cálculo Diferencial e Integral." />
+  <meta name="theme-color" content="#eef2ff" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0b1120" media="(prefers-color-scheme: dark)" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="MateTic" />
+  <title>MateTic | Matemáticas Interactivas</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png" />
 
-  <!-- Hojas de Estilo Modulares y Tipografía Matemática KaTeX + MathLive -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mathlive@0.101.2/dist/mathlive-static.css" crossorigin="anonymous" />
+  <!-- Hojas de Estilo Modulares y Tipografía Matemática KaTeX + MathLive Locales -->
+  <link rel="stylesheet" href="vendor/katex/katex.min.css" />
+  <link rel="stylesheet" href="vendor/mathlive/mathlive-static.css" />
   <link rel="stylesheet" href="css/variables.css" />
   <link rel="stylesheet" href="css/layout.css" />
   <link rel="stylesheet" href="css/components.css" />
   <link rel="stylesheet" href="css/tools.css" />
   <link rel="stylesheet" href="css/responsive.css" />
   <link rel="stylesheet" href="css/print.css" />
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/mathlive@0.101.2/dist/mathlive.min.js" crossorigin="anonymous"></script>
+  <script defer src="vendor/katex/katex.min.js"></script>
+  <script defer src="vendor/mathlive/mathlive.min.js"></script>
 </head>
 <body>
+  <canvas id="ambient-math-canvas" class="ambient-math-canvas" aria-hidden="true"></canvas>
   <div class="app-layout">
     <!-- Overlay para menú móvil/tablet -->
     <div class="sidebar-overlay" id="sidebar-overlay"></div>
@@ -28,8 +37,8 @@
       <div class="sidebar-brand">
         <div class="brand-logo" aria-hidden="true">∫π</div>
         <div class="brand-text">
-          <span class="brand-title">Matemática Interactiva</span>
-          <span class="brand-subtitle">Academia Interactiva</span>
+          <span class="brand-title">MateTic</span>
+          <span class="brand-subtitle">Matemáticas Interactivas</span>
         </div>
         <button class="sidebar-close-btn" id="btn-close-sidebar" title="Cerrar menú">✕</button>
       </div>
@@ -48,6 +57,27 @@
             <div class="sidebar-progress-fill" id="sidebar-global-fill" style="width: 0%;"></div>
           </div>
         </div>
+
+        <a
+          href="https://ko-fi.com/edrx_ngl"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="kofi-support-btn"
+          id="btn-kofi-support"
+          aria-label="Apóyame en Ko-fi (se abre en una pestaña nueva)">
+          <span aria-hidden="true">☕</span>
+          <span>Apóyame en Ko-fi</span>
+        </a>
+
+        <button
+          type="button"
+          class="sidebar-settings-btn"
+          id="btn-open-settings"
+          aria-haspopup="dialog"
+          aria-controls="settings-modal">
+          <span aria-hidden="true">⚙️</span>
+          <span>Ajustes</span>
+        </button>
       </div>
     </aside>
 
@@ -56,7 +86,7 @@
       <!-- Barra Superior -->
       <header class="top-header">
         <div class="header-left">
-          <button class="mobile-menu-btn" id="btn-open-sidebar" title="Abrir menú de navegación">☰</button>
+          <button class="mobile-menu-btn" id="btn-open-sidebar" title="Abrir menú de navegación" aria-label="Abrir menú de navegación" aria-expanded="false" aria-controls="app-sidebar">☰</button>
           <div class="header-breadcrumb" id="header-breadcrumb">
             <span>Inicio</span> <span>›</span> <strong>Panel Principal</strong>
           </div>
@@ -65,21 +95,29 @@
 
         <!-- Buscador Instantáneo -->
         <div class="header-search">
-          <span class="header-search-icon">🔍</span>
+          <span class="header-search-icon" aria-hidden="true">🔍</span>
           <input
             type="search"
             id="global-search-input"
             class="header-search-input"
             placeholder="Buscar tema (ej. factorización, racionalización, límites, derivadas, integrales...)"
             autocomplete="off"
+            role="combobox"
+            aria-expanded="false"
+            aria-controls="global-search-dropdown"
+            aria-label="Buscar tema matemático"
           />
-          <div class="search-results-dropdown" id="global-search-dropdown"></div>
+          <div class="search-results-dropdown" id="global-search-dropdown" role="listbox" aria-label="Resultados de búsqueda"></div>
         </div>
 
-        <!-- Estadísticas Rápidas y Calculadora Flotante -->
+        <!-- Estadísticas Rápidas, Tema y Calculadora Flotante -->
         <div class="header-actions">
           <span class="stat-pill streak" id="header-streak-pill" title="Racha de días de estudio">🔥 1 día</span>
           <span class="stat-pill" id="header-xp-pill" title="Puntos de experiencia matemática">🌱 0 XP</span>
+          <button class="theme-toggle-btn" id="btn-theme-toggle" type="button" aria-pressed="false" title="Cambiar entre modo claro y oscuro">
+            <span class="theme-toggle-icon" aria-hidden="true">🌙</span>
+            <span class="theme-toggle-text">Oscuro</span>
+          </button>
           <button class="quick-tool-btn" id="btn-open-quick-calc" title="Abrir Calculadora Científica Rápida">
             <span>🧮</span>
             <span class="btn-text">Calculadora</span>
@@ -95,22 +133,414 @@
   </div>
 
   <!-- Modal Flotante para Calculadora Rápida desde cualquier lección -->
-  <div class="quick-modal-backdrop" id="quick-tool-modal">
+  <div class="quick-modal-backdrop no-print" id="quick-tool-modal" role="dialog" aria-modal="true" aria-labelledby="quick-modal-title">
     <div class="quick-modal-window">
       <div class="quick-modal-header">
-        <strong style="font-size:1rem;">🧮 Calculadora Científica de Apoyo Rápido</strong>
-        <button class="btn btn-glass btn-sm" id="btn-close-quick-modal">✕ Cerrar</button>
+        <strong class="quick-modal-title" id="quick-modal-title">🧮 Calculadora Científica de Apoyo Rápido</strong>
+        <button class="btn btn-glass btn-sm" id="btn-close-quick-modal" aria-label="Cerrar calculadora rápida">✕ Cerrar</button>
       </div>
       <div class="quick-modal-body" id="quick-tool-modal-body"></div>
     </div>
   </div>
 
+  <!-- Diálogo / Bottom Sheet de Ajustes -->
+  <div class="quick-modal-backdrop sheet-modal-backdrop no-print" id="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-modal-title" hidden>
+    <div class="quick-modal-window sheet-modal-window">
+      <div class="sheet-grabber" aria-hidden="true"></div>
+      <div class="quick-modal-header sheet-modal-header">
+        <strong class="quick-modal-title" id="settings-modal-title">⚙️ Ajustes</strong>
+        <button type="button" class="btn btn-glass btn-sm sheet-close-btn" id="btn-close-settings" aria-label="Cerrar Ajustes">✕ Cerrar</button>
+      </div>
+      <div class="quick-modal-body sheet-modal-body">
+        <section class="settings-section" aria-labelledby="settings-sec-exp">
+          <h2 class="settings-section-title" id="settings-sec-exp">Experiencia</h2>
+          <div class="settings-group-card">
+            <div class="settings-control-row">
+              <div class="settings-control-text">
+                <span class="settings-control-label">Vibración háptica</span>
+                <span class="settings-control-note" id="haptics-support-note">Retroalimentación táctil breve al interactuar</span>
+              </div>
+              <button
+                type="button"
+                class="pref-switch-btn settings-switch-only is-on"
+                id="btn-toggle-haptics"
+                role="switch"
+                aria-checked="true"
+                aria-label="Activar o desactivar vibración háptica">
+                <span class="pref-switch-pill" aria-hidden="true"><span class="pref-switch-thumb"></span></span>
+              </button>
+            </div>
+
+            <div class="settings-control-row">
+              <div class="settings-control-text">
+                <span class="settings-control-label">Fondo animado</span>
+                <span class="settings-control-note">Fórmulas matemáticas sutiles flotando en el fondo</span>
+              </div>
+              <button
+                type="button"
+                class="pref-switch-btn settings-switch-only is-on"
+                id="btn-toggle-ambient"
+                role="switch"
+                aria-checked="true"
+                aria-label="Activar o desactivar fondo animado">
+                <span class="pref-switch-pill" aria-hidden="true"><span class="pref-switch-thumb"></span></span>
+              </button>
+            </div>
+
+            <div class="settings-control-row settings-theme-row">
+              <div class="settings-control-text">
+                <span class="settings-control-label">Tema visual</span>
+                <span class="settings-control-note">Sigue el sistema o elige modo fijo claro/oscuro</span>
+              </div>
+              <div class="settings-segmented" role="group" aria-label="Selector de tema">
+                <button type="button" class="settings-seg-btn" data-theme-choice="auto" aria-pressed="true">Automático</button>
+                <button type="button" class="settings-seg-btn" data-theme-choice="light" aria-pressed="false">Claro</button>
+                <button type="button" class="settings-seg-btn" data-theme-choice="dark" aria-pressed="false">Oscuro</button>
+              </div>
+            </div>
+
+            <div class="settings-control-row settings-wrappable-row" id="settings-row-bg-light">
+              <div class="settings-control-text">
+                <span class="settings-control-label">Fondos para modo claro</span>
+                <span class="settings-control-note">Elige entre 3 atmósferas luminosas para estudiar</span>
+                <span class="settings-bg-mode-notice" id="settings-bg-light-notice" hidden></span>
+              </div>
+              <div class="settings-bg-grid" role="group" aria-label="Fondos para modo claro">
+                <button type="button" class="settings-bg-swatch-btn" data-bg-light-choice="cristal" aria-pressed="true">
+                  <span class="swatch-preview swatch-light-cristal" aria-hidden="true"></span>
+                  <span>Índigo Cristal</span>
+                </button>
+                <button type="button" class="settings-bg-swatch-btn" data-bg-light-choice="esmeralda" aria-pressed="false">
+                  <span class="swatch-preview swatch-light-esmeralda" aria-hidden="true"></span>
+                  <span>Brisa Esmeralda</span>
+                </button>
+                <button type="button" class="settings-bg-swatch-btn" data-bg-light-choice="aurora" aria-pressed="false">
+                  <span class="swatch-preview swatch-light-aurora" aria-hidden="true"></span>
+                  <span>Aurora Cálida</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="settings-control-row settings-wrappable-row" id="settings-row-bg-dark">
+              <div class="settings-control-text">
+                <span class="settings-control-label">Fondos para modo oscuro</span>
+                <span class="settings-control-note">Elige entre 3 atmósferas nocturnas con contraste AA</span>
+                <span class="settings-bg-mode-notice" id="settings-bg-dark-notice" hidden></span>
+              </div>
+              <div class="settings-bg-grid" role="group" aria-label="Fondos para modo oscuro">
+                <button type="button" class="settings-bg-swatch-btn" data-bg-dark-choice="cosmos" aria-pressed="true">
+                  <span class="swatch-preview swatch-dark-cosmos" aria-hidden="true"></span>
+                  <span>Cosmos</span>
+                </button>
+                <button type="button" class="settings-bg-swatch-btn" data-bg-dark-choice="abismo" aria-pressed="false">
+                  <span class="swatch-preview swatch-dark-abismo" aria-hidden="true"></span>
+                  <span>Boreal Cian</span>
+                </button>
+                <button type="button" class="settings-bg-swatch-btn" data-bg-dark-choice="nebulosa" aria-pressed="false">
+                  <span class="swatch-preview swatch-dark-nebulosa" aria-hidden="true"></span>
+                  <span>Nebulosa</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="settings-section" aria-labelledby="settings-sec-ui">
+          <h2 class="settings-section-title" id="settings-sec-ui">Interfaz</h2>
+          <div class="settings-group-card">
+            <div class="settings-control-row">
+              <div class="settings-control-text">
+                <span class="settings-control-label">Mostrar botón de cambio de tema</span>
+                <span class="settings-control-note">Muestra u oculta el botón rápido en la barra superior</span>
+              </div>
+              <button
+                type="button"
+                class="pref-switch-btn settings-switch-only is-on"
+                id="btn-toggle-show-theme-btn"
+                role="switch"
+                aria-checked="true"
+                aria-label="Mostrar botón de cambio de tema en la barra superior">
+                <span class="pref-switch-pill" aria-hidden="true"><span class="pref-switch-thumb"></span></span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section class="settings-section" aria-labelledby="settings-sec-app">
+          <h2 class="settings-section-title" id="settings-sec-app">Aplicación</h2>
+          <div class="settings-group-card">
+            <div class="settings-control-row">
+              <div class="settings-control-text">
+                <span class="settings-control-label">Uso sin conexión</span>
+                <span class="settings-control-note" id="settings-offline-status">Preparando uso sin conexión…</span>
+              </div>
+              <span class="settings-status-badge" id="settings-offline-badge">PWA</span>
+            </div>
+
+            <div class="settings-control-row" id="settings-install-row" hidden>
+              <div class="settings-control-text">
+                <span class="settings-control-label">Instalar aplicación</span>
+                <span class="settings-control-note" id="settings-install-note">Acceso directo e inicio rápido sin internet</span>
+              </div>
+              <button type="button" class="btn btn-primary btn-sm" id="btn-install-pwa">📲 Instalar</button>
+            </div>
+
+            <div class="settings-control-row settings-wrappable-row">
+              <div class="settings-control-text">
+                <span class="settings-control-label" id="settings-app-version"></span>
+                <span class="settings-control-note" id="settings-app-studio"></span>
+              </div>
+              <button type="button" class="btn btn-outline btn-sm" id="btn-open-whats-new">✨ Novedades de esta versión</button>
+            </div>
+          </div>
+        </section>
+
+        <div class="settings-footer-actions">
+          <button type="button" class="btn btn-outline settings-reset-btn" id="btn-reset-preferences">
+            ↺ Restablecer preferencias
+          </button>
+          <span class="settings-reset-hint">Restaura únicamente estas preferencias; nunca borra tu progreso ni XP.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Aviso de Actualización / Novedades por Versión -->
+  <div class="quick-modal-backdrop sheet-modal-backdrop whats-new-modal-backdrop no-print" id="whats-new-modal" role="dialog" aria-modal="true" aria-labelledby="whats-new-title" hidden>
+    <div class="quick-modal-window sheet-modal-window whats-new-modal-window">
+      <div class="sheet-grabber" aria-hidden="true"></div>
+      <div class="quick-modal-header sheet-modal-header">
+        <strong class="quick-modal-title" id="whats-new-title">✨ Novedades</strong>
+        <button type="button" class="btn btn-glass btn-sm sheet-close-btn" id="btn-close-whats-new" aria-label="Cerrar novedades">✕ Cerrar</button>
+      </div>
+      <div class="quick-modal-body sheet-modal-body" id="whats-new-body">
+        <!-- Renderizado dinámicamente desde js/version.js -->
+      </div>
+      <div class="whats-new-footer">
+        <button type="button" class="btn btn-outline btn-sm" id="btn-whats-new-more">Ver más en Ajustes</button>
+        <button type="button" class="btn btn-primary whats-new-ack-btn" id="btn-ack-whats-new">✓ Entendido</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ventana Promocional: Calculadora con Álgebra Computacional (NUMERUS CAS) -->
+  <div class="quick-modal-backdrop sheet-modal-backdrop numerus-cas-backdrop no-print" id="numerus-cas-modal" role="dialog" aria-modal="true" aria-labelledby="numerus-cas-title" hidden>
+    <div class="quick-modal-window sheet-modal-window numerus-cas-window">
+      <div class="sheet-grabber" aria-hidden="true"></div>
+      <div class="quick-modal-header sheet-modal-header numerus-cas-header">
+        <div class="numerus-cas-title-wrap">
+          <span class="numerus-dev-badge">⚛️ EN DESARROLLO · ALPA STUDIO</span>
+          <strong class="quick-modal-title" id="numerus-cas-title">NUMERUS CAS — Álgebra Computacional</strong>
+        </div>
+        <button type="button" class="btn btn-glass btn-sm sheet-close-btn" id="btn-close-numerus-cas" aria-label="Cerrar NUMERUS CAS">✕ Cerrar</button>
+      </div>
+
+      <div class="quick-modal-body sheet-modal-body numerus-cas-body">
+        <p class="numerus-cas-pitch">
+          <strong>NUMERUS CAS</strong> será una calculadora de álgebra simbólica de alta precisión numérica, con opciones avanzadas.
+          <strong>¡Tu apoyo hace posible terminar su desarrollo!</strong>
+        </p>
+
+        <div class="numerus-modules-stage">
+          <div class="numerus-modules-grid" role="group" aria-label="Módulos próximos en NUMERUS CAS">
+            <button type="button" class="numerus-module-btn is-selected" data-cas-mod="calculadora">
+              <span class="numerus-module-icon" aria-hidden="true">
+                <svg viewBox="0 0 64 64" width="46" height="46" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="16" y="8" width="32" height="48" rx="4" stroke="#f8fafc" stroke-width="2.5"/>
+                  <rect x="21" y="13" width="22" height="9" rx="1.8" stroke="#eab308" stroke-width="2.2"/>
+                  <line x1="25" y1="17.5" x2="31" y2="17.5" stroke="#eab308" stroke-width="2"/>
+                  <line x1="34" y1="17.5" x2="39" y2="17.5" stroke="#eab308" stroke-width="2"/>
+                  <rect x="21" y="27" width="4" height="4" rx="0.8" stroke="#f8fafc" stroke-width="1.8"/>
+                  <rect x="27" y="27" width="4" height="4" rx="0.8" stroke="#f8fafc" stroke-width="1.8"/>
+                  <rect x="33" y="27" width="4" height="4" rx="0.8" stroke="#f8fafc" stroke-width="1.8"/>
+                  <rect x="39" y="27" width="4" height="4" rx="0.8" stroke="#eab308" stroke-width="1.8"/>
+                  <rect x="21" y="34" width="4" height="4" rx="0.8" stroke="#f8fafc" stroke-width="1.8"/>
+                  <rect x="27" y="34" width="4" height="4" rx="0.8" stroke="#f8fafc" stroke-width="1.8"/>
+                  <rect x="33" y="34" width="4" height="4" rx="0.8" stroke="#f8fafc" stroke-width="1.8"/>
+                  <rect x="39" y="34" width="4" height="4" rx="0.8" stroke="#eab308" stroke-width="1.8"/>
+                  <rect x="21" y="41" width="4" height="4" rx="0.8" stroke="#f8fafc" stroke-width="1.8"/>
+                  <rect x="27" y="41" width="4" height="4" rx="0.8" stroke="#f8fafc" stroke-width="1.8"/>
+                  <rect x="33" y="41" width="4" height="4" rx="0.8" stroke="#f8fafc" stroke-width="1.8"/>
+                  <rect x="39" y="41" width="4" height="11" rx="0.8" stroke="#eab308" stroke-width="2"/>
+                  <rect x="21" y="48" width="4" height="4" rx="0.8" stroke="#f8fafc" stroke-width="1.8"/>
+                  <rect x="27" y="48" width="4" height="4" rx="0.8" stroke="#f8fafc" stroke-width="1.8"/>
+                  <rect x="33" y="48" width="4" height="4" rx="0.8" stroke="#f8fafc" stroke-width="1.8"/>
+                </svg>
+              </span>
+              <span class="numerus-module-label">Calculadora</span>
+            </button>
+
+            <button type="button" class="numerus-module-btn" data-cas-mod="calculo">
+              <span class="numerus-module-icon" aria-hidden="true">
+                <svg viewBox="0 0 64 64" width="46" height="46" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M25 14c-4 0-5.5 3.5-5.5 10v16c0 6.5-1.5 10-5.5 10" stroke="#f8fafc" stroke-width="2.6"/>
+                  <path d="M23.5 14c1.2 0 2 0.8 2 1.6" stroke="#f8fafc" stroke-width="2.6"/>
+                  <path d="M14 50c-1.2 0-2-0.8-2-1.6" stroke="#f8fafc" stroke-width="2.6"/>
+                  <line x1="27" y1="47" x2="54" y2="47" stroke="#f8fafc" stroke-width="2.2"/>
+                  <line x1="33" y1="44" x2="33" y2="50" stroke="#f8fafc" stroke-width="2"/>
+                  <line x1="50" y1="44" x2="50" y2="50" stroke="#f8fafc" stroke-width="2"/>
+                  <path d="M29 44 Q40 40 51 20" stroke="#eab308" stroke-width="2.6"/>
+                  <line x1="36" y1="47" x2="36" y2="39.5" stroke="#eab308" stroke-width="1.8" opacity="0.85"/>
+                  <line x1="40" y1="47" x2="40" y2="35.5" stroke="#eab308" stroke-width="1.8" opacity="0.85"/>
+                  <line x1="44" y1="47" x2="44" y2="30" stroke="#eab308" stroke-width="1.8" opacity="0.85"/>
+                  <line x1="48" y1="47" x2="48" y2="24" stroke="#eab308" stroke-width="1.8" opacity="0.85"/>
+                </svg>
+              </span>
+              <span class="numerus-module-label">Cálculo</span>
+            </button>
+
+            <button type="button" class="numerus-module-btn" data-cas-mod="graficas">
+              <span class="numerus-module-icon" aria-hidden="true">
+                <svg viewBox="0 0 64 64" width="46" height="46" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <g stroke="#f8fafc" stroke-width="1.1" opacity="0.24">
+                    <line x1="16" y1="18" x2="52" y2="18"/><line x1="16" y1="26" x2="52" y2="26"/>
+                    <line x1="16" y1="34" x2="52" y2="34"/><line x1="16" y1="42" x2="52" y2="42"/>
+                    <line x1="24" y1="14" x2="24" y2="48"/><line x1="34" y1="14" x2="34" y2="48"/>
+                    <line x1="44" y1="14" x2="44" y2="48"/>
+                  </g>
+                  <path d="M16 12v36h38" stroke="#f8fafc" stroke-width="2.4"/>
+                  <path d="M13 15l3-3 3 3M51 45l3 3-3 3" stroke="#f8fafc" stroke-width="2.2"/>
+                  <path d="M18 28 C25 14, 33 44, 41 37 C46 33, 50 22, 53 16" stroke="#eab308" stroke-width="2.7"/>
+                  <circle cx="38" cy="37" r="3.4" fill="#131624" stroke="#f8fafc" stroke-width="2.2"/>
+                </svg>
+              </span>
+              <span class="numerus-module-label">Gráficas</span>
+            </button>
+
+            <button type="button" class="numerus-module-btn" data-cas-mod="ecuaciones">
+              <span class="numerus-module-icon" aria-hidden="true">
+                <svg viewBox="0 0 64 64" width="46" height="46" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="32" y1="16" x2="32" y2="49" stroke="#f8fafc" stroke-width="2.4"/>
+                  <line x1="21" y1="50" x2="43" y2="50" stroke="#f8fafc" stroke-width="2.6"/>
+                  <circle cx="32" cy="12.5" r="2.8" stroke="#f8fafc" stroke-width="2.2"/>
+                  <line x1="14" y1="20" x2="50" y2="20" stroke="#f8fafc" stroke-width="2.4"/>
+                  <path d="M18 20l-6 14h12z" stroke="#f8fafc" stroke-width="2"/>
+                  <path d="M11 34c0 5 14 5 14 0z" stroke="#f8fafc" stroke-width="2.2"/>
+                  <path d="M46 20l-6 14h12z" stroke="#f8fafc" stroke-width="2"/>
+                  <path d="M39 34c0 5 14 5 14 0z" stroke="#f8fafc" stroke-width="2.2"/>
+                  <text x="15.5" y="31.5" fill="#eab308" font-size="10" font-weight="800" font-family="sans-serif">X</text>
+                  <circle cx="43.5" cy="31" r="2.4" stroke="#eab308" stroke-width="2"/>
+                  <circle cx="48.5" cy="31" r="2.4" stroke="#eab308" stroke-width="2"/>
+                </svg>
+              </span>
+              <span class="numerus-module-label">Ecuaciones</span>
+            </button>
+
+            <button type="button" class="numerus-module-btn" data-cas-mod="matrices">
+              <span class="numerus-module-icon" aria-hidden="true">
+                <svg viewBox="0 0 64 64" width="46" height="46" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M19 13h-6v38h6M45 13h6v38h-6" stroke="#f8fafc" stroke-width="2.6"/>
+                  <text x="20" y="25" fill="#eab308" font-size="11" font-weight="800" font-family="monospace">1</text>
+                  <text x="29" y="25" fill="#f8fafc" font-size="11" font-weight="700" font-family="monospace">0</text>
+                  <text x="38" y="25" fill="#f8fafc" font-size="11" font-weight="700" font-family="monospace">0</text>
+                  <text x="20" y="36" fill="#f8fafc" font-size="11" font-weight="700" font-family="monospace">0</text>
+                  <text x="29" y="36" fill="#eab308" font-size="11" font-weight="800" font-family="monospace">1</text>
+                  <text x="38" y="36" fill="#f8fafc" font-size="11" font-weight="700" font-family="monospace">0</text>
+                  <text x="20" y="47" fill="#f8fafc" font-size="11" font-weight="700" font-family="monospace">0</text>
+                  <text x="29" y="47" fill="#f8fafc" font-size="11" font-weight="700" font-family="monospace">0</text>
+                  <text x="38" y="47" fill="#eab308" font-size="11" font-weight="800" font-family="monospace">1</text>
+                </svg>
+              </span>
+              <span class="numerus-module-label">Matrices</span>
+            </button>
+
+            <button type="button" class="numerus-module-btn" data-cas-mod="estadistica">
+              <span class="numerus-module-icon" aria-hidden="true">
+                <svg viewBox="0 0 64 64" width="46" height="46" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M15 13v36h38" stroke="#f8fafc" stroke-width="2.4"/>
+                  <line x1="34" y1="15" x2="34" y2="49" stroke="#f8fafc" stroke-width="1.6" stroke-dasharray="3 3" opacity="0.6"/>
+                  <rect x="20" y="37" width="6" height="12" rx="1" stroke="#f8fafc" stroke-width="2"/>
+                  <rect x="28" y="26" width="6" height="23" rx="1" stroke="#f8fafc" stroke-width="2"/>
+                  <rect x="36" y="22" width="6" height="27" rx="1" stroke="#f8fafc" stroke-width="2"/>
+                  <rect x="44" y="34" width="6" height="15" rx="1" stroke="#f8fafc" stroke-width="2"/>
+                  <path d="M17 44 C24 41, 29 19, 34 19 C39 19, 44 40, 52 44" stroke="#eab308" stroke-width="2.6"/>
+                  <circle cx="29" cy="26" r="2" fill="#eab308"/><circle cx="34" cy="19" r="2" fill="#eab308"/>
+                  <circle cx="39" cy="24" r="2" fill="#eab308"/><circle cx="48" cy="39" r="2" fill="#eab308"/>
+                </svg>
+              </span>
+              <span class="numerus-module-label">Estadística</span>
+            </button>
+
+            <button type="button" class="numerus-module-btn" data-cas-mod="tablas">
+              <span class="numerus-module-icon" aria-hidden="true">
+                <svg viewBox="0 0 64 64" width="46" height="46" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="14" y="14" width="36" height="36" rx="3" stroke="#f8fafc" stroke-width="2.4"/>
+                  <line x1="14" y1="24" x2="50" y2="24" stroke="#f8fafc" stroke-width="2.2"/>
+                  <line x1="14" y1="33" x2="50" y2="33" stroke="#f8fafc" stroke-width="1.8"/>
+                  <line x1="14" y1="42" x2="50" y2="42" stroke="#f8fafc" stroke-width="1.8"/>
+                  <line x1="26" y1="14" x2="26" y2="50" stroke="#f8fafc" stroke-width="2"/>
+                  <line x1="38" y1="14" x2="38" y2="50" stroke="#f8fafc" stroke-width="2"/>
+                  <line x1="18" y1="19" x2="22" y2="19" stroke="#eab308" stroke-width="2.2"/>
+                  <line x1="30" y1="19" x2="34" y2="19" stroke="#eab308" stroke-width="2.2"/>
+                  <line x1="42" y1="19" x2="46" y2="19" stroke="#eab308" stroke-width="2.2"/>
+                  <rect x="28" y="35" width="8" height="5" rx="1" stroke="#eab308" stroke-width="2.2"/>
+                  <line x1="18" y1="28.5" x2="22" y2="28.5" stroke="#f8fafc" stroke-width="1.8"/>
+                  <line x1="30" y1="28.5" x2="34" y2="28.5" stroke="#f8fafc" stroke-width="1.8"/>
+                  <line x1="42" y1="28.5" x2="46" y2="28.5" stroke="#f8fafc" stroke-width="1.8"/>
+                  <line x1="18" y1="46" x2="22" y2="46" stroke="#f8fafc" stroke-width="1.8"/>
+                  <line x1="30" y1="46" x2="34" y2="46" stroke="#f8fafc" stroke-width="1.8"/>
+                  <line x1="42" y1="46" x2="46" y2="46" stroke="#f8fafc" stroke-width="1.8"/>
+                </svg>
+              </span>
+              <span class="numerus-module-label">Tablas</span>
+            </button>
+
+            <button type="button" class="numerus-module-btn" data-cas-mod="probabilidad">
+              <span class="numerus-module-icon" aria-hidden="true">
+                <svg viewBox="0 0 64 64" width="46" height="46" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <g transform="rotate(-12 24 37)">
+                    <rect x="13" y="26" width="22" height="22" rx="4" stroke="#f8fafc" stroke-width="2.4"/>
+                    <circle cx="19" cy="32" r="1.6" fill="#f8fafc"/><circle cx="29" cy="32" r="1.6" fill="#f8fafc"/>
+                    <circle cx="24" cy="37" r="1.6" fill="#eab308"/>
+                    <circle cx="19" cy="42" r="1.6" fill="#f8fafc"/><circle cx="29" cy="42" r="1.6" fill="#f8fafc"/>
+                  </g>
+                  <g transform="rotate(14 42 25)">
+                    <rect x="31" y="14" width="21" height="21" rx="4" stroke="#eab308" stroke-width="2.4"/>
+                    <circle cx="37" cy="20" r="1.6" fill="#eab308"/><circle cx="46" cy="20" r="1.6" fill="#eab308"/>
+                    <circle cx="37" cy="29" r="1.6" fill="#eab308"/><circle cx="46" cy="29" r="1.6" fill="#eab308"/>
+                  </g>
+                  <path d="M35 45 C42 44, 48 40, 50 35" stroke="#f8fafc" stroke-width="1.8" stroke-dasharray="3 3"/>
+                </svg>
+              </span>
+              <span class="numerus-module-label">Probabilidad</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="numerus-module-preview" id="numerus-module-preview">
+          <strong>Calculadora Simbólica CAS</strong>
+          <span>Motor de simplificación exacta, radicales, fracciones exactas e historial con paso a paso.</span>
+        </div>
+
+        <div class="numerus-kofi-box">
+          <div class="numerus-kofi-copy">
+            <strong>☕ Impulsa el lanzamiento de NUMERUS CAS</strong>
+            <span>Proyecto en desarrollo activo por ALPA Studio. Tu donación impulsa su lanzamiento.</span>
+          </div>
+          <a
+            href="https://ko-fi.com/edrx_ngl"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="kofi-support-btn numerus-kofi-cta"
+            id="btn-numerus-kofi">
+            <span aria-hidden="true">☕</span>
+            <span>Donar en Ko-fi para apoyar</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Motores Matemáticos y de Almacenamiento -->
+  <script src="js/version.js"></script>
+  <script src="js/engine/haptics.js"></script>
+  <script src="js/engine/ambient-bg.js"></script>
   <script src="js/engine/math-parser.js"></script>
   <script src="js/engine/math-renderer.js"></script>
   <script src="js/engine/math-input.js"></script>
   <script src="js/engine/step-solver.js"></script>
   <script src="js/engine/storage.js"></script>
+  <script src="js/engine/curriculum-index.js"></script>
 
   <!-- Base de Conocimiento Curricular (9 Materias Completas) -->
   <script src="js/data/curriculum-part1.js"></script>
@@ -119,11 +549,13 @@
 
   <!-- Herramientas Interactivas y Gráficas de Lección -->
   <script src="js/tools/lesson-graphs.js"></script>
+  <script src="js/tools/demo-animations.js"></script>
   <script src="js/tools/grapher.js"></script>
   <script src="js/tools/calculator.js"></script>
   <script src="js/tools/expression-editor.js"></script>
   <script src="js/tools/guided-solver.js"></script>
   <script src="js/tools/formula-sheets.js"></script>
+  <script src="js/tools/prepmat.js"></script>
 
   <!-- Controlador Principal de la Aplicación -->
   <script src="js/app.js"></script>

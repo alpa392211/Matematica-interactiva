@@ -1,5 +1,5 @@
 /* ==========================================================================
-   MATEMÁTICA INTERACTIVA - Motor Definitivo de Representación Matemática
+   MATETIC - Motor Definitivo de Representación Matemática
    Archivo: js/engine/math-renderer.js
    Soporta:
    1. Renderizado profesional con KaTeX (si está disponible en ventana).

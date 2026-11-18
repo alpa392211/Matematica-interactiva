@@ -1,5 +1,5 @@
 /* ==========================================================================
-   MATEMÁTICA INTERACTIVA - Currículo Parte 3: Derivadas, Integrales y Cálculo
+   MATETIC - Currículo Parte 3: Derivadas, Integrales y Cálculo
    Archivo: js/data/curriculum-part3.js
    Incluye la estructura didáctica completa de 9 etapas y gráficas interactivas
    para Derivadas (4 temas exhaustivos), Integrales (3 temas exhaustivos)
@@ -30,8 +30,9 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
         {
           id: 'der-1',
           title: 'Concepto de Derivada, Definición por Límites, Recta Tangente y Razón de Cambio',
-          summary: 'Cociente incremental de Newton-Leibniz, paso de recta secante a recta tangente, velocidad instantánea y derivabilidad.',
+          summary: 'Cociente incremental de diferencias (Fermat, Newton y Leibniz), paso de recta secante a recta tangente, velocidad instantánea y derivabilidad.',
           graphPreset: '0.5*x^2',
+          demoAnimations: ['der-razon-promedio', 'der-secante-tangente', 'der-velocidad-instantanea', 'der-no-derivable'],
           interactiveGraph: {
             mode: 'derivatives',
             title: 'Laboratorio Geométrico: De la Recta Secante a la Recta Tangente',
@@ -44,7 +45,8 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
             presets: [
               { label: 'Parábola: 0.5x²', fn: '0.5*x^2', x0: 1.5, h: 1.2 },
               { label: 'Cúbica: x³ - 3x', fn: 'x^3 - 3*x', x0: 1.2, h: 0.8 },
-              { label: 'Sinusoidal: 2·sen(x)', fn: '2*sin(x)', x0: 0.8, h: 1.0 }
+              { label: 'Sinusoidal: 2·sen(x)', fn: '2*sin(x)', x0: 0.8, h: 1.0 },
+              { label: 'Continua no derivable: |x| (x₀=0)', fn: 'abs(x)', x0: 0, h: 0.8 }
             ]
           },
           theory: {
@@ -58,38 +60,88 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
               'Resolución de límites indeterminados de la forma $\\frac{0}{0}$ mediante factorización y racionalización.'
             ],
             detailedExplanation: [
-              '**1. De la razón de cambio promedio a la instantánea:** Si una magnitud $y = f(x)$ cambia desde $x_0$ hasta $x_0 + h$, el cambio en la variable independiente es $\\Delta x = h$ y el cambio en la función es $\\Delta y = f(x_0 + h) - f(x_0)$. El cociente $\\frac{\\Delta y}{\\Delta x} = \\frac{f(x_0 + h) - f(x_0)}{h}$ se denomina **cociente incremental** o razón de cambio promedio en el intervalo $[x_0, x_0 + h]$.',
-              '**2. Interpretación geométrica (Recta Secante vs. Recta Tangente):** Geométricamente, el cociente incremental es la pendiente $m_{\\text{sec}}$ de la **recta secante** que corta a la curva en los puntos $P(x_0, f(x_0))$ y $Q(x_0 + h, f(x_0 + h))$. Cuando hacemos que $h \\to 0$, el punto $Q$ se desliza a lo largo de la curva aproximándose indefinidamente a $P$, y la recta secante gira hasta alcanzar su posición límite: la **recta tangente** en $P$.',
-              '**3. Definición formal mediante límites:** Decimos que $f$ es derivable en $x$ si existe y es finito el límite del cociente incremental cuando $h \\to 0$. En tal caso, dicho límite define la función derivada $f\'(x)$. Si representamos la función como $y = f(x)$, la derivada se denota indistintamente como $f\'(x)$ (Lagrange), $\\frac{dy}{dx}$ (Leibniz), $Df(x)$ (Cauchy) o $\\dot{y}$ (Newton).'
+              '**1. Razón de cambio promedio vs. instantánea y unidades:** Si $y = f(x)$ varía desde $x_0$ hasta $x_0 + h$ ($h \\neq 0$), el cambio en la variable independiente es $\\Delta x = h$ y la variación de la función es $\\Delta y = f(x_0 + h) - f(x_0)$. El cociente $\\frac{\\Delta y}{\\Delta x} = \\frac{f(x_0 + h) - f(x_0)}{h}$ se llama **cociente incremental** o **razón de cambio promedio** en el intervalo entre $x_0$ y $x_0 + h$, y posee las unidades de medida $\\frac{\\text{unidades de } y}{\\text{unidades de } x}$. Al tomar el límite cuando $h \\to 0$ (si existe y es finito), se obtiene la **razón de cambio instantánea** $f\'(x_0)$.',
+              '**2. Aplicaciones interdisciplinarias (Física, Economía, Biología, Química y Geometría):** En **Física**, si $s(t)$ es la posición en metros y $t$ el tiempo en segundos, $v(t) = s\'(t)$ es la **velocidad instantánea** (en $\\text{m/s}$) y $a(t) = v\'(t) = s\'\'(t)$ es la **aceleración instantánea** (en $\\text{m/s}^2$). En **Economía**, si $C(q)$ es el costo total de producir $q$ artículos e $I(q)$ el ingreso, $C\'(q)$ es el **costo marginal** e $I\'(q)$ el **ingreso marginal** (aproximan el costo e ingreso de producir una unidad adicional en $\\$/\\text{unidad}$). En **Biología y Química**, $P\'(t)$ mide la tasa instantánea de crecimiento de una población (individuos/hora) y $[A]\'(t)$ la velocidad instantánea de reacción química ($\\text{mol}/(\\text{L}\\cdot\\text{s})$). En **Geometría**, para un círculo de área $A(r) = \\pi r^2$, su derivada $A\'(r) = 2\\pi r$ es justamente la longitud de la circunferencia.',
+              '**3. Definición formal en un punto (formas equivalentes) y derivadas laterales:** Sea $f$ definida en un entorno abierto de $a$. Decimos que $f$ es **derivable en $a$** si existe y es finito cualquiera de los dos límites equivalentes (relacionados por $x = a + h$): $$f\'(a) = \\lim_{h \\to 0} \\frac{f(a + h) - f(a)}{h} = \\lim_{x \\to a} \\frac{f(x) - f(a)}{x - a}$$ Definimos además las **derivadas laterales** por izquierda y por derecha: $$f\'_-(a) = \\lim_{h \\to 0^-} \\frac{f(a+h)-f(a)}{h} \\quad ; \\quad f\'_+(a) = \\lim_{h \\to 0^+} \\frac{f(a+h)-f(a)}{h}$$ Una función es derivable en $a$ **si y solo si** ambas derivadas laterales existen, son finitas e iguales: $f\'_-(a) = f\'_+(a)$.',
+              '**4. La función derivada, dominio de $f\'$, notaciones y órdenes superiores:** Al variar $x$ en todos los puntos donde el límite existe y es finito, $x \\mapsto f\'(x)$ define una nueva función llamada **función derivada**, cuyo dominio satisface siempre $\\operatorname{Dom}(f\') \\subseteq \\operatorname{Dom}(f)$ (por ejemplo, para $f(x) = \\sqrt{x}$, $\\operatorname{Dom}(f) = [0, \\infty)$, mientras que $\\operatorname{Dom}(f\') = (0, \\infty)$ pues la tangente en $x = 0$ es vertical). En cálculo universitario conviven cuatro notaciones complementarias: **Lagrange** $f\'(x)$ (práctica para evaluar en un punto $f\'(a)$), **Leibniz** $\\frac{dy}{dx}$ o $\\left.\\frac{df}{dx}\\right|_{x=a}$ (explicita variables, unidades y regla de la cadena), **Newton** $\\dot{y}$ (derivadas temporales en física) y **Cauchy** $Df(x)$ (enfoque de operador lineal). Derivando sucesivamente se obtienen las **derivadas de orden superior**: $f\'\'(x) = \\frac{d^2y}{dx^2}$, $f\'\'\'(x)$, $\\dots$, $f^{(n)}(x) = \\frac{d^ny}{dx^n}$.',
+              '**5. Recta tangente, recta normal, aproximación lineal y diferencial:** Geométricamente, el cociente incremental es la pendiente de la **recta secante** por $P(a, f(a))$ y $Q(a+h, f(a+h))$. Si $f$ es derivable en $a$, la **recta tangente** en $P$ es $y = f(a) + f\'(a)(x - a)$. La **recta normal** es la perpendicular a la tangente en $P$: si $f\'(a) \\neq 0$, su ecuación es $y = f(a) - \\frac{1}{f\'(a)}(x - a)$ (y si $f\'(a) = 0$, la normal es vertical $x = a$). Para $x$ cercano a $a$, la función $L(x) = f(a) + f\'(a)(x - a)$ constituye la **aproximación lineal** o linealización de $f$ en $a$, mientras que $dy = f\'(x)\\,dx$ es el **diferencial** que aproxima al incremento exacto $\\Delta y = f(x+dx) - f(x)$.'
             ],
             concepts: [
               {
-                title: '1. Definición de la Derivada mediante Límites',
-                body: 'Para cualquier punto $x$ donde el límite exista: $$f\'(x) = \\lim_{h \\to 0} \\frac{f(x + h) - f(x)}{h}$$ De manera equivalente, haciendo el cambio $x_1 = x_0 + h$, la derivada en un punto específico $x_0$ se escribe como: $$f\'(x_0) = \\lim_{x \\to x_0} \\frac{f(x) - f(x_0)}{x - x_0}$$'
+                title: '1. Definición de la Derivada mediante Límites (h → 0 y x → a)',
+                body: 'Para cualquier punto $x$ donde el límite exista y sea finito: $$f\'(x) = \\lim_{h \\to 0} \\frac{f(x + h) - f(x)}{h}$$ De manera equivalente en un punto específico $a$ (con $x = a + h$): $$f\'(a) = \\lim_{x \\to a} \\frac{f(x) - f(a)}{x - a}$$ En un extremo cerrado $[a, b]$, solo se exigen las derivadas laterales correspondientes $f\'_+(a)$ y $f\'_-(b)$.'
               },
               {
-                title: '2. Interpretación Geométrica: Ecuación de la Recta Tangente',
-                body: 'El valor numérico $m_t = f\'(x_0)$ es la pendiente de la recta tangente a la gráfica de $y = f(x)$ en el punto de contacto $(x_0, f(x_0))$. Usando la forma punto-pendiente, la ecuación de la recta tangente es: $$y - f(x_0) = f\'(x_0) \\cdot (x - x_0)$$'
+                title: '2. Recta Tangente, Recta Normal y Diferencial dy',
+                body: 'En $(a, f(a))$ con $f$ derivable: **Recta Tangente:** $L(x) = f(a) + f\'(a)(x - a)$ (mejor aproximación afín local). **Recta Normal:** $y - f(a) = -\\frac{1}{f\'(a)}(x - a)$ si $f\'(a) \\neq 0$. **Diferencial:** $dy = f\'(a)\\,dx \\approx \\Delta y$.'
               },
               {
-                title: '3. Interpretación Física como Razón de Cambio Instantánea',
-                body: 'Si $s(t)$ describe la posición de una partícula en función del tiempo $t$, la razón de cambio promedio $\\frac{s(t+\\Delta t)-s(t)}{\\Delta t}$ es la velocidad media, y la derivada $v(t) = s\'(t) = \\frac{ds}{dt}$ es la **velocidad instantánea**. En economía, si $C(x)$ es el costo de producir $x$ unidades, $C\'(x)$ es el **costo marginal**.'
+                title: '3. Dominio de f\' y Derivadas de Orden Superior',
+                body: 'Siempre se cumple $\\operatorname{Dom}(f\') \\subseteq \\operatorname{Dom}(f)$. Por ejemplo, $f(x) = \\sqrt{x}$ es continua en $x=0$, pero $f\'(x) = \\frac{1}{2\\sqrt{x}}$ solo existe para $x > 0$. La segunda derivada $f\'\'(x) = \\frac{d^2y}{dx^2}$ mide la rapidez de cambio de la pendiente (aceleración en cinemática y concavidad en geometría).'
               },
               {
-                title: '4. Derivabilidad Implica Continuidad',
-                body: 'Todo punto donde una función es derivable es necesariamente un punto donde la función es continua. Sin embargo, el recíproco es falso: una función puede ser continua en $x_0$ pero **no derivable** si presenta un pico o esquina angulosa (como $f(x) = |x|$ en $x = 0$, donde las derivadas laterales son $-1$ y $+1$) o una tangente vertical (como $f(x) = \\sqrt[3]{x}$ en $x = 0$).'
+                title: '4. Catálogo Completo de No Derivabilidad (4 Casos)',
+                body: 'Una función deja de ser derivable en $x = a$ en cuatro situaciones prototípicas: **(1) Punto anguloso:** continua pero con derivadas laterales finitas distintas, como $f(x) = |x|$ en $0$ ($f\'_-(0) = -1 \\neq +1 = f\'_+(0)$); **(2) Cúspide:** continua con cocientes laterales que divergen con signos opuestos ($-\\infty$ y $+\\infty$), como $f(x) = x^{2/3}$ en $0$; **(3) Tangente vertical:** continua con límite del cociente incremental $+\\infty$ o $-\\infty$, como $f(x) = \\sqrt[3]{x}$ en $0$; y **(4) Discontinuidad:** toda función discontinua en $a$ (como una función escalón o con hueco/salto) es automáticamente no derivable en $a$.',
+                graphLabel: 'Ver |x| en graficador',
+                graphPayload: { kind: 'derivative', expr: 'abs(x)', tangentX: 0, showDerivative: true }
+              },
+              {
+                title: '5. Prototipos Derivados Desde la Definición (Resumen)',
+                body: 'Aplicando $\\lim_{h\\to 0}\\frac{f(x+h)-f(x)}{h}$ se demuestran las derivadas elementales: $(c)\' = 0$; $(x)\' = 1$; $(x^2)\' = 2x$; $(x^n)\' = nx^{n-1}$ ($n \\in \\mathbb{N}$ por binomio); $\\left(\\frac{1}{x}\\right)\' = -\\frac{1}{x^2}$ ($x \\neq 0$); $(\\sqrt{x})\' = \\frac{1}{2\\sqrt{x}}$ ($x > 0$); $(\\text{sen}\\,x)\' = \\cos x$ (radianes); $(e^x)\' = e^x$.'
+              }
+            ],
+            theorems: [
+              {
+                badge: 'Teorema Fundamental',
+                title: 'Derivabilidad en un punto implica Continuidad en ese punto',
+                hypothesis: '$f$ está definida en un entorno abierto de $a$ y es derivable en $x = a$ (es decir, $f\'(a) = \\lim_{x \\to a} \\frac{f(x)-f(a)}{x-a}$ existe y es finito).',
+                statement: 'Entonces $f$ es necesariamente **continua en $x = a$**, es decir, $\\lim_{x \\to a} f(x) = f(a)$.',
+                proofSteps: [
+                  'Para todo $x \\neq a$ en el entorno de $a$, escribimos la identidad algebraica: $f(x) - f(a) = \\frac{f(x) - f(a)}{x - a} \\cdot (x - a)$.',
+                  'Tomamos límite cuando $x \\to a$ en ambos miembros. Por hipótesis, $\\lim_{x \\to a} \\frac{f(x)-f(a)}{x-a} = f\'(a) \\in \\mathbb{R}$ existe, y claramente $\\lim_{x \\to a} (x - a) = 0$.',
+                  'Por el teorema del límite del producto (ambos límites existen y son finitos): $\\lim_{x \\to a} [f(x) - f(a)] = f\'(a) \\cdot 0 = 0$.',
+                  'Sumando $f(a)$ obtenemos $\\lim_{x \\to a} f(x) = f(a)$, que es exactamente la definición de continuidad en $a$. $\\blacksquare$'
+                ],
+                note: 'El recíproco es **falso**: ser continua en $a$ NO implica ser derivable en $a$. Contraejemplos: $f(x) = |x|$, $x^{2/3}$ y $\\sqrt[3]{x}$ son continuas en $x = 0$ pero no derivables ahí. Por contrapositivo, si $f$ es discontinua en $a$, entonces $f$ **no** es derivable en $a$.'
+              },
+              {
+                badge: 'Deducción por Definición',
+                title: 'Derivada de c, x, x² y xⁿ (n ∈ ℕ) mediante Binomio de Newton',
+                hypothesis: 'Sea $n \\in \\mathbb{N}$ ($n \\ge 1$) y $x \\in \\mathbb{R}$.',
+                statement: 'Para cualquier constante $c \\in \\mathbb{R}$, $\\frac{d}{dx}(c) = 0$; y para $f(x) = x^n$, se cumple $\\frac{d}{dx}(x^n) = n x^{n-1}$. En particular, $(x)\' = 1$ y $(x^2)\' = 2x$.',
+                proofSteps: [
+                  'Caso constante $f(x) = c$: $\\frac{f(x+h)-f(x)}{h} = \\frac{c-c}{h} = 0$ para todo $h \\neq 0$, luego $\\lim_{h\\to 0} 0 = 0$.',
+                  'Para $f(x) = x^n$ con $h \\neq 0$, aplicamos el Binomio de Newton: $(x + h)^n = x^n + n x^{n-1} h + \\binom{n}{2} x^{n-2} h^2 + \\dots + h^n$.',
+                  'Restando $x^n$ y dividiendo entre $h \\neq 0$: $\\frac{(x+h)^n - x^n}{h} = n x^{n-1} + h\\left[\\binom{n}{2}x^{n-2} + \\dots + h^{n-2}\\right]$.',
+                  'Como el corchete es un polinomio en $h$, es acotado cerca de $h = 0$; al tomar $\\lim_{h\\to 0}$, todo término con factor $h$ se anula, resultando $n x^{n-1}$. $\\blacksquare$'
+                ]
+              },
+              {
+                badge: 'Deducción Trascendente',
+                title: 'Derivada de sen(x) y eˣ desde la Definición',
+                hypothesis: 'Para $\\operatorname{sen}(x)$, $x$ está en **radianes** y se asumen los límites notables $\\lim_{h \\to 0} \\frac{\\operatorname{sen}(h)}{h} = 1$ y $\\lim_{h \\to 0} \\frac{\\cos(h) - 1}{h} = 0$. Para $e^x$, se asume el límite fundamental $\\lim_{h \\to 0} \\frac{e^h - 1}{h} = 1$.',
+                statement: '$\\frac{d}{dx}(\\operatorname{sen} x) = \\cos x$ y $\\frac{d}{dx}(e^x) = e^x$ para todo $x \\in \\mathbb{R}$.',
+                proofSteps: [
+                  'Para $f(x) = \\operatorname{sen}(x)$: por identidad de suma de ángulos, $\\operatorname{sen}(x+h) = \\operatorname{sen}(x)\\cos(h) + \\cos(x)\\operatorname{sen}(h)$.',
+                  'Sustituimos en el cociente incremental: $\\frac{\\operatorname{sen}(x+h)-\\operatorname{sen}(x)}{h} = \\operatorname{sen}(x)\\cdot\\frac{\\cos(h)-1}{h} + \\cos(x)\\cdot\\frac{\\operatorname{sen}(h)}{h}$.',
+                  'Tomando $h \\to 0$ (ambos límites existen): $\\operatorname{sen}(x)\\cdot(0) + \\cos(x)\\cdot(1) = \\cos(x)$.',
+                  'Para $g(x) = e^x$: factorizamos $e^{x+h} - e^x = e^x(e^h - 1)$, de modo que $\\lim_{h\\to 0}\\frac{e^x(e^h - 1)}{h} = e^x \\lim_{h\\to 0}\\frac{e^h - 1}{h} = e^x \\cdot 1 = e^x$. $\\blacksquare$'
+                ],
+                note: 'Si $x$ se midiera en grados sexagesimales en lugar de radianes, aparecería un factor adicional $\\frac{\\pi}{180}$: $\\frac{d}{dx}(\\operatorname{sen}(x^\\circ)) = \\frac{\\pi}{180}\\cos(x^\\circ)$.'
               }
             ],
             formulas: [
               {
-                label: 'Definición de Derivada (Cociente de Newton-Leibniz)',
+                label: 'Definición de Derivada (Límite del Cociente Incremental)',
                 expr: 'f\'(x) = \\frac{dy}{dx} = \\lim_{h \\to 0} \\frac{f(x+h) - f(x)}{h}',
                 note: 'Siempre produce inicialmente una indeterminación 0/0 que debe simplificarse algebraicamente antes de evaluar h = 0.'
               },
               {
                 label: 'Recta Tangente en x = x₀',
                 expr: 'y = f(x_0) + f\'(x_0)(x - x_0)',
-                note: 'Constituye además la mejor aproximación lineal (linealización) de f(x) cerca de x₀.'
+                note: 'Constituye además la mejor aproximación lineal (linealización) de f(x) cerca de x₀.',
+                graphLabel: 'Ver tangente en graficador',
+                graphPayload: { kind: 'derivative', expr: '0.5*x^2', tangentX: 1.5, showDerivative: true }
               }
             ]
           },
@@ -97,6 +149,7 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
             {
               title: 'Ejemplo 1: Cálculo de la derivada por definición de límite (función cuadrática)',
               problem: 'Utiliza la definición formal mediante límites para hallar la derivada de $f(x) = 3x^2 - 5x + 1$.',
+              graphPayload: { kind: 'derivative', expr: '3*x^2 - 5*x + 1', tangentX: 1, showDerivative: true },
               steps: [
                 {
                   title: 'Paso 1: Plantear f(x + h) y desarrollar el binomio',
@@ -118,6 +171,7 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
             {
               title: 'Ejemplo 2: Derivada por definición de una raíz cuadrada y recta tangente',
               problem: 'Halla $f\'(x)$ por definición para $f(x) = \\sqrt{x}$ y determina la ecuación de la recta tangente en $x_0 = 4$.',
+              graphPayload: { kind: 'derivative', expr: 'sqrt(x)', tangentX: 4, showDerivative: true },
               steps: [
                 {
                   title: 'Paso 1: Formar el cociente incremental y racionalizar con el conjugado',
@@ -133,6 +187,67 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
                   title: 'Paso 3: Calcular la pendiente y la recta tangente en x₀ = 4',
                   math: 'f(4) = 2, \\quad m_t = f\'(4) = \\frac{1}{2\\sqrt{4}} = \\frac{1}{4} \\implies y - 2 = \\frac{1}{4}(x - 4) \\implies y = \\frac{1}{4}x + 1',
                   reason: 'Sustituimos el punto (4, 2) y la pendiente m = 1/4 en la ecuación punto-pendiente.'
+                }
+              ]
+            },
+            {
+              title: 'Ejemplo 3: Razón promedio vs. instantánea en Física y Economía (con unidades)',
+              problem: 'a) La altura de un móvil (en metros) es $s(t) = 5t^2 + 3t$ ($t$ en segundos). Halla la velocidad promedio en $[2, 4]$ y la velocidad y aceleración instantáneas en $t = 2\\text{ s}$. b) El costo de producir $q$ piezas es $C(q) = 0.2q^2 + 12q + 500$ dólares; calcula el costo marginal en $q = 50$.',
+              graphPayload: { kind: 'derivative', expr: '5*x^2 + 3*x', tangentX: 2, showDerivative: true },
+              steps: [
+                {
+                  title: 'Paso 1: Razón de cambio promedio en [2, 4]',
+                  math: 's(2) = 5(4) + 6 = 26\\text{ m}, \\; s(4) = 5(16) + 12 = 92\\text{ m} \\implies v_{\\text{prom}} = \\frac{92 - 26}{4 - 2} = \\frac{66}{2} = 33\\text{ m/s}',
+                  reason: 'La razón promedio divide el desplazamiento neto (metros) entre el lapso transcurrido (segundos).'
+                },
+                {
+                  title: 'Paso 2: Velocidad y aceleración instantáneas en t = 2 s',
+                  math: 'v(t) = s\'(t) = 10t + 3 \\implies v(2) = 23\\text{ m/s} \\quad ; \\quad a(t) = v\'(t) = s\'\'(t) = 10\\text{ m/s}^2',
+                  reason: 'La primera derivada da velocidad instantánea (m/s) y la segunda derivada da aceleración (m/s²).'
+                },
+                {
+                  title: 'Paso 3: Costo marginal en q = 50 unidades',
+                  math: 'C\'(q) = 0.4q + 12 \\implies C\'(50) = 0.4(50) + 12 = 32\\text{ \\$/unidad}',
+                  reason: 'El costo marginal C\'(50) = 32 dólares por unidad estima el incremento al producir la pieza número 51 (el costo exacto adicional es C(51)-C(50) = 32.20 $).'
+                }
+              ]
+            },
+            {
+              title: 'Ejemplo 4: Derivada por definición de 1/x, recta tangente, normal y aproximación lineal',
+              problem: 'Para $f(x) = \\frac{1}{x}$ ($x \\neq 0$), halla $f\'(x)$ usando el cociente incremental, obtén las rectas tangente y normal en $x_0 = 2$ y aproxima linealmente $\\frac{1}{2.05}$.',
+              graphPayload: { kind: 'derivative', expr: '1/x', tangentX: 2, showDerivative: true },
+              steps: [
+                {
+                  title: 'Paso 1: Simplificar el cociente incremental de 1/x',
+                  math: '\\frac{\\frac{1}{x+h} - \\frac{1}{x}}{h} = \\frac{\\frac{x - (x+h)}{x(x+h)}}{h} = \\frac{-h}{h\\,x(x+h)} = \\frac{-1}{x(x+h)} \\xrightarrow{h\\to 0} f\'(x) = -\\frac{1}{x^2}',
+                  reason: 'Con x ≠ 0, al sumar las fracciones se factoriza y cancela h, eliminando la forma 0/0.'
+                },
+                {
+                  title: 'Paso 2: Recta tangente y recta normal en x₀ = 2',
+                  math: 'f(2) = 0.5, \\; m_t = f\'(2) = -0.25 \\implies \\text{Tangente: } y = 0.5 - 0.25(x - 2) \\quad ; \\quad m_n = 4 \\implies \\text{Normal: } y = 0.5 + 4(x - 2)',
+                  reason: 'Como m_t = -1/4 ≠ 0, la pendiente normal es su recíproca con signo opuesto m_n = 4.'
+                },
+                {
+                  title: 'Paso 3: Aproximación lineal y diferencial para 1/2.05',
+                  math: 'dx = 2.05 - 2 = 0.05 \\implies L(2.05) = 0.5 + (-0.25)(0.05) = 0.5 - 0.0125 = 0.4875',
+                  reason: 'La variación diferencial dy = -0.0125 permite estimar 1/2.05 ≈ 0.4875 (valor real ≈ 0.487805).'
+                }
+              ]
+            },
+            {
+              title: 'Ejemplo 5: Estudio mediante derivadas laterales en f(x) = |x - 3|',
+              problem: 'Verifica analíticamente con derivadas laterales por qué $f(x) = |x - 3|$ **no** es derivable en $x_0 = 3$, pero sí es derivable en $x_0 = 5$.',
+              graphPayload: { kind: 'derivative', expr: 'abs(x - 3)', tangentX: 3, showDerivative: true },
+              steps: [
+                {
+                  title: 'Paso 1: Calcular derivadas laterales en x₀ = 3',
+                  math: 'f\'_-(3) = \\lim_{h \\to 0^-} \\frac{|h| - 0}{h} = \\lim_{h \\to 0^-} \\frac{-h}{h} = -1 \\quad ; \\quad f\'_+(3) = \\lim_{h \\to 0^+} \\frac{h}{h} = +1',
+                  reason: 'Para h < 0, |h| = -h, mientras que para h > 0, |h| = h.'
+                },
+                {
+                  title: 'Paso 2: Concluir sobre x₀ = 3 y x₀ = 5',
+                  math: 'f\'_-(3) = -1 \\neq +1 = f\'_+(3) \\implies \\nexists f\'(3) \\quad ; \\quad \\text{En } x > 3,\\; f(x) = x - 3 \\implies f\'(5) = 1',
+                  reason: 'En x = 3 hay un punto anguloso (esquina); en x = 5 la función coincide localmente con la recta x - 3 de pendiente 1.'
                 }
               ]
             }
@@ -206,6 +321,44 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
               ],
               reviewTip: 'Deriva cada potencia de $t$ y verifica cuidadosamente la aritmética al sustituir $t = 4$: $3(16) - 12(4) + 15$.',
               whyCorrect: '¡Perfecto! La razón de cambio instantánea de la posición respecto al tiempo nos da la velocidad exacta en $t = 4\\text{ s}$.'
+            },
+            {
+              id: 'der-1-ex4',
+              level: 'intermedio',
+              statement: 'Usando la aproximación lineal $L(x) = f(a) + f\'(a)(x - a)$ de $f(x) = x^2$ centrada en $a = 3$, calcula la aproximación de $(3.02)^2$.',
+              answer: '9.12',
+              alternatives: ['9.12', '228/25'],
+              placeholder: 'Ej: 9.12',
+              hints: [
+                'Calcula $f(3) = 9$ y $f\'(3) = 2(3) = 6$.',
+                'El incremento es $dx = x - a = 3.02 - 3 = 0.02$.',
+                'Evalúa $L(3.02) = 9 + 6(0.02)$.'
+              ],
+              solutionSteps: [
+                'Como $f(x) = x^2$, tenemos $f(3) = 9$ y $f\'(x) = 2x \\implies f\'(3) = 6$.',
+                'Aplicamos $L(3.02) = 9 + 6(3.02 - 3) = 9 + 6(0.02) = 9 + 0.12 = 9.12$.'
+              ],
+              reviewTip: 'Aplica $L(3.02) = f(3) + f\'(3)(0.02)$ usando el diferencial $dy = 6 \\cdot 0.02 = 0.12$.',
+              whyCorrect: '¡Correcto! La linealización en $a = 3$ da $9.12$, sumamente cercana al valor exacto $(3.02)^2 = 9.1204$.'
+            },
+            {
+              id: 'der-1-ex5',
+              level: 'avanzado',
+              statement: 'El costo total en dólares de fabricar $x$ artículos sigue $C(x) = 0.5x^2 + 10x + 200$. Calcula el **costo marginal** $C\'(20)$ en dólares por artículo cuando $x = 20$.',
+              answer: '30',
+              alternatives: ['30'],
+              placeholder: 'Costo marginal en x = 20...',
+              hints: [
+                'El costo marginal es la función derivada $C\'(x)$.',
+                'Derivando: $C\'(x) = 0.5(2x) + 10 = x + 10$.',
+                'Evalúa $C\'(20)$.'
+              ],
+              solutionSteps: [
+                'Derivamos $C(x)$: $C\'(x) = x + 10$.',
+                'Evaluando en $x = 20$: $C\'(20) = 20 + 10 = 30$ dólares/artículo.'
+              ],
+              reviewTip: 'La derivada de $0.5x^2$ es $1.0x = x$; la constante $200$ tiene derivada cero.',
+              whyCorrect: '¡Muy bien! En $x = 20$, producir una unidad adicional incrementa el costo aproximadamente en 30 dólares.'
             }
           ],
           quiz: [
@@ -242,6 +395,7 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
           title: 'Reglas de Derivación: Potencia, Suma/Resta, Producto, Cociente y Regla de la Cadena',
           summary: 'Álgebra de derivadas, reescritura de radicales y exponentes negativos, y derivación de funciones compuestas.',
           graphPreset: 'x^3 - 3*x',
+          demoAnimations: ['der-construccion-fprima', 'der-secante-tangente'],
           interactiveGraph: {
             mode: 'derivatives',
             title: 'Explorador de Función Original f(x) y su Función Derivada f\'(x)',
@@ -287,6 +441,32 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
               {
                 title: '4. Regla de la Cadena y Regla General de las Potencias',
                 body: 'Para la función compuesta $h(x) = f(g(x))$: $$h\'(x) = f\'(g(x)) \\cdot g\'(x)$$ En particular, si $y = [u(x)]^n$, entonces: $$y\' = n \\cdot [u(x)]^{n-1} \\cdot u\'(x)$$'
+              }
+            ],
+            theorems: [
+              {
+                badge: 'Reglas Básicas',
+                title: 'Linealidad, Regla del Producto y Regla del Cociente',
+                hypothesis: 'Sean $u$ y $v$ derivables en $x$, y $a, b \\in \\mathbb{R}$ constantes. Para la regla del cociente se exige además $v(x) \\neq 0$.',
+                statement: '$(a u + b v)\' = a u\' + b v\'$, $(u v)\' = u\'v + uv\'$ y $\\left(\\frac{u}{v}\\right)\' = \\frac{u\'v - uv\'}{v^2}$.',
+                proofSteps: [
+                  'Linealidad: $\\frac{[a u(x+h)+b v(x+h)] - [a u(x)+b v(x)]}{h} = a\\frac{u(x+h)-u(x)}{h} + b\\frac{v(x+h)-v(x)}{h} \\xrightarrow{h\\to 0} a u\'(x) + b v\'(x)$.',
+                  'Producto: sumamos y restamos $u(x)v(x+h)$ en el numerador: $\\frac{u(x+h)v(x+h)-u(x)v(x)}{h} = \\frac{u(x+h)-u(x)}{h}v(x+h) + u(x)\\frac{v(x+h)-v(x)}{h}$. Como $v$ es derivable en $x$, es continua en $x$, luego $\\lim_{h\\to 0} v(x+h) = v(x)$ y el límite total es $u\'(x)v(x) + u(x)v\'(x)$.',
+                  'Cociente: primero para $1/v(x)$ ($v(x)\\neq 0$ implica $v(x+h)\\neq 0$ cerca de $h=0$): $\\frac{\\frac{1}{v(x+h)}-\\frac{1}{v(x)}}{h} = -\\frac{v(x+h)-v(x)}{h} \\cdot \\frac{1}{v(x)v(x+h)} \\xrightarrow{h\\to 0} -\\frac{v\'(x)}{[v(x)]^2}$. Aplicando luego la regla del producto a $u \\cdot \\frac{1}{v}$ resulta $\\frac{u\'v - uv\'}{v^2}$. $\\blacksquare$'
+                ]
+              },
+              {
+                badge: 'Teorema Central',
+                title: 'Regla de la Cadena',
+                hypothesis: 'Sea $g$ derivable en $x$ y sea $f$ derivable en $u = g(x)$.',
+                statement: 'La función compuesta $F(x) = f(g(x))$ es derivable en $x$ y su derivada cumple $F\'(x) = f\'(g(x)) \\cdot g\'(x)$.',
+                proofSteps: [
+                  'Definimos la función auxiliar de error $\\varepsilon(k) = \\frac{f(u+k) - f(u)}{k} - f\'(u)$ para $k \\neq 0$ y $\\varepsilon(0) = 0$. Como $f$ es derivable en $u$, $\\lim_{k\\to 0}\\varepsilon(k) = 0$, luego $\\varepsilon$ es continua en $0$.',
+                  'Para todo $k$, incluso $k = 0$, se verifica exactamente $f(u+k) - f(u) = [f\'(u) + \\varepsilon(k)] \\cdot k$.',
+                  'Tomando $k = g(x+h) - g(x)$ (donde $\\lim_{h\\to 0} k = 0$ por continuidad de $g$) y dividiendo por $h \\neq 0$: $\\frac{f(g(x+h)) - f(g(x))}{h} = [f\'(g(x)) + \\varepsilon(k)] \\cdot \\frac{g(x+h) - g(x)}{h}$.',
+                  'Al tomar $h \\to 0$, $k \\to 0$, por continuidad $\\varepsilon(k) \\to 0$ y obtenemos $f\'(g(x)) \\cdot g\'(x)$. $\\blacksquare$'
+                ],
+                note: 'El uso de $\\varepsilon(k)$ evita la división errónea entre $g(x+h)-g(x)$ cuando $g$ oscila alrededor de $x$.'
               }
             ],
             formulas: [
@@ -337,6 +517,45 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
                   title: 'Paso 2: Aplicar regla de la cadena en b) reescribiendo h(x) = (5x² + 4)^(1/2)',
                   math: 'h\'(x) = \\frac{1}{2}(5x^2 + 4)^{-1/2} \\cdot (10x) = \\frac{5x}{\\sqrt{5x^2 + 4}}',
                   reason: 'Multiplicamos la derivada exterior 1/(2√u) por la derivada interna u\' = 10x y simplificamos 10/2 = 5.'
+                }
+              ]
+            },
+            {
+              title: 'Ejemplo 3: Regla del producto con factorización de la exponencial',
+              problem: 'Halla $f\'(x)$ para $f(x) = (x^2 + 1)e^x$ y evalúa $f\'(0)$ y $f\'(1)$.',
+              graphPayload: { kind: 'derivative', expr: '(x^2 + 1)*exp(x)', tangentX: 0, showDerivative: true },
+              steps: [
+                {
+                  title: 'Paso 1: Identificar factores y derivar con (uv)\' = u\'v + uv\'',
+                  math: 'u = x^2 + 1 \\; (u\' = 2x), \\quad v = e^x \\; (v\' = e^x) \\implies f\'(x) = (2x)e^x + (x^2 + 1)e^x',
+                  reason: 'Derivamos cada factor sin olvidar que eˣ es su propia derivada.'
+                },
+                {
+                  title: 'Paso 2: Factorizar eˣ y evaluar en x = 0 y x = 1',
+                  math: 'f\'(x) = (x^2 + 2x + 1)e^x = (x + 1)^2 e^x \\implies f\'(0) = 1, \\quad f\'(1) = 4e',
+                  reason: 'Factorizar permite ver inmediatamente que f\'(x) ≥ 0 para todo x ∈ ℝ, luego f es creciente en todo ℝ.'
+                }
+              ]
+            },
+            {
+              title: 'Ejemplo 4: Regla de la cadena combinada con regla del cociente',
+              problem: 'Deriva $f(x) = \\left(\\frac{2x - 1}{x + 1}\\right)^3$ ($x \\neq -1$) y evalúa la pendiente tangente en $x = 2$.',
+              graphPayload: { kind: 'derivative', expr: '((2*x - 1)/(x + 1))^3', tangentX: 2, showDerivative: true },
+              steps: [
+                {
+                  title: 'Paso 1: Derivar la potencia exterior y multiplicar por la derivada interna del cociente',
+                  math: 'f\'(x) = 3\\left(\\frac{2x - 1}{x + 1}\\right)^2 \\cdot \\left(\\frac{2x - 1}{x + 1}\\right)\'',
+                  reason: 'Aplicamos primero la regla de la potencia u³ → 3u²·u\'.'
+                },
+                {
+                  title: 'Paso 2: Derivar el cociente interno y simplificar',
+                  math: '\\left(\\frac{2x - 1}{x + 1}\\right)\' = \\frac{2(x + 1) - (2x - 1)(1)}{(x + 1)^2} = \\frac{3}{(x + 1)^2} \\implies f\'(x) = \\frac{9(2x - 1)^2}{(x + 1)^4}',
+                  reason: 'Multiplicamos las fracciones algebraicas combinando potencias del denominador (x+1)²·(x+1)².'
+                },
+                {
+                  title: 'Paso 3: Evaluar en x = 2',
+                  math: 'f\'(2) = \\frac{9(2(2) - 1)^2}{(2 + 1)^4} = \\frac{9 \\cdot 9}{81} = 1',
+                  reason: 'En x = 2 la curva tiene una recta tangente con pendiente exactamente igual a 1.'
                 }
               ]
             }
@@ -411,6 +630,44 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
               ],
               reviewTip: 'No olvides multiplicar $4 u^3$ por la derivada interna $u\'(1) = 2(1) + 3 = 5$.',
               whyCorrect: '¡Impecable! Encadenaste correctamente la derivada exterior $4u^3$ con la derivada interior $u\' = 2x + 3$.'
+            },
+            {
+              id: 'der-2-ex4',
+              level: 'avanzado',
+              statement: 'Dada la función producto-compuesta $h(x) = (2x - 1)^3 \\cdot (x + 1)$, calcula el valor numérico exacto de $h\'(1)$.',
+              answer: '13',
+              alternatives: ['13'],
+              placeholder: 'Valor numérico de h\'(1)...',
+              hints: [
+                'Aplica la regla del producto $(u\\cdot v)\' = u\'v + uv\'$ con $u = (2x - 1)^3$ y $v = x + 1$.',
+                'Para $u\'$, usa la regla de la cadena: $u\' = 3(2x - 1)^2 \\cdot 2 = 6(2x - 1)^2$.',
+                'Evalúa $h\'(1) = 6(1)^2(2) + (1)^3(1)$.'
+              ],
+              solutionSteps: [
+                'Derivando por producto y cadena: $h\'(x) = 6(2x - 1)^2(x + 1) + (2x - 1)^3(1)$.',
+                'En $x = 1$: $h\'(1) = 6(2 - 1)^2(1 + 1) + (2 - 1)^3 = 6(1)(2) + 1 = 12 + 1 = 13$.'
+              ],
+              reviewTip: 'Recuerda combinar la regla del producto con el factor interno $2$ proveniente de $(2x-1)\'$.',
+              whyCorrect: '¡Correcto! Combinaste regla del producto y regla de la cadena sin omitir el factor interno.'
+            },
+            {
+              id: 'der-2-ex5',
+              level: 'avanzado',
+              statement: 'Un vehículo autónomo se mueve sobre una pista recta con posición $s(t) = (t^2 + 1)^2\\text{ metros}$ en el instante $t$ (segundos). Usa la regla de la cadena para calcular su velocidad instantánea $s\'(2)$ en $\\text{m/s}$.',
+              answer: '40',
+              alternatives: ['40'],
+              placeholder: 'Velocidad en m/s...',
+              whyCorrect: 'Por regla de la cadena, $s\'(t) = 2(t^2 + 1)(2t) = 4t(t^2 + 1)$. Al evaluar en $t = 2$ resulta $4(2)(4 + 1) = 8 \\cdot 5 = 40\\text{ m/s}$.',
+              reviewTip: 'No olvides multiplicar la derivada exterior $2u$ por la derivada interior $u\' = 2t$.',
+              hints: [
+                'Toma $u = t^2 + 1$ con $u\' = 2t$.',
+                'Aplica la cadena: $s\'(t) = 2(t^2 + 1) \\cdot 2t$.',
+                'Sustituye $t = 2$ y opera.'
+              ],
+              solutionSteps: [
+                'Derivada: $s\'(t) = 2(t^2 + 1) \\cdot (2t) = 4t(t^2 + 1)$.',
+                'Velocidad en $t = 2$: $s\'(2) = 4(2)(2^2 + 1) = 8(5) = 40\\text{ m/s}$.'
+              ]
             }
           ],
           quiz: [
@@ -447,6 +704,7 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
           title: 'Derivadas Trigonométricas, Exponenciales, Logarítmicas, Implícita y Rectas Tangente y Normal',
           summary: 'Derivación de funciones trascendentes con regla de la cadena, ecuaciones implícitas F(x,y)=0 y geometría de la recta normal.',
           graphPreset: 'sin(x) + 0.5*cos(2*x)',
+          demoAnimations: ['der-secante-tangente', 'der-construccion-fprima'],
           interactiveGraph: {
             mode: 'derivatives',
             title: 'Geometría Diferencial: Recta Tangente y Recta Normal Ortogonal',
@@ -495,6 +753,20 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
                 body: 'En el punto $P(x_0, y_0)$ con pendiente tangente $m_t = f\'(x_0) \\neq 0$:\n- **Recta Tangente:** $y - y_0 = m_t(x - x_0)$\n- **Recta Normal (perpendicular a la tangente en $P$):** Tiene pendiente recíproca y de signo opuesto $m_n = -\\frac{1}{m_t} = -\\frac{1}{f\'(x_0)}$, por lo que su ecuación es: $$y - y_0 = -\\frac{1}{f\'(x_0)}(x - x_0)$$'
               }
             ],
+            theorems: [
+              {
+                badge: 'Derivada de Inversa',
+                title: 'Derivada de ln(x) mediante Derivación Implícita',
+                hypothesis: 'Sea $x > 0$ y $y = \\ln(x)$, función inversa de $e^y = x$ con $(e^y)\' = e^y > 0$.',
+                statement: 'La función $y = \\ln(x)$ es derivable en $(0, \\infty)$ y cumple $\\frac{d}{dx}(\\ln x) = \\frac{1}{x}$.',
+                proofSteps: [
+                  'Partimos de la equivalencia definitoria $e^y = x$ para $x > 0$.',
+                  'Derivamos ambos miembros respecto a $x$ asumiendo la derivabilidad de la función inversa $\\ln$: $\\frac{d}{dx}(e^y) = \\frac{d}{dx}(x)$.',
+                  'Por la regla de la cadena: $e^y \\cdot \\frac{dy}{dx} = 1$.',
+                  'Despejando $\\frac{dy}{dx}$ y recordando que $e^y = x$: $\\frac{dy}{dx} = \\frac{1}{e^y} = \\frac{1}{x}$. $\\blacksquare$'
+                ]
+              }
+            ],
             formulas: [
               {
                 label: 'Exponencial y Logaritmo Compuestos',
@@ -528,7 +800,8 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
                   math: 'f\'(x) = e^{3x}[3\\,\\text{sen}(2x) + 2\\cos(2x)] + \\frac{2x}{x^2 + 5}',
                   reason: 'Sumamos las derivadas de ambos sumandos.'
                 }
-              ]
+              ],
+              graphPayload: { kind: 'derivative', expr: 'exp(3*x)*sin(2*x) + ln(x^2 + 5)', tangentX: 0, showDerivative: true }
             },
             {
               title: 'Ejemplo 2: Derivación implícita y ecuaciones de la recta tangente y normal',
@@ -548,6 +821,28 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
                   title: 'Paso 3: Calcular la pendiente de la recta normal y ambas ecuaciones',
                   math: 'm_n = -\\frac{1}{m_t} = \\frac{4}{3} \\quad ; \\quad \\text{Tangente: } y - 4 = -\\frac{3}{4}(x - 3) \\quad ; \\quad \\text{Normal: } y - 4 = \\frac{4}{3}(x - 3)',
                   reason: 'Observa que la recta normal y = (4/3)x pasa por el origen (0,0), como todo radio de una circunferencia centrada en el origen.'
+                }
+              ],
+              graphPayload: { kind: 'derivative', expr: 'sqrt(25 - x^2)', tangentX: 3, showDerivative: true }
+            },
+            {
+              title: 'Ejemplo 3: Derivación implícita con producto exponencial x·eʸ + 2y = 3x',
+              problem: 'La curva implícita $x e^y + 2y = 3x$ pasa por el origen $P(0, 0)$. Calcula $\\frac{dy}{dx}$ en función de $(x, y)$ y halla las ecuaciones de la recta tangente y de la recta normal en $P(0, 0)$.',
+              steps: [
+                {
+                  title: 'Paso 1: Derivar respecto a x aplicando regla del producto a x·eʸ',
+                  math: '(1 \\cdot e^y + x e^y y\') + 2 y\' = 3',
+                  reason: 'Derivamos x·eʸ como (x)\'eʸ + x(eʸ)\' donde (eʸ)\' = eʸ·y\'.'
+                },
+                {
+                  title: 'Paso 2: Agrupar los términos con y\' y despejar dy/dx',
+                  math: 'y\'(x e^y + 2) = 3 - e^y \\implies \\frac{dy}{dx} = \\frac{3 - e^y}{x e^y + 2}',
+                  reason: 'Factorizamos y\' en el miembro izquierdo y dividimos entre (xeʸ + 2), que vale 2 ≠ 0 en (0, 0).'
+                },
+                {
+                  title: 'Paso 3: Evaluar pendientes en P(0, 0) y escribir tangente y normal',
+                  math: 'm_t = \\frac{3 - e^0}{0 \\cdot e^0 + 2} = \\frac{3 - 1}{2} = 1 \\quad ; \\quad m_n = -\\frac{1}{1} = -1 \\implies \\text{Tangente: } y = x, \\; \\text{Normal: } y = -x',
+                  reason: 'Como la recta pasa por (0, 0) y m_t = 1 ≠ 0, la recta tangente es y = x y la normal perpendicular es y = -x.'
                 }
               ]
             }
@@ -621,6 +916,44 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
               ],
               reviewTip: 'Revisa que la derivada de $4y^2$ respecto a $x$ es $8y \\cdot y\'$ y que la derivada de la constante $20$ es $0$.',
               whyCorrect: '¡Perfecto! Obtuviste la pendiente tangente de la elipse sin necesidad de despejar raíces cuadradas.'
+            },
+            {
+              id: 'der-3-ex4',
+              level: 'intermedio',
+              statement: 'La carga eléctrica en un capacitor descargándose sigue $q(t) = 20\\,e^{-0.5t}$ coulombs. Calcula la tasa de cambio instantánea $q\'(0)$ en $t = 0$ (incluye el signo).',
+              answer: '-10',
+              alternatives: ['-10'],
+              placeholder: 'Tasa inicial q\'(0)...',
+              whyCorrect: 'Derivando con regla de la cadena, $q\'(t) = 20(-0.5)e^{-0.5t} = -10\\,e^{-0.5t}$; en $t = 0$ vale $-10\\,e^0 = -10$.',
+              reviewTip: 'La derivada de $e^{kt}$ es $k\\,e^{kt}$, conservando su signo.',
+              hints: [
+                'Aplica $\\frac{d}{dt}(e^{-0.5t}) = -0.5\\,e^{-0.5t}$.',
+                'Multiplica $20 \\times (-0.5) = -10$.',
+                'Evalúa en $t = 0$ recordando que $e^0 = 1$.'
+              ],
+              solutionSteps: [
+                '$q\'(t) = 20(-0.5)e^{-0.5t} = -10\\,e^{-0.5t}$.',
+                'En $t = 0$: $q\'(0) = -10\\,e^0 = -10$.'
+              ]
+            },
+            {
+              id: 'der-3-ex5',
+              level: 'avanzado',
+              statement: 'Un modelo de costo energético sigue $f(x) = 6\\ln(x) + x^2$. Calcula la pendiente exacta de la recta tangente en el punto de operación $x = 1$, es decir $f\'(1)$.',
+              answer: '8',
+              alternatives: ['8'],
+              placeholder: 'Pendiente f\'(1)...',
+              whyCorrect: 'Como $(\\ln x)\' = \\frac{1}{x}$, la derivada es $f\'(x) = \\frac{6}{x} + 2x$, y en $x = 1$ da $\\frac{6}{1} + 2(1) = 8$.',
+              reviewTip: 'La pendiente de la recta tangente en $x = a$ es el valor numérico de la derivada $f\'(a)$.',
+              hints: [
+                'Deriva término a término: la derivada de $6\\ln(x)$ es $\\frac{6}{x}$.',
+                'Suma la derivada de $x^2$, que es $2x$.',
+                'Evalúa $f\'(1) = \\frac{6}{1} + 2(1)$.'
+              ],
+              solutionSteps: [
+                'Derivada: $f\'(x) = \\frac{6}{x} + 2x$.',
+                'En $x = 1$: $f\'(1) = 6 + 2 = 8$.'
+              ]
             }
           ],
           quiz: [
@@ -657,6 +990,7 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
           title: 'Máximos y Mínimos, Crecimiento, Concavidad, Puntos de Inflexión y Optimización',
           summary: 'Criterios de la primera y segunda derivada, monotonía, curvatura, puntos de inflexión y modelado de problemas de optimización.',
           graphPreset: 'x^3 - 3*x',
+          demoAnimations: ['der-construccion-fprima', 'der-velocidad-instantanea'],
           interactiveGraph: {
             mode: 'derivatives',
             title: 'Análisis de Curvas: Extremos Relativos, Monotonía y Concavidad',
@@ -702,6 +1036,33 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
               {
                 title: '4. Metodología de 5 Pasos para Problemas de Optimización',
                 body: '1. Identifica la magnitud a optimizar (función objetivo $Q$) y las restricciones (ecuación auxiliar).\n2. Despeja una variable de la restricción y sustitúyela en $Q$ para obtener una función de **una sola variable** $Q(x)$.\n3. Halla los puntos críticos resolviendo $Q\'(x) = 0$.\n4. Verifica con $Q\'\'(x)$ (o en los extremos del dominio) que se trata efectivamente del máximo o mínimo buscado.\n5. Responde con las dimensiones y el valor óptimo.'
+              }
+            ],
+            theorems: [
+              {
+                badge: 'Teorema de Fermat',
+                title: 'Condición Necesaria para Extremos Locales Interiores',
+                hypothesis: '$f$ posee un máximo o mínimo local en un punto **interior** $c \\in (a, b)$ de su dominio y $f$ es **derivable** en $c$.',
+                statement: 'Necesariamente se cumple que $f\'(c) = 0$.',
+                proofSteps: [
+                  'Supongamos el caso de máximo local en $c$: existe $\\delta > 0$ tal que $f(c + h) \\le f(c)$ para todo $|h| < \\delta$.',
+                  'Para $h > 0$ ($0 < h < \\delta$): $f(c+h) - f(c) \\le 0 \\implies \\frac{f(c+h)-f(c)}{h} \\le 0$. Al tomar $h \\to 0^+$ se conserva la desigualdad no estricta: $f\'_+(c) \\le 0$.',
+                  'Para $h < 0$ ($-\\delta < h < 0$): el numerador sigue siendo $\\le 0$, pero $h < 0$, luego $\\frac{f(c+h)-f(c)}{h} \\ge 0$, y al tomar $h \\to 0^-$ resulta $f\'_-(c) \\ge 0$.',
+                  'Como $f$ es derivable en $c$, $f\'(c) = f\'_+(c) = f\'_-(c)$. La única cantidad que cumple $0 \\le f\'(c) \\le 0$ es $f\'(c) = 0$. (El caso de mínimo es análogo invirtiendo signos). $\\blacksquare$'
+                ],
+                note: 'No sobreprometas el recíproco: $f\'(c)=0$ NO garantiza un extremo (en $f(x)=x^3$, $f\'(0)=0$ es punto de inflexión). Tampoco aplica si $c$ es un extremo de intervalo cerrado $[a,b]$ o si $f$ no es derivable en $c$ (ej. $|x|$ tiene mínimo en $0$ sin que exista $f\'(0)$).'
+              },
+              {
+                badge: 'Teorema del Valor Medio (Lagrange)',
+                title: 'Teorema del Valor Medio y Criterio de Monotonía por el Signo de f\'',
+                hypothesis: '$f$ es **continua** en el intervalo cerrado $[a, b]$ y **derivable** en el intervalo abierto $(a, b)$.',
+                statement: 'Existe al menos un punto $c \\in (a, b)$ tal que $f\'(c) = \\frac{f(b) - f(a)}{b - a}$. Como corolario directo, si $f\'(x) > 0$ para todo $x \\in (a, b)$, entonces $f$ es **estrictamente creciente** en $[a, b]$; si $f\'(x) < 0$ en $(a, b)$, $f$ es **estrictamente decreciente**.',
+                proofSteps: [
+                  'Para probar el corolario de monotonía a partir del TVM: sean dos puntos cualesquiera $x_1 < x_2$ dentro de $[a, b]$.',
+                  'Como $f$ es continua en $[x_1, x_2]$ y derivable en $(x_1, x_2)$, por el TVM existe $c \\in (x_1, x_2)$ tal que $f(x_2) - f(x_1) = f\'(c)(x_2 - x_1)$.',
+                  'Si $f\'(x) > 0$ en $(a, b)$, entonces $f\'(c) > 0$; además $x_2 - x_1 > 0$, luego el producto es positivo: $f(x_2) - f(x_1) > 0 \\implies f(x_1) < f(x_2)$.',
+                  'Análogamente, si $f\'(x) < 0$ en $(a, b)$, resulta $f(x_2) - f(x_1) < 0 \\implies f(x_1) > f(x_2)$, demostrando decrecimiento estricto. $\\blacksquare$'
+                ]
               }
             ],
             formulas: [
@@ -752,6 +1113,49 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
                   title: 'Paso 3: Calcular la dimensión y y el área máxima',
                   math: 'y = 120 - 2(30) = 60\\text{ m} \\quad ; \\quad A_{\\max} = 30 \\times 60 = 1800\\text{ m}^2',
                   reason: 'El terreno óptimo mide 30 m de fondo por 60 m de frente, con un área máxima de 1800 m².'
+                }
+              ]
+            },
+            {
+              title: 'Ejemplo 3: Punto estacionario que NO es extremo (f(x) = x⁴ - 4x³)',
+              problem: 'Determina los intervalos de crecimiento/decrecimiento, puntos críticos, extremos relativos y puntos de inflexión de $f(x) = x^4 - 4x^3$.',
+              graphPayload: { kind: 'derivative', expr: 'x^4 - 4*x^3', tangentX: 3, showDerivative: true },
+              steps: [
+                {
+                  title: 'Paso 1: Calcular puntos críticos con f\'(x) = 0',
+                  math: 'f\'(x) = 4x^3 - 12x^2 = 4x^2(x - 3) = 0 \\implies x = 0 \\; \\text{y} \\; x = 3',
+                  reason: 'Factorizamos 4x² para distinguir rápidamente la multiplicidad de cada raíz crítica.'
+                },
+                {
+                  title: 'Paso 2: Analizar el signo de f\'(x) alrededor de x = 0 y x = 3',
+                  math: '\\text{En } (-\\infty, 0): f\'(x) < 0; \\quad \\text{en } (0, 3): f\'(x) < 0; \\quad \\text{en } (3, \\infty): f\'(x) > 0',
+                  reason: 'Como 4x² ≥ 0 siempre, el signo lo dicta (x - 3). En x = 0 la función decrece antes y después: f\'(0) = 0 pero NO es extremo. En x = 3 cambia de - a +: mínimo absoluto f(3) = -27.'
+                },
+                {
+                  title: 'Paso 3: Concavidad y puntos de inflexión con f\'\'(x)',
+                  math: 'f\'\'(x) = 12x^2 - 24x = 12x(x - 2) = 0 \\implies x = 0 \\; (f(0)=0) \\; \\text{y} \\; x = 2 \\; (f(2) = -16)',
+                  reason: 'En x = 0 y x = 2 hay cambio de signo en f\'\'(x), por lo que ambos son puntos de inflexión.'
+                }
+              ]
+            },
+            {
+              title: 'Ejemplo 4: Verificación del Teorema del Valor Medio de Lagrange en [0, 2]',
+              problem: 'Comprueba que $f(x) = x^3 - x$ satisface las hipótesis del Teorema del Valor Medio en $[0, 2]$ y encuentra todos los valores $c \\in (0, 2)$ garantizados por el teorema.',
+              steps: [
+                {
+                  title: 'Paso 1: Verificar hipótesis de continuidad y derivabilidad',
+                  math: 'f(x) = x^3 - x \\text{ es polinómica } \\implies \\text{continua en } [0, 2] \\text{ y derivable en } (0, 2)',
+                  reason: 'Sin comprobar primero ambas hipótesis en el intervalo cerrado y abierto respectivamente, no sería válido invocar el TVM.'
+                },
+                {
+                  title: 'Paso 2: Igualar la razón promedio con la derivada f\'(c)',
+                  math: '\\frac{f(2) - f(0)}{2 - 0} = \\frac{(8 - 2) - 0}{2} = 3 \\quad ; \\quad f\'(c) = 3c^2 - 1 = 3 \\implies 3c^2 = 4',
+                  reason: 'Buscamos el punto interior donde la pendiente instantánea iguala a la pendiente secante entre (0,0) y (2,6).'
+                },
+                {
+                  title: 'Paso 3: Seleccionar el valor c dentro del intervalo abierto (0, 2)',
+                  math: 'c = \\pm\\sqrt{\\frac{4}{3}} = \\pm\\frac{2}{\\sqrt{3}} \\implies c = \\frac{2}{\\sqrt{3}} \\approx 1.1547 \\in (0, 2)',
+                  reason: 'Descartamos -2/√3 por quedar fuera de (0, 2) y retenemos c = 2/√3 ≈ 1.1547.'
                 }
               ]
             }
@@ -826,6 +1230,44 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
               ],
               reviewTip: 'Observa que el problema pide el **producto máximo** ($10 \\times 10 = 100$), no solo el valor de $x = 10$.',
               whyCorrect: '¡Brillante! Demostraste mediante cálculo diferencial que de todos los pares de números con suma constante, el producto es máximo cuando ambos son iguales.'
+            },
+            {
+              id: 'der-4-ex4',
+              level: 'intermedio',
+              statement: 'La altura en metros de un dron sigue la trayectoria $h(t) = -5t^2 + 30t + 4$ ($t$ en segundos). Usa la primera derivada para encontrar en qué segundo exacto alcanza su altura máxima.',
+              answer: '3',
+              alternatives: ['3'],
+              placeholder: 'Segundo de altura máxima...',
+              whyCorrect: 'Igualando la velocidad vertical a cero: $h\'(t) = -10t + 30 = 0 \\Rightarrow t = 3\\text{ s}$, con $h\'\'(3) = -10 < 0$ (máximo).',
+              reviewTip: 'Un extremo local ocurre donde la primera derivada se anula ($h\'(t) = 0$).',
+              hints: [
+                'Calcula la primera derivada $h\'(t) = -10t + 30$.',
+                'Iguala $h\'(t) = 0$ para hallar el punto crítico.',
+                'Despeja $t = \\frac{30}{10}$.'
+              ],
+              solutionSteps: [
+                '$h\'(t) = -10t + 30 = 0 \\Rightarrow 10t = 30 \\Rightarrow t = 3\\text{ s}$.',
+                'Como $h\'\'(t) = -10 < 0$, en $t = 3\\text{ s}$ hay un máximo absoluto.'
+              ]
+            },
+            {
+              id: 'der-4-ex5',
+              level: 'avanzado',
+              statement: 'Se dispone de $80\\text{ m}$ de malla metálica para cercar un jardín rectangular completo por sus cuatro lados. ¿Cuál debe ser la medida de cada lado en metros para obtener el área máxima posible?',
+              answer: '20',
+              alternatives: ['20'],
+              placeholder: 'Medida óptima en m...',
+              whyCorrect: 'De $2x + 2y = 80$ se tiene $y = 40 - x$ y $A(x) = 40x - x^2$. Su derivada $A\'(x) = 40 - 2x = 0$ da $x = 20\\text{ m}$ (un cuadrado de $20 \\times 20$).',
+              reviewTip: 'Expresa una dimensión en términos del perímetro fijo para derivar la función de área de una sola variable.',
+              hints: [
+                'De $2x + 2y = 80$, simplifica $x + y = 40 \\Rightarrow y = 40 - x$.',
+                'Arma la función área: $A(x) = x(40 - x) = 40x - x^2$.',
+                'Deriva e iguala a cero: $A\'(x) = 40 - 2x = 0$.'
+              ],
+              solutionSteps: [
+                'Restricción: $y = 40 - x$. Área: $A(x) = 40x - x^2$.',
+                '$A\'(x) = 40 - 2x = 0 \\Rightarrow x = 20\\text{ m}$ (y $y = 20\\text{ m}$).'
+              ]
             }
           ],
           quiz: [
@@ -875,6 +1317,7 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
           title: 'Concepto de Integral, Antiderivadas, Constante de Integración y Reglas Fundamentales',
           summary: 'Operación inversa de la derivación, familia de curvas primitivas F(x) + C, e integrales de potencias, exponenciales, logarítmicas y trigonométricas.',
           graphPreset: '2*x',
+          demoAnimations: ['int-suma-riemann'],
           interactiveGraph: {
             mode: 'integrals',
             title: 'Explorador de Acumulación e Integración Fundamental',
@@ -934,6 +1377,21 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
                 expr: '\\int e^x\\,dx = e^x + C \\quad ; \\quad \\int \\cos(x)\\,dx = \\text{sen}(x) + C \\quad ; \\quad \\int \\text{sen}(x)\\,dx = -\\cos(x) + C',
                 note: 'Verifica siempre el signo derivando tu respuesta final.'
               }
+            ],
+            theorems: [
+              {
+                badge: 'Teorema de Unicidad Aditiva',
+                title: '¿Por qué dos antiderivadas difieren en una constante C?',
+                hypothesis: 'Sean $F_1$ y $F_2$ dos antiderivadas de $f$ en un intervalo abierto $I$ (es decir, $F_1\'(x) = F_2\'(x) = f(x)$ para todo $x \\in I$).',
+                statement: 'Existe una constante única $C \\in \\mathbb{R}$ tal que $F_1(x) - F_2(x) = C$ para todo $x \\in I$.',
+                proofSteps: [
+                  'Definimos $H(x) = F_1(x) - F_2(x)$ sobre el intervalo $I$. Por linealidad de la derivada, $H\'(x) = F_1\'(x) - F_2\'(x) = f(x) - f(x) = 0$ en todo $I$.',
+                  'Tomamos dos puntos cualesquiera $x_1 < x_2$ dentro de $I$. Como $H$ es derivable en $[x_1, x_2]$, cumple las hipótesis del Teorema del Valor Medio de Lagrange.',
+                  'Existe $c \\in (x_1, x_2)$ tal que $H(x_2) - H(x_1) = H\'(c)(x_2 - x_1) = 0 \\cdot (x_2 - x_1) = 0$.',
+                  'Por lo tanto $H(x_2) = H(x_1)$ para todo par de puntos de $I$, lo que demuestra que $H(x) = C$ es constante en $I$. $\\blacksquare$'
+                ],
+                note: 'La hipótesis de estar en un **intervalo conexo** es vital: en $\\mathbb{R} \\setminus \\{0\\}$ (dos intervalos separados), $\\ln|x|$ admite constantes distintas para $x < 0$ y $x > 0$.'
+              }
             ]
           },
           examples: [
@@ -976,6 +1434,23 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
                   title: 'Paso 3: Escribir la antiderivada particular',
                   math: 'F(x) = 2x^2 - 3x + 3',
                   reason: 'Sustituimos C = 3 en la expresión general.'
+                }
+              ],
+              graphPayload: { kind: 'integral', expr: '2*x^2 - 3*x + 3', integralA: 0, integralB: 2, showIntegral: true }
+            },
+            {
+              title: 'Ejemplo 3: Simplificación previa combinada con trigonométricas y exponenciales',
+              problem: 'Calcula $\\int \\left(\\frac{x^3 + 2x}{x} + 3\\cos(x) - 2e^x\\right) dx$ ($x \\neq 0$) y verifica tu resultado derivando.',
+              steps: [
+                {
+                  title: 'Paso 1: Dividir algebraicamente cada término del numerador entre x',
+                  math: '\\int \\left(x^2 + 2 + 3\\cos(x) - 2e^x\\right) dx',
+                  reason: 'La integral de un cociente NO es el cociente de integrales; simplificar el polinomio convierte todo en suma directa.'
+                },
+                {
+                  title: 'Paso 2: Integrar cada término y comprobar por derivación',
+                  math: 'F(x) = \\frac{x^3}{3} + 2x + 3\\,\\text{sen}(x) - 2e^x + C \\quad \\Longrightarrow \\quad F\'(x) = x^2 + 2 + 3\\cos(x) - 2e^x',
+                  reason: 'Al derivar F(x) recuperamos exactamente el integrando simplificado.'
                 }
               ]
             }
@@ -1048,6 +1523,44 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
               ],
               reviewTip: 'Integra primero para hallar $2x^3 - x^2 + x + C$ y luego sustituye $x = 1$ para despejar $C$.',
               whyCorrect: '¡Perfecto! La condición inicial $F(1) = 7$ fija de manera única la constante $C = 5$.'
+            },
+            {
+              id: 'int-1-ex4',
+              level: 'basico',
+              statement: 'El flujo de entrada de agua a un tanque es $r(t) = 6t + 4$ litros por minuto. Si al comienzo ($t = 0$) el tanque contenía $10\\text{ litros}$, calcula cuántos litros totales tendrá en $t = 2$ minutos.',
+              answer: '30',
+              alternatives: ['30'],
+              placeholder: 'Volumen total en litros...',
+              whyCorrect: 'La antiderivada es $V(t) = 3t^2 + 4t + C$; con $V(0) = 10$ resulta $C = 10$, y en $t = 2$ vale $V(2) = 3(4) + 4(2) + 10 = 30\\text{ L}$.',
+              reviewTip: 'La condición inicial $V(0) = 10$ fija el valor exacto de la constante de integración $C$.',
+              hints: [
+                'Integra la tasa de cambio: $V(t) = \\int (6t + 4)\\,dt = 3t^2 + 4t + C$.',
+                'Usa $V(0) = 10$ para hallar $C = 10$.',
+                'Evalúa $V(2) = 3(2)^2 + 4(2) + 10$.'
+              ],
+              solutionSteps: [
+                'Antiderivada: $V(t) = 3t^2 + 4t + C$. Como $V(0) = 10$, entonces $C = 10$.',
+                'En $t = 2$: $V(2) = 12 + 8 + 10 = 30\\text{ litros}$.'
+              ]
+            },
+            {
+              id: 'int-1-ex5',
+              level: 'intermedio',
+              statement: 'El perfil de una pista tiene pendiente dada por $\\frac{dy}{dx} = 4x - 3$. Si la curva pasa por el punto $(1, 5)$, calcula el valor exacto de la altura $y$ cuando $x = 3$.',
+              answer: '15',
+              alternatives: ['15'],
+              placeholder: 'Altura y(3)...',
+              whyCorrect: 'Integrando, $y(x) = 2x^2 - 3x + C$. Con $y(1) = 2 - 3 + C = 5$ resulta $C = 6$, así que $y(3) = 2(9) - 3(3) + 6 = 15$.',
+              reviewTip: 'Encuentra primero la familia de antiderivadas y luego sustituye $(1, 5)$ para determinar $C$.',
+              hints: [
+                'Integra $4x - 3$ para obtener $y(x) = 2x^2 - 3x + C$.',
+                'Sustituye $x = 1, y = 5$: $2(1) - 3(1) + C = 5 \\Rightarrow C = 6$.',
+                'Calcula $y(3) = 2(3)^2 - 3(3) + 6$.'
+              ],
+              solutionSteps: [
+                '$y(x) = 2x^2 - 3x + C$. Con $(1, 5)$: $-1 + C = 5 \\Rightarrow C = 6$.',
+                '$y(3) = 18 - 9 + 6 = 15$.'
+              ]
             }
           ],
           quiz: [
@@ -1084,6 +1597,7 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
           title: 'Métodos de Integración: Sustitución (Cambio de Variable) e Integración por Partes',
           summary: 'Inversión de la regla de la cadena mediante cambio de variable u = g(x) e inversión de la regla del producto (ILATE).',
           graphPreset: 'x*exp(-0.5*x^2)',
+          demoAnimations: ['int-suma-riemann', 'der-construccion-fprima'],
           interactiveGraph: {
             mode: 'integrals',
             title: 'Visualizador de Integrandos Compuestos y Productos',
@@ -1139,6 +1653,19 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
                 expr: '\\int u\\,dv = u \\cdot v - \\int v\\,du',
                 note: 'Prioridad ILATE para elegir u: Inversa, Logarítmica, Algebraica, Trigonométrica, Exponencial.'
               }
+            ],
+            theorems: [
+              {
+                badge: 'Deducción de Reglas',
+                title: 'Fórmula de Integración por Partes desde la Regla del Producto',
+                hypothesis: 'Sean $u(x)$ y $v(x)$ funciones con derivada continua en un intervalo $I$.',
+                statement: '$\\int u(x)v\'(x)\\,dx = u(x)v(x) - \\int v(x)u\'(x)\\,dx$, abreviada como $\\int u\\,dv = uv - \\int v\\,du$.',
+                proofSteps: [
+                  'Por la regla del producto: $\\frac{d}{dx}[u(x)v(x)] = u\'(x)v(x) + u(x)v\'(x)$.',
+                  'Integrando ambos miembros respecto a $x$: $u(x)v(x) = \\int u\'(x)v(x)\\,dx + \\int u(x)v\'(x)\\,dx$.',
+                  'Despejando la segunda integral obtenemos directamente $\\int u(x)v\'(x)\\,dx = u(x)v(x) - \\int v(x)u\'(x)\\,dx$. $\\blacksquare$'
+                ]
+              }
             ]
           },
           examples: [
@@ -1161,7 +1688,8 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
                   math: '\\frac{1}{3}(x^2 + 9)^{3/2} + C',
                   reason: 'Sustituimos nuevamente u = x² + 9 para expresar la respuesta en la variable original.'
                 }
-              ]
+              ],
+              graphPayload: { kind: 'integral', expr: 'x*sqrt(x^2 + 9)', integralA: 0, integralB: 4, showIntegral: true }
             },
             {
               title: 'Ejemplo 2: Integración por Partes de un producto algebraico-exponencial',
@@ -1181,6 +1709,23 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
                   title: 'Paso 3: Resolver la integral restante y simplificar',
                   math: '\\frac{1}{2}x\\,e^{2x} - \\frac{1}{2}\\left(\\frac{1}{2}e^{2x}\\right) + C = \\frac{1}{2}x\\,e^{2x} - \\frac{1}{4}e^{2x} + C = \\frac{e^{2x}}{4}(2x - 1) + C',
                   reason: 'Integramos e^(2x) nuevamente dividiendo entre 2.'
+                }
+              ],
+              graphPayload: { kind: 'integral', expr: 'x*exp(2*x)', integralA: 0, integralB: 1, showIntegral: true }
+            },
+            {
+              title: 'Ejemplo 3: Antiderivada clásica de ln(x) mediante integración por partes',
+              problem: 'Halla $\\int \\ln(x)\\,dx$ para $x > 0$ aplicando integración por partes.',
+              steps: [
+                {
+                  title: 'Paso 1: Elegir u = ln(x) (L en ILATE) y dv = 1 dx',
+                  math: 'u = \\ln(x) \\implies du = \\frac{1}{x}\\,dx \\quad ; \\quad dv = dx \\implies v = x',
+                  reason: 'Aunque no aparezca explícitamente otro factor, tomamos dv = dx cuya primitiva es x.'
+                },
+                {
+                  title: 'Paso 2: Aplicar la fórmula y verificar derivando',
+                  math: '\\int \\ln(x)\\,dx = x\\ln(x) - \\int x \\cdot \\frac{1}{x}\\,dx = x\\ln(x) - \\int 1\\,dx = x\\ln(x) - x + C',
+                  reason: 'Derivando: (1)·ln(x) + x·(1/x) - 1 = ln(x) + 1 - 1 = ln(x).'
                 }
               ]
             }
@@ -1254,6 +1799,42 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
               ],
               reviewTip: 'Recuerda la fórmula $\\int u\\,dv = u \\cdot v - \\int v\\,du$ con $u = x$ y $v = e^x$.',
               whyCorrect: '¡Excelente! Al derivar $(x - 1)e^x$ con la regla del producto se obtiene $1\\cdot e^x + (x-1)e^x = x\\,e^x$.'
+            },
+            {
+              id: 'int-2-ex4',
+              level: 'intermedio',
+              statement: 'La velocidad de transmisión en una red sigue $f(t) = 6t(t^2 + 1)^2\\text{ MB/s}$. Usando cambio de variable $u = t^2 + 1$, calcula los megabytes transmitidos entre $t = 0$ y $t = 1$: $\\int_0^1 6t(t^2 + 1)^2\\,dt$.',
+              answer: '7',
+              alternatives: ['7'],
+              placeholder: 'Megabytes acumulados...',
+              whyCorrect: 'Con $u = t^2 + 1$, $du = 2t\\,dt$ y los límites cambian de $[0, 1]$ a $[1, 2]$: $\\int_1^2 3u^2\\,du = [u^3]_1^2 = 8 - 1 = 7\\text{ MB}$.',
+              reviewTip: 'Al usar sustitución en una integral definida, cambia también los límites de integración a la nueva variable $u$.',
+              hints: [
+                'Define $u = t^2 + 1$, entonces $du = 2t\\,dt$ (así que $6t\\,dt = 3\\,du$).',
+                'Cambia límites: si $t=0 \\Rightarrow u=1$; si $t=1 \\Rightarrow u=2$.',
+                'Evalúa $\\int_1^2 3u^2\\,du = 2^3 - 1^3$.'
+              ],
+              solutionSteps: [
+                'Sustitución $u = t^2 + 1, du = 2t\\,dt$: $\\int_1^2 3u^2\\,du = \\left[u^3\\right]_1^2 = 2^3 - 1^3 = 7$.'
+              ]
+            },
+            {
+              id: 'int-2-ex5',
+              level: 'avanzado',
+              statement: 'Un modelo termodinámico evalúa el trabajo acumulado mediante $W = \\int_0^1 x\\,e^x\\,dx$. Aplica integración por partes para hallar el valor numérico exacto de $W$.',
+              answer: '1',
+              alternatives: ['1'],
+              placeholder: 'Valor exacto de W...',
+              whyCorrect: 'Tomando $u = x$ y $dv = e^x\\,dx$, por partes se obtiene $[x\\,e^x - e^x]_0^1 = (1\\cdot e - e) - (0 - e^0) = 0 - (-1) = 1$.',
+              reviewTip: 'Aplica $\\int u\\,dv = uv - \\int v\\,du$ eligiendo $u = x$ para que desaparezca al derivar.',
+              hints: [
+                'Elige $u = x$ ($du = dx$) y $dv = e^x\\,dx$ ($v = e^x$).',
+                'La antiderivada es $x\\,e^x - \\int e^x\\,dx = (x - 1)e^x$.',
+                'Evalúa en el extremo superior $x = 1$ y resta en $x = 0$.'
+              ],
+              solutionSteps: [
+                'Por partes: $\\left[x\\,e^x - e^x\\right]_0^1 = (e - e) - (0 - 1) = 0 + 1 = 1$.'
+              ]
             }
           ],
           quiz: [
@@ -1290,6 +1871,7 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
           title: 'Integrales Definidas, Teorema Fundamental del Cálculo, Área Bajo la Curva y Aplicaciones',
           summary: 'Sumas de Riemann, Regla de Barrow F(b) - F(a), diferenciación visual y analítica entre áreas positivas y negativas, y aplicaciones.',
           graphPreset: 'x^3 - 4*x',
+          demoAnimations: ['int-suma-riemann'],
           interactiveGraph: {
             mode: 'integrals',
             title: 'Laboratorio del Teorema Fundamental del Cálculo: Áreas Positivas y Negativas',
@@ -1349,6 +1931,20 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
                 expr: 'I_{\\text{neta}} = A_{+} - A_{-} \\quad ; \\quad A_{\\text{total}} = \\int_a^b |f(x)|\\,dx = A_{+} + A_{-}',
                 note: 'Usa la gráfica interactiva superior para visualizar en azul A+ y en ámbar A-.'
               }
+            ],
+            theorems: [
+              {
+                badge: 'Teorema Fundamental del Cálculo (I y II)',
+                title: 'Conexión Exacta entre Derivación e Integración (Regla de Barrow)',
+                hypothesis: 'Sea $f$ **continua** en el intervalo cerrado $[a, b]$.',
+                statement: '**Parte I:** La función área $g(x) = \\int_a^x f(t)\\,dt$ es continua en $[a,b]$, derivable en $(a,b)$ y $g\'(x) = f(x)$. **Parte II (Barrow):** Si $F$ es cualquier antiderivada de $f$ en $[a, b]$ ($F\' = f$), entonces $\\int_a^b f(x)\\,dx = F(b) - F(a)$.',
+                proofSteps: [
+                  'Para la Parte II: sea $a = x_0 < x_1 < \\dots < x_n = b$ una partición regular de $[a, b]$ con paso $\\Delta x = \\frac{b-a}{n}$.',
+                  'Escribimos la diferencia total como suma telescópica: $F(b) - F(a) = \\sum_{i=1}^n [F(x_i) - F(x_{i-1})]$.',
+                  'Como $F$ es continua en $[x_{i-1}, x_i]$ y derivable en $(x_{i-1}, x_i)$ con $F\' = f$, el Teorema del Valor Medio garantiza un $c_i \\in (x_{i-1}, x_i)$ tal que $F(x_i) - F(x_{i-1}) = F\'(c_i)\\Delta x = f(c_i)\\Delta x$.',
+                  'Sumando obtenemos $F(b) - F(a) = \\sum_{i=1}^n f(c_i)\\Delta x$. Al refinar $n \\to \\infty$, la suma de Riemann converge a $\\int_a^b f(x)\\,dx$, quedando $F(b) - F(a) = \\int_a^b f(x)\\,dx$. $\\blacksquare$'
+                ]
+              }
             ]
           },
           examples: [
@@ -1371,7 +1967,8 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
                   math: '\\int_1^3 (3x^2 - 2x + 1)\\,dx = F(3) - F(1) = 21 - 1 = 20\\text{ u}^2',
                   reason: 'Como f(x) > 0 en todo [1, 3], el área bajo la curva es exactamente 20 unidades cuadradas.'
                 }
-              ]
+              ],
+              graphPayload: { kind: 'integral', expr: '3*x^2 - 2*x + 1', integralA: 1, integralB: 3, showIntegral: true }
             },
             {
               title: 'Ejemplo 2: Cálculo de área cuando la función cruza el eje X (áreas positivas y negativas)',
@@ -1391,6 +1988,23 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
                   title: 'Paso 3: Comparar la Integral Neta con el Área Geométrica Total',
                   math: '\\text{a) Integral neta} = 4 + (-4) = 0 \\quad ; \\quad \\text{b) Área total} = |4| + |-4| = 4 + 4 = 8\\text{ u}^2',
                   reason: 'Las áreas con signo se cancelan en la integral neta (0), pero el área física pintada suma 8 u².'
+                }
+              ],
+              graphPayload: { kind: 'integral', expr: 'x^3 - 4*x', integralA: -2, integralB: 2, showIntegral: true }
+            },
+            {
+              title: 'Ejemplo 3: Valor promedio de una función y Teorema del Valor Medio Integral',
+              problem: 'Halla el **valor promedio** de $f(x) = x^2$ en $[0, 3]$ y determina el valor $c \\in (0, 3)$ donde $f(c)$ alcanza dicho promedio.',
+              steps: [
+                {
+                  title: 'Paso 1: Calcular el valor promedio mediante integral definida',
+                  math: 'f_{\\text{prom}} = \\frac{1}{3 - 0}\\int_0^3 x^2\\,dx = \\frac{1}{3}\\left[\\frac{x^3}{3}\\right]_0^3 = \\frac{1}{3}(9 - 0) = 3',
+                  reason: 'Dividimos la integral definida (área bajo x² igual a 9) entre la longitud del intervalo (3).'
+                },
+                {
+                  title: 'Paso 2: Encontrar c ∈ (0, 3) tal que f(c) = 3',
+                  math: 'c^2 = 3 \\implies c = \\sqrt{3} \\approx 1.7321 \\in (0, 3)',
+                  reason: 'El rectángulo de base 3 y altura f(√3) = 3 tiene exactamente la misma área (9 u²) que la región parabólica.'
                 }
               ]
             }
@@ -1465,6 +2079,42 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
               ],
               reviewTip: 'Recuerda que el **área geométrica total** suma el valor absoluto de la parte negativa ($|-4| = 4$) más la parte positiva ($+4$), dando $8$ (no $0$).',
               whyCorrect: '¡Impecable! Distinguiste perfectamente entre la integral neta ($0$) y el área geométrica total ($|-4| + 4 = 8$).'
+            },
+            {
+              id: 'int-3-ex4',
+              level: 'intermedio',
+              statement: 'Una válvula suministra agua con caudal $Q(t) = 3t^2 + 2\\text{ L/min}$. Usa la integral definida $\\int_0^3 (3t^2 + 2)\\,dt$ para calcular el volumen total suministrado en los primeros $3$ minutos.',
+              answer: '33',
+              alternatives: ['33'],
+              placeholder: 'Volumen en litros...',
+              whyCorrect: 'Por el Teorema Fundamental del Cálculo: $\\left[t^3 + 2t\\right]_0^3 = (3^3 + 2(3)) - 0 = 27 + 6 = 33\\text{ L}$.',
+              reviewTip: 'Evalúa la antiderivada $F(t) = t^3 + 2t$ en $t = 3$ menos su valor en $t = 0$.',
+              hints: [
+                'Encuentra la antiderivada: $F(t) = t^3 + 2t$.',
+                'Evalúa $F(3) = 3^3 + 2(3) = 27 + 6$.',
+                'Resta $F(0) = 0$.'
+              ],
+              solutionSteps: [
+                '$\\int_0^3 (3t^2 + 2)\\,dt = \\left[t^3 + 2t\\right]_0^3 = (27 + 6) - 0 = 33\\text{ litros}$.'
+              ]
+            },
+            {
+              id: 'int-3-ex5',
+              level: 'avanzado',
+              statement: 'Un ventanal arquitectónico tiene perfil parabólico dado por $y = 9 - x^2$ sobre la base horizontal $y = 0$, entre $x = -3$ y $x = 3$. Calcula su área exacta evaluando $\\int_{-3}^{3} (9 - x^2)\\,dx$.',
+              answer: '36',
+              alternatives: ['36'],
+              placeholder: 'Área en m²...',
+              whyCorrect: 'Aprovechando simetría par: $2\\int_0^3 (9 - x^2)\\,dx = 2\\left[9x - \\frac{x^3}{3}\\right]_0^3 = 2(27 - 9) = 36\\text{ m}^2$.',
+              reviewTip: 'Como $9 - x^2$ es función par en $[-3, 3]$, puedes integrar de $0$ a $3$ y multiplicar por $2$.',
+              hints: [
+                'Antiderivada: $F(x) = 9x - \\frac{x^3}{3}$.',
+                'Por simetría en $[-3, 3]$, calcula $2 \\cdot F(3)$.',
+                'Evalúa $2\\left(27 - \\frac{27}{3}\\right) = 2(18)$.'
+              ],
+              solutionSteps: [
+                '$2\\int_0^3 (9 - x^2)\\,dx = 2\\left[9x - \\frac{x^3}{3}\\right]_0^3 = 2(27 - 9) = 36$.'
+              ]
             }
           ],
           quiz: [
@@ -1514,6 +2164,7 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
           title: 'Área Entre Dos Curvas y Aplicaciones en Cinemática',
           summary: 'Intersección de curvas, integración de [f(x) - g(x)] y relación completa entre posición s(t), velocidad v(t) y aceleración a(t).',
           graphPreset: '4 - x^2',
+          demoAnimations: ['der-velocidad-instantanea'],
           interactiveGraph: {
             mode: 'integrals',
             title: 'Laboratorio de Área Acotada y Síntesis del Cálculo',
@@ -1560,6 +2211,19 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
                 expr: 'A = \\int_a^b \\big[f_{\\text{sup}}(x) - g_{\\text{inf}}(x)\\big]\\,dx',
                 note: 'Los límites a y b se determinan resolviendo la ecuación de intersección f(x) = g(x).'
               }
+            ],
+            theorems: [
+              {
+                badge: 'Teorema de Integración de Regiones',
+                title: 'Área Plana Encerrada Entre Dos Gráficas Continuas',
+                hypothesis: 'Sean $f$ y $g$ continuas en $[a, b]$ con $f(x) \\ge g(x)$ para todo $x \\in [a, b]$.',
+                statement: 'El área exacta de la región $R = \\{(x, y) : a \\le x \\le b,\\; g(x) \\le y \\le f(x)\\}$ vale $A = \\int_a^b [f(x) - g(x)]\\,dx$.',
+                proofSteps: [
+                  'Cada franja vertical representativa centrada en $x_i^*$ tiene ancho $\\Delta x$ y altura no negativa $f(x_i^*) - g(x_i^*)$.',
+                  'La suma aproximada de áreas de rectángulos es $S_n = \\sum_{i=1}^n [f(x_i^*) - g(x_i^*)]\\Delta x$.',
+                  'Como $f - g$ es continua en $[a, b]$, al refinar la partición ($n \\to \\infty$), la suma de Riemann converge a la integral $\\int_a^b [f(x) - g(x)]\\,dx$. $\\blacksquare$'
+                ]
+              }
             ]
           },
           examples: [
@@ -1581,6 +2245,40 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
                   title: 'Paso 3: Evaluar mediante la Regla de Barrow',
                   math: 'A = \\left(1 - \\frac{1}{3}\\right) - \\left(-1 + \\frac{1}{3}\\right) = \\frac{2}{3} - \\left(-\\frac{2}{3}\\right) = \\frac{4}{3}\\text{ u}^2',
                   reason: 'El área encerrada entre ambas gráficas es 4/3 unidades cuadradas.'
+                }
+              ],
+              graphPayload: { kind: 'integral', expr: '(4 - x^2) - 3', integralA: -1, integralB: 1, showIntegral: true }
+            },
+            {
+              title: 'Ejemplo 2: Área encerrada entre recta f(x) = x + 2 y parábola g(x) = x²',
+              problem: 'Halla el área total de la región finita acotada por la recta $y = x + 2$ y la parábola $y = x^2$.',
+              steps: [
+                {
+                  title: 'Paso 1: Igualar las funciones para obtener los cortes',
+                  math: 'x^2 = x + 2 \\implies x^2 - x - 2 = (x - 2)(x + 1) = 0 \\implies a = -1, \\; b = 2',
+                  reason: 'En x = 0, la recta vale 2 y la parábola vale 0; luego f_sup(x) = x + 2.'
+                },
+                {
+                  title: 'Paso 2: Integrar (x + 2 - x²) en [-1, 2]',
+                  math: 'A = \\int_{-1}^2 (x + 2 - x^2)\\,dx = \\left[\\frac{x^2}{2} + 2x - \\frac{x^3}{3}\\right]_{-1}^2 = \\left(2 + 4 - \\frac{8}{3}\\right) - \\left(\\frac{1}{2} - 2 + \\frac{1}{3}\\right) = \\frac{10}{3} + \\frac{7}{6} = \\frac{9}{2} = 4.5\\text{ u}^2',
+                  reason: 'Evaluamos primero en el límite superior b = 2 y restamos el inferior a = -1.'
+                }
+              ],
+              graphPayload: { kind: 'integral', expr: 'x + 2 - x^2', integralA: -1, integralB: 2, showIntegral: true }
+            },
+            {
+              title: 'Ejemplo 3: Recuperación cinemática de v(t) y s(t) desde la aceleración a(t)',
+              problem: 'Un móvil parte desde $s(0) = 5\\text{ m}$ con velocidad inicial $v(0) = 2\\text{ m/s}$ y aceleración $a(t) = 6t - 4\\text{ m/s}^2$. Calcula su posición $s(2)$ al cabo de $2\\text{ s}$.',
+              steps: [
+                {
+                  title: 'Paso 1: Integrar a(t) y fijar v(0) = 2',
+                  math: 'v(t) = \\int (6t - 4)\\,dt = 3t^2 - 4t + C_1 \\xrightarrow{v(0)=2} v(t) = 3t^2 - 4t + 2',
+                  reason: 'Determinamos C₁ = 2 usando la velocidad inicial en t = 0.'
+                },
+                {
+                  title: 'Paso 2: Integrar v(t), fijar s(0) = 5 y evaluar s(2)',
+                  math: 's(t) = \\int (3t^2 - 4t + 2)\\,dt = t^3 - 2t^2 + 2t + 5 \\implies s(2) = 8 - 8 + 4 + 5 = 9\\text{ m}',
+                  reason: 'La posición exacta a los 2 segundos es 9 metros.'
                 }
               ]
             }
@@ -1648,6 +2346,42 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
               ],
               reviewTip: 'Iguala primero $9 - x^2 = 5$ para obtener los límites $[-2, 2]$ e integra la resta $(9 - x^2) - 5 = 4 - x^2$.',
               whyCorrect: '¡Perfecto! Encontraste primero las intersecciones $x = \\pm 2$ e integraste la diferencia de ambas funciones.'
+            },
+            {
+              id: 'calc-1-ex4',
+              level: 'intermedio',
+              statement: 'Una placa metálica está acotada arriba por $y = 4x$ y abajo por $y = x^2$ desde $x = 0$ hasta $x = 4$. Calcula el área exacta entre ambas curvas mediante $\\int_0^4 (4x - x^2)\\,dx$.',
+              answer: '32/3',
+              alternatives: ['32/3', '\\frac{32}{3}'],
+              placeholder: 'Área exacta (ej: 32/3)...',
+              whyCorrect: 'Integrando la curva superior menos la inferior: $\\left[2x^2 - \\frac{x^3}{3}\\right]_0^4 = 32 - \\frac{64}{3} = \\frac{96 - 64}{3} = \\frac{32}{3}$.',
+              reviewTip: 'El área entre curvas siempre integra $(\\text{techo} - \\text{piso})$ en el intervalo dado.',
+              hints: [
+                'Antiderivada de $4x - x^2$: $2x^2 - \\frac{x^3}{3}$.',
+                'Evalúa en $x = 4$: $2(16) - \\frac{64}{3} = 32 - \\frac{64}{3}$.',
+                'Convierte $32 = \\frac{96}{3}$ y resta.'
+              ],
+              solutionSteps: [
+                '$A = \\left[2x^2 - \\frac{x^3}{3}\\right]_0^4 = 32 - \\frac{64}{3} = \\frac{32}{3}$.'
+              ]
+            },
+            {
+              id: 'calc-1-ex5',
+              level: 'avanzado',
+              statement: 'Un tren frena con velocidad positiva $v(t) = 12 - 3t\\text{ m/s}$ desde $t = 0$ hasta detenerse en $t = 4\\text{ s}$. Calcula la distancia total de frenado en metros mediante integración.',
+              answer: '24',
+              alternatives: ['24'],
+              placeholder: 'Distancia en metros...',
+              whyCorrect: 'La distancia con $v(t) \\ge 0$ es $\\int_0^4 (12 - 3t)\\,dt = \\left[12t - \\frac{3}{2}t^2\\right]_0^4 = 48 - 24 = 24\\text{ m}$.',
+              reviewTip: 'El desplazamiento o distancia recorrida sin cambio de dirección es la integral definida de la velocidad.',
+              hints: [
+                'Integra la velocidad: $\\int_0^4 (12 - 3t)\\,dt$.',
+                'La antiderivada es $12t - \\frac{3}{2}t^2$.',
+                'Evalúa en $t = 4$: $12(4) - 1.5(16)$.'
+              ],
+              solutionSteps: [
+                '$d = \\int_0^4 (12 - 3t)\\,dt = \\left[12t - \\frac{3}{2}t^2\\right]_0^4 = 48 - \\frac{3(16)}{2} = 48 - 24 = 24\\text{ m}$.'
+              ]
             }
           ],
           quiz: [
@@ -1673,6 +2407,7 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
           title: 'Ecuaciones Diferenciales de Variables Separables y Modelos de Crecimiento',
           summary: 'Separación de diferenciales g(y)dy = f(x)dx, problemas de valor inicial (PVI) y ley de crecimiento/decaimiento exponencial.',
           graphPreset: '2*exp(0.5*x)',
+          demoAnimations: ['lim-aprox-tabla', 'lim-epsilon-banda'],
           interactiveGraph: {
             mode: 'general',
             title: 'Curvas Solución de Ecuaciones Diferenciales Ordinarias',
@@ -1716,6 +2451,19 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
                 expr: 'g(y)\\,dy = f(x)\\,dx \\implies \\int g(y)\\,dy = \\int f(x)\\,dx + C',
                 note: 'Basta con colocar una sola constante arbitraria C en el lado derecho.'
               }
+            ],
+            theorems: [
+              {
+                badge: 'Método Analítico',
+                title: 'Validez de la Separación de Variables en EDO de Primer Orden',
+                hypothesis: 'Considérese la ecuación $\\frac{dy}{dx} = f(x)\\,h(y)$ con $f$ y $h$ continuas cerca de $(x_0, y_0)$ y $h(y_0) \\neq 0$.',
+                statement: 'Si $G(y)$ es una primitiva de $\\frac{1}{h(y)}$ y $F(x)$ es una primitiva de $f(x)$, toda solución en un entorno de $x_0$ satisface la relación implícita $G(y(x)) = F(x) + C$.',
+                proofSteps: [
+                  'Como $h(y_0) \\neq 0$ y $h$ es continua, en un entorno de $y_0$ tenemos $h(y) \\neq 0$, luego podemos dividir: $\\frac{1}{h(y(x))}\\frac{dy}{dx} = f(x)$.',
+                  'Reconociendo la derivada implícita por regla de la cadena, $\\frac{d}{dx}[G(y(x))] = G\'(y(x))\\,y\'(x) = \\frac{y\'(x)}{h(y(x))} = f(x) = F\'(x)$.',
+                  'Como ambas derivadas coinciden en el intervalo, por el teorema de la constante de integración se concluye $G(y(x)) = F(x) + C$, donde $C = G(y_0) - F(x_0)$. $\\blacksquare$'
+                ]
+              }
             ]
           },
           examples: [
@@ -1738,7 +2486,41 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
                   math: 'y(0) = C\\,e^{0} = 3 \\implies C = 3 \\implies y(x) = 3e^{x^2}',
                   reason: 'Sustituimos x = 0 e igualamos a 3 para obtener la solución particular.'
                 }
+              ],
+              graphPayload: { kind: 'derivative', expr: '3*exp(x^2)', tangentX: 0.5, showDerivative: true }
+            },
+            {
+              title: 'Ejemplo 2: Modelo de decaimiento exponencial radiactivo',
+              problem: 'Una muestra pierde masa proporcionalmente a la masa presente según $\\frac{dy}{dt} = -0.2y$, con $y(0) = 100\\text{ g}$. Halla $y(t)$ y la masa restante en $t = 5\\text{ h}$.',
+              steps: [
+                {
+                  title: 'Paso 1: Separar e integrar con y > 0',
+                  math: '\\frac{1}{y}\\,dy = -0.2\\,dt \\implies \\ln(y) = -0.2t + C_1 \\implies y(t) = y_0 e^{-0.2t} = 100 e^{-0.2t}',
+                  reason: 'Al evaluar en t = 0 obtenemos y(0) = C = 100 g.'
+                },
+                {
+                  title: 'Paso 2: Evaluar en t = 5 h',
+                  math: 'y(5) = 100 e^{-0.2(5)} = 100 e^{-1} = \\frac{100}{e} \\approx 36.79\\text{ g}',
+                  reason: 'Transcurridas 5 horas permanece aproximadamente un 36.79 % de la muestra.'
+                }
               ]
+            },
+            {
+              title: 'Ejemplo 3: EDO separable no lineal y solución explícita positiva',
+              problem: 'Resuelve $\\frac{dy}{dx} = \\frac{x}{y}$ ($y > 0$) con condición inicial $y(0) = 4$, y evalúa $y(3)$.',
+              steps: [
+                {
+                  title: 'Paso 1: Separar variables e integrar ambos lados',
+                  math: 'y\\,dy = x\\,dx \\implies \\frac{y^2}{2} = \\frac{x^2}{2} + C_1 \\implies y^2 = x^2 + C',
+                  reason: 'Multiplicamos toda la igualdad por 2 absorbiendo 2C₁ en una constante C.'
+                },
+                {
+                  title: 'Paso 2: Determinar C, despejar la rama positiva y evaluar y(3)',
+                  math: '4^2 = 0^2 + C \\implies C = 16 \\implies y(x) = \\sqrt{x^2 + 16} \\implies y(3) = \\sqrt{9 + 16} = \\sqrt{25} = 5',
+                  reason: 'Seleccionamos la raíz cuadrada positiva porque y(0) = 4 > 0.'
+                }
+              ],
+              graphPayload: { kind: 'function', expr: 'sqrt(x^2 + 16)', tangentX: 3 }
             }
           ],
           commonMistakes: [
@@ -1805,6 +2587,42 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
               ],
               reviewTip: 'Al integrar $y\\,dy = x\\,dx$ obtienes $y^2 = x^2 + 9$; evalúa en $x = 4$ y extrae la raíz cuadrada.',
               whyCorrect: '¡Impecable! Resolviste un problema de valor inicial no lineal separando $y\\,dy = x\\,dx$.'
+            },
+            {
+              id: 'calc-2-ex4',
+              level: 'intermedio',
+              statement: 'Una colonia celular sigue la EDO $M\'(t) = kM(t)$ con $M(0) = 100\\text{ mg}$ y constante $k = \\ln(2)\\text{ h}^{-1}$. Usando su solución $M(t) = 100\\,e^{kt}$, calcula cuántos miligramos habrá a las $t = 4$ horas.',
+              answer: '1600',
+              alternatives: ['1600'],
+              placeholder: 'Masa en mg...',
+              whyCorrect: 'Sustituyendo $k = \\ln(2)$ y $t = 4$: $M(4) = 100\\,e^{4\\ln 2} = 100 \\cdot (e^{\\ln 2})^4 = 100 \\cdot 2^4 = 1600\\text{ mg}$.',
+              reviewTip: 'Recuerda la identidad $e^{t \\ln(2)} = 2^t$.',
+              hints: [
+                'Escribe $M(4) = 100\\,e^{4 \\ln 2}$.',
+                'Aplica la propiedad $e^{4 \\ln 2} = (e^{\\ln 2})^4 = 2^4 = 16$.',
+                'Multiplica $100 \\times 16$.'
+              ],
+              solutionSteps: [
+                '$M(4) = 100\\,e^{4\\ln(2)} = 100 \\cdot 2^4 = 100 \\cdot 16 = 1600\\text{ mg}$.'
+              ]
+            },
+            {
+              id: 'calc-2-ex5',
+              level: 'avanzado',
+              statement: 'Un objeto se enfría siguiendo la solución de la ley de Newton $T(t) = 20 + 60 \\cdot 2^{-t/5}$ ($T$ en $^\\circ\\text{C}$ y $t$ en minutos). ¿Qué temperatura en $^\\circ\\text{C}$ marca el sensor tras $t = 10$ minutos?',
+              answer: '35',
+              alternatives: ['35'],
+              placeholder: 'Temperatura en °C...',
+              whyCorrect: 'En $t = 10$, el exponente es $-10/5 = -2$, por lo que $2^{-2} = \\frac{1}{4}$ y $T(10) = 20 + 60 \\cdot \\frac{1}{4} = 20 + 15 = 35^\\circ\\text{C}$.',
+              reviewTip: 'Evalúa primero la potencia negativa $2^{-2} = \\frac{1}{2^2} = \\frac{1}{4}$ antes de multiplicar por $60$.',
+              hints: [
+                'Sustituye $t = 10$ en el exponente: $-\\frac{10}{5} = -2$.',
+                'Convierte la potencia negativa: $2^{-2} = \\frac{1}{4}$.',
+                'Calcula $20 + 60 \\cdot \\frac{1}{4}$.'
+              ],
+              solutionSteps: [
+                '$T(10) = 20 + 60 \\cdot 2^{-10/5} = 20 + 60 \\cdot \\frac{1}{4} = 20 + 15 = 35^\\circ\\text{C}$.'
+              ]
             }
           ],
           quiz: [

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   MATEMÁTICA INTERACTIVA - Currículo Parte 1: Aritmética, Álgebra y Geometría
+   MATETIC - Currículo Parte 1: Aritmética, Álgebra y Geometría
    Incluye el bloque completo de Factorización y Racionalización orientado
    a preparar al estudiante para Límites y Cálculo Diferencial e Integral.
    Archivo: js/data/curriculum-part1.js
@@ -71,6 +71,19 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
                 expr: 'a^{-n} = \\frac{1}{a^n} \\quad ; \\quad \\sqrt[n]{a^m} = a^{\\frac{m}{n}} \\quad ; \\quad \\frac{1}{\\sqrt{x}} = x^{-\\frac{1}{2}}',
                 note: 'Si el índice n es par, se requiere a ≥ 0 para que la raíz exista en el conjunto de los números reales ℝ.'
               }
+            ],
+            theorems: [
+              {
+                badge: 'Propiedad Estructural',
+                title: 'Consistencia de los Exponentes Negativos y Racionales',
+                hypothesis: 'Sea $a > 0$ y sean $m \\in \\mathbb{Z},\\; n \\in \\mathbb{N}$.',
+                statement: 'Definir $a^{-n} = \\frac{1}{a^n}$ y $a^{m/n} = (\\sqrt[n]{a})^m$ es el único modo de preservar la ley aditiva $a^{p+q} = a^p a^q$ en $\\mathbb{Q}$.',
+                proofSteps: [
+                  'Exigiendo $a^0 \\cdot a^n = a^{0+n} = a^n$ y siendo $a^n \\neq 0$, resulta $a^0 = 1$.',
+                  'Exigiendo $a^{-n} \\cdot a^n = a^0 = 1$, se deduce necesariamente $a^{-n} = \\frac{1}{a^n}$.',
+                  'Finalmente, si $(a^{1/n})^n = a^{(1/n)\\cdot n} = a^1 = a$ con $a > 0$, la raíz $n$-ésima principal positiva $\\sqrt[n]{a}$ satisface dicha ecuación. $\\blacksquare$'
+                ]
+              }
             ]
           },
           interactiveGraph: {
@@ -130,6 +143,22 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
                   title: 'Sustituir y simplificar',
                   math: '9 + \\frac{1}{4} - 9 = \\frac{1}{4} = 0.25',
                   reason: '9 y -9 se cancelan, quedando exactamente 1/4.'
+                }
+              ]
+            },
+            {
+              title: 'Potencia negativa de una fracción y exponente negativo multiplicativo',
+              problem: 'Simplifica a fracción irreducible: $$\\left(\\frac{3}{4}\\right)^{-2} - \\sqrt{64} \\cdot 2^{-2}$$',
+              steps: [
+                {
+                  title: 'Invertir la base fraccionaria de exponente negativo y calcular √64',
+                  math: '\\left(\\frac{3}{4}\\right)^{-2} = \\left(\\frac{4}{3}\\right)^2 = \\frac{16}{9} \\quad ; \\quad \\sqrt{64} \\cdot 2^{-2} = 8 \\cdot \\frac{1}{4} = 2',
+                  reason: 'Aplicamos (a/b)^(-n) = (b/a)^n y 2⁻² = 1/4.'
+                },
+                {
+                  title: 'Efectuar la resta final con denominador común',
+                  math: '\\frac{16}{9} - 2 = \\frac{16 - 18}{9} = -\\frac{2}{9}',
+                  reason: 'Expresamos 2 = 18/9 para restar fracciones homogéneas.'
                 }
               ]
             }
@@ -214,6 +243,43 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
                 '$16^{1/2} = \\sqrt{16} = 4$ y $2^{-1} = \\frac{1}{2}$.',
                 'Suma total: $4 + 4 - \\frac{1}{2} + \\frac{1}{2} = 8$.'
               ]
+            },
+            {
+              id: 'arit-1-ex4',
+              level: 'intermedio',
+              statement: 'En un laboratorio, un cultivo inicia con $500$ bacterias y su población se duplica cada hora ($P(t) = 500 \\cdot 2^t$). Si tras $3$ horas se retiran exactamente $1200$ bacterias para análisis, ¿cuántas bacterias quedan en el cultivo?',
+              answer: '2800',
+              alternatives: ['2800'],
+              placeholder: 'Cantidad de bacterias...',
+              whyCorrect: 'Porque por jerarquía primero calculamos la potencia $2^3 = 8$, luego el producto $500 \\cdot 8 = 4000$ y finalmente restamos $4000 - 1200 = 2800$.',
+              reviewTip: 'Aplica el orden de operaciones: potencia antes de multiplicación y multiplicación antes de resta.',
+              hints: [
+                'Sustituye $t = 3$ en $500 \\cdot 2^3 - 1200$.',
+                'Evalúa la potencia $2^3 = 8$ antes de multiplicar por $500$.',
+                'Calcula $4000 - 1200$.'
+              ],
+              solutionSteps: [
+                'Población a las 3 horas: $500 \\cdot 2^3 = 500 \\cdot 8 = 4000$ bacterias.',
+                'Tras retirar $1200$: $4000 - 1200 = 2800$ bacterias.'
+              ]
+            },
+            {
+              id: 'arit-1-ex5',
+              level: 'avanzado',
+              statement: 'Un sensor sísmico registra una energía liberada $E = 2 \\cdot 10^6\\text{ J}$ y otro registra $E_0 = 5 \\cdot 10^3\\text{ J}$. Calcula el cociente numérico $\\frac{E}{E_0}$ usando las leyes de los exponentes.',
+              answer: '400',
+              alternatives: ['400', '4*10^2'],
+              placeholder: 'Valor del cociente...',
+              whyCorrect: 'Al dividir coeficientes $\\frac{2}{5} = 0.4$ y restar exponentes $10^{6-3} = 10^3 = 1000$, obtenemos $0.4 \\cdot 1000 = 400$.',
+              reviewTip: 'Recuerda la ley $\\frac{a^m}{a^n} = a^{m-n}$ y separa el cociente decimal de la potencia de $10$.',
+              hints: [
+                'Separa el cociente en $(\\frac{2}{5}) \\cdot \\frac{10^6}{10^3}$.',
+                'Usa la resta de exponentes: $10^{6-3} = 10^3 = 1000$.',
+                'Multiplica $0.4 \\times 1000$.'
+              ],
+              solutionSteps: [
+                '$\\frac{2 \\cdot 10^6}{5 \\cdot 10^3} = \\frac{2}{5} \\cdot 10^{6-3} = 0.4 \\cdot 1000 = 400$.'
+              ]
             }
           ],
           quiz: [
@@ -275,6 +341,19 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
                 expr: '\\frac{a}{b} \\pm \\frac{c}{d} = \\frac{ad \\pm bc}{bd} \\quad ; \\quad \\frac{a}{b} \\cdot \\frac{c}{d} = \\frac{ac}{bd} \\quad ; \\quad \\frac{a}{b} \\div \\frac{c}{d} = \\frac{ad}{bc}',
                 note: 'Condición: b ≠ 0 y d ≠ 0; en la división además se exige c ≠ 0.'
               }
+            ],
+            theorems: [
+              {
+                badge: 'Criterio en ℚ',
+                title: 'Equivalencia de Fracciones y Producto Cruzado',
+                hypothesis: 'Sean $a, b, c, d \\in \\mathbb{Z}$ con $b \\neq 0$ y $d \\neq 0$.',
+                statement: '$\\frac{a}{b} = \\frac{c}{d}$ si y solo si $a \\cdot d = b \\cdot c$.',
+                proofSteps: [
+                  'Multiplicamos ambos miembros de $\\frac{a}{b} = \\frac{c}{d}$ por $b \\cdot d \\neq 0$.',
+                  'Simplificando $b$ a la izquierda y $d$ a la derecha obtenemos $a d = b c$.',
+                  'Recíprocamente, si $a d = b c$, dividiendo entre $b d \\neq 0$ recuperamos $\\frac{a}{b} = \\frac{c}{d}$. $\\blacksquare$'
+                ]
+              }
             ]
           },
           interactiveGraph: {
@@ -304,6 +383,40 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
                   reason: 'Toda cantidad no nula dividida entre sí misma es igual a la unidad.'
                 }
               ]
+            },
+            {
+              title: 'Proporcionalidad inversa aplicada',
+              problem: 'Si $6$ técnicos tardan $10$ días en completar un montaje a ritmo constante, ¿cuántos días tardarán $4$ técnicos al mismo ritmo?',
+              steps: [
+                {
+                  title: 'Identificar la constante de proporcionalidad inversa k = x · y',
+                  math: 'k = 6 \\cdot 10 = 60\\text{ días-técnico}',
+                  reason: 'A menor número de técnicos, mayor tiempo requerido; el producto total de trabajo se mantiene constante.'
+                },
+                {
+                  title: 'Despejar el tiempo para 4 técnicos',
+                  math: '4 \\cdot d = 60 \\implies d = \\frac{60}{4} = 15\\text{ días}',
+                  reason: 'Dividimos la carga constante entre los 4 técnicos.'
+                }
+              ],
+              graphPayload: { kind: 'function', expr: '60/x', tangentX: 4 }
+            },
+            {
+              title: 'Regla de tres compuesta: análisis de razones directas e inversas',
+              problem: 'En un laboratorio, $5$ impresoras 3D producen $150$ piezas en $6$ horas. ¿Cuántas horas requerirán $3$ impresoras del mismo tipo para producir $180$ piezas?',
+              steps: [
+                {
+                  title: 'Determinar la tasa unitaria de producción por impresora y hora',
+                  math: 'r = \\frac{150}{5 \\cdot 6} = \\frac{150}{30} = 5\\;\\frac{\\text{piezas}}{\\text{impresora}\\cdot\\text{hora}}',
+                  reason: 'La cantidad de piezas crece de forma directamente proporcional tanto al número de impresoras como al tiempo.'
+                },
+                {
+                  title: 'Plantear la ecuación de variación conjunta P = r · n · t y despejar t',
+                  math: '180 = 5 \\cdot 3 \\cdot t \\implies 15t = 180 \\implies t = \\frac{180}{15} = 12\\text{ horas}',
+                  reason: 'Comprobamos con razones equivalentes: menos impresoras (3/5) invierten el tiempo y más piezas (180/150) lo aumentan: t = 6 · (5/3) · (180/150) = 12 h.'
+                }
+              ],
+              graphPayload: { kind: 'function', expr: '180/(5*x)', tangentX: 3 }
             }
           ],
           commonMistakes: [
@@ -372,6 +485,44 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
                 'Numerador: $\\frac{2}{3} + \\frac{1}{2} = \\frac{7}{6}$.',
                 'Denominador: $\\frac{5}{6} - \\frac{1}{3} = \\frac{3}{6} = \\frac{1}{2}$.',
                 'Cociente: $\\frac{7/6}{1/2} = \\frac{7}{6} \\cdot \\frac{2}{1} = \\frac{7}{3}$.'
+              ]
+            },
+            {
+              id: 'arit-2-ex4',
+              level: 'basico',
+              statement: 'Un carpintero tiene tres listones de madera que miden $48\\text{ cm}$, $72\\text{ cm}$ y $120\\text{ cm}$. Quiere cortarlos en tramos iguales de la mayor longitud posible sin que sobre madera. ¿Cuántos centímetros medirá cada tramo?',
+              answer: '24',
+              alternatives: ['24'],
+              placeholder: 'Longitud en cm...',
+              whyCorrect: 'El máximo común divisor de $48$, $72$ y $120$ es $\\operatorname{MCD}(48, 72, 120) = 2^3 \\cdot 3 = 24\\text{ cm}$.',
+              reviewTip: 'Para repartir en trozos máximos exactos sin residuo siempre se busca el Máximo Común Divisor (MCD).',
+              hints: [
+                'Descompón $48 = 2^4 \\cdot 3$, $72 = 2^3 \\cdot 3^2$ y $120 = 2^3 \\cdot 3 \\cdot 5$.',
+                'Toma los factores primos comunes con el menor exponente.',
+                'Multiplica $2^3 \\cdot 3$.'
+              ],
+              solutionSteps: [
+                'Factorización prima: $48 = 2^4 \\cdot 3$, $72 = 2^3 \\cdot 3^2$, $120 = 2^3 \\cdot 3 \\cdot 5$.',
+                'Factores comunes de menor potencia: $\\operatorname{MCD} = 2^3 \\cdot 3 = 8 \\cdot 3 = 24\\text{ cm}$.'
+              ]
+            },
+            {
+              id: 'arit-2-ex5',
+              level: 'intermedio',
+              statement: 'En un taller eléctrico, tres bombas se activan juntas a las 8:00 a.m. Trabajan en ciclos periódicos de $12$, $15$ y $20$ minutos respectivamente. ¿Cuántos minutos deben pasar para que vuelvan a coincidir encendiéndose al mismo tiempo?',
+              answer: '60',
+              alternatives: ['60'],
+              placeholder: 'Minutos hasta coincidir...',
+              whyCorrect: 'La primera coincidencia futura corresponde al mínimo común múltiplo: $\\operatorname{MCM}(12, 15, 20) = 2^2 \\cdot 3 \\cdot 5 = 60$ minutos.',
+              reviewTip: 'Cuando varios eventos periódicos coinciden en el tiempo, calcula el Mínimo Común Múltiplo (MCM).',
+              hints: [
+                'Factoriza $12 = 2^2 \\cdot 3$, $15 = 3 \\cdot 5$ y $20 = 2^2 \\cdot 5$.',
+                'Incluye todos los factores primos con su mayor exponente.',
+                'Multiplica $2^2 \\cdot 3 \\cdot 5$.'
+              ],
+              solutionSteps: [
+                'Descomposición: $12 = 2^2 \\cdot 3$, $15 = 3 \\cdot 5$, $20 = 2^2 \\cdot 5$.',
+                '$\\operatorname{MCM}(12, 15, 20) = 2^2 \\cdot 3 \\cdot 5 = 4 \\cdot 15 = 60$ minutos.'
               ]
             }
           ],
@@ -453,6 +604,19 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
                 expr: 'a^3 - b^3 = (a - b)(a^2 + ab + b^2) \\quad ; \\quad a^3 + b^3 = (a + b)(a^2 - ab + b^2)',
                 note: 'El factor cuadrático (a² ± ab + b²) nunca lleva el número 2 en el término central y es irreducible en ℝ.'
               }
+            ],
+            theorems: [
+              {
+                badge: 'Teorema del Factor (Álgebra Polinomial)',
+                title: 'Relación entre Raíces de un Polinomio y Factores Lineales',
+                hypothesis: 'Sea $P(x)$ un polinomio de grado $n \\ge 1$ con coeficientes reales y sea $a \\in \\mathbb{R}$.',
+                statement: 'El binomio $(x - a)$ es un factor de $P(x)$ si y solo si $P(a) = 0$.',
+                proofSteps: [
+                  'Por el algoritmo de la división de polinomios entre el divisor lineal $(x - a)$, existen un cociente $Q(x)$ y un residuo constante $r \\in \\mathbb{R}$ únicos tales que $P(x) = (x - a)Q(x) + r$.',
+                  'Evaluando ambos lados en $x = a$ se anula $(a - a)Q(a) = 0$, resultando el Teorema del Residuo: $P(a) = r$.',
+                  'Por tanto $(x - a)$ divide exactamente a $P(x)$ ($r = 0$) si y solo si $P(a) = 0$. Esto fundamenta por qué las formas $\\frac{0}{0}$ en límites racionales siempre comparten el factor $(x - a)$. $\\blacksquare$'
+                ]
+              }
             ]
           },
           interactiveGraph: {
@@ -487,7 +651,8 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
                   math: '3x(2x + 3) - 1(2x + 3) = (2x + 3)(3x - 1)',
                   reason: 'Extraemos el factor común binomio (2x + 3) de ambos grupos.'
                 }
-              ]
+              ],
+              graphPayload: { kind: 'function', expr: '6*x^2 + 7*x - 3', tangentX: 0.3333 }
             },
             {
               title: 'Factorización de diferencia de cubos aplicada a una simplificación para límites',
@@ -507,6 +672,23 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
                   title: 'Cancelar el factor común (x - 2)',
                   math: '\\frac{(x - 2)(x^2 + 2x + 4)}{(x - 2)(x + 2)} = \\frac{x^2 + 2x + 4}{x + 2}',
                   reason: 'Esta simplificación elimina la indeterminación 0/0 cuando x tiende a 2.'
+                }
+              ],
+              graphPayload: { kind: 'limit', expr: '(x^3 - 8)/(x^2 - 4)', tangentX: 2 }
+            },
+            {
+              title: 'Factorización completa iterada de un polinomio de grado 4',
+              problem: 'Factoriza al máximo en factores irreducibles reales el polinomio $$P(x) = x^4 - 16$$ y verifica todas sus raíces reales.',
+              steps: [
+                {
+                  title: 'Aplicar diferencia de cuadrados sobre (x²)² - 4²',
+                  math: 'x^4 - 16 = (x^2 - 4)(x^2 + 4)',
+                  reason: 'El primer factor aún admite otra diferencia de cuadrados; el segundo es suma de cuadrados irreducible en ℝ.'
+                },
+                {
+                  title: 'Volver a factorizar (x² - 4) y comprobar raíces',
+                  math: 'P(x) = (x - 2)(x + 2)(x^2 + 4) \\implies \\text{Raíces reales: } x = 2 \\text{ y } x = -2',
+                  reason: 'Como x² + 4 ≥ 4 > 0 nunca se anula en ℝ, la factorización real es completa.'
                 }
               ]
             }
@@ -584,6 +766,44 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
                 'Diferencia de cubos: $x^3 - 27 = (x - 3)(x^2 + 3x + 9)$.',
                 'Cancelación: $\\frac{(x - 3)(x^2 + 3x + 9)}{x - 3} = x^2 + 3x + 9$.'
               ]
+            },
+            {
+              id: 'alg-1-ex4',
+              level: 'intermedio',
+              statement: 'El área rectangular de una plaza cívica está modelada por $A(x) = x^2 - 9$, mientras que su ancho mide $(x - 3)$ metros (con $x > 3$). Factoriza el área y escribe la expresión simplificada de su largo.',
+              answer: 'x + 3',
+              alternatives: ['x+3', '3+x'],
+              placeholder: 'Expresión del largo (ej: x+3)...',
+              whyCorrect: 'Por diferencia de cuadrados $x^2 - 9 = (x - 3)(x + 3)$. Al dividir entre el ancho $(x - 3)$ se obtiene $x + 3$.',
+              reviewTip: 'Identifica la diferencia de cuadrados $a^2 - b^2 = (a - b)(a + b)$.',
+              hints: [
+                'El largo se obtiene dividiendo el área entre el ancho: $\\frac{x^2 - 9}{x - 3}$.',
+                'Factoriza $x^2 - 9 = (x - 3)(x + 3)$.',
+                'Cancela el factor común $(x - 3)$.'
+              ],
+              solutionSteps: [
+                'Factorización: $x^2 - 3^2 = (x - 3)(x + 3)$.',
+                'Largo: $\\frac{(x - 3)(x + 3)}{x - 3} = x + 3$.'
+              ]
+            },
+            {
+              id: 'alg-1-ex5',
+              level: 'avanzado',
+              statement: 'En el diseño de un canal de flujo continuo, el perfil geométrico depende de $\\frac{x^3 - 8}{x - 2}$ para $x \\neq 2$. Factoriza la diferencia de cubos y escribe el polinomio cuadrático resultante.',
+              answer: 'x^2 + 2x + 4',
+              alternatives: ['x^2+2x+4', 'x^2 + 2*x + 4'],
+              placeholder: 'Polinomio simplificado...',
+              whyCorrect: 'Con $a^3 - b^3 = (a - b)(a^2 + ab + b^2)$ y $b = 2$, $x^3 - 8 = (x - 2)(x^2 + 2x + 4)$, simplificando a $x^2 + 2x + 4$.',
+              reviewTip: 'La fórmula de diferencia de cubos lleva signo positivo en los tres términos del factor cuadrático.',
+              hints: [
+                'Reescribe $8 = 2^3$ para aplicar $a^3 - b^3 = (a - b)(a^2 + ab + b^2)$.',
+                'Con $a = x$ y $b = 2$, obtienes $(x - 2)(x^2 + 2x + 4)$.',
+                'Cancela $(x - 2)$ con el denominador.'
+              ],
+              solutionSteps: [
+                '$x^3 - 8 = (x - 2)(x^2 + 2x + 4)$.',
+                'Al dividir entre $(x - 2)$ resulta $x^2 + 2x + 4$.'
+              ]
             }
           ],
           quiz: [
@@ -652,6 +872,18 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
                 expr: '(\\sqrt{A} - \\sqrt{B})(\\sqrt{A} + \\sqrt{B}) = A - B \\quad ; \\quad (\\sqrt{A} - b)(\\sqrt{A} + b) = A - b^2',
                 note: 'Restricción: Los radicandos A y B deben ser no negativos (A ≥ 0, B ≥ 0).'
               }
+            ],
+            theorems: [
+              {
+                badge: 'Identidad de Racionalización',
+                title: 'Eliminación de Radicales Cuadráticos mediante Conjugado',
+                hypothesis: 'Sean $A, B \\ge 0$ con $A \\neq B$ (de modo que $\\sqrt{A} \\pm \\sqrt{B} \\neq 0$).',
+                statement: 'Se verifica $\\frac{1}{\\sqrt{A} - \\sqrt{B}} = \\frac{\\sqrt{A} + \\sqrt{B}}{A - B}$.',
+                proofSteps: [
+                  'Como $A \\ge 0$ y $B \\ge 0$, tanto $\\sqrt{A}$ como $\\sqrt{B}$ existen en $\\mathbb{R}$ y $(\\sqrt{A})^2 = A$, $(\\sqrt{B})^2 = B$.',
+                  'Si $A \\neq B$, ambos factores $\\sqrt{A}-\\sqrt{B}$ y $\\sqrt{A}+\\sqrt{B}$ son no nulos, y multiplicando numerador y denominador por el segundo factor aplicamos diferencia de cuadrados: $(\\sqrt{A}-\\sqrt{B})(\\sqrt{A}+\\sqrt{B}) = A - B$. $\\blacksquare$'
+                ]
+              }
             ]
           },
           interactiveGraph: {
@@ -702,7 +934,25 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
                   math: '\\frac{x + 9 - 9}{x(\\sqrt{x + 9} + 3)} = \\frac{x}{x(\\sqrt{x + 9} + 3)} = \\frac{1}{\\sqrt{x + 9} + 3}',
                   reason: 'La nueva expresión ya no se indetermina cuando x = 0 (vale 1/(3+3) = 1/6).'
                 }
-              ]
+              ],
+              graphPayload: { kind: 'limit', expr: '(sqrt(x + 9) - 3)/x', tangentX: 0 }
+            },
+            {
+              title: 'Racionalización de diferencia de dos raíces cuadradas',
+              problem: 'Racionaliza el numerador y simplifica para $x \\ge \\frac{1}{3},\\; x \\neq 1$: $$\\frac{\\sqrt{x + 1} - \\sqrt{3x - 1}}{x - 1}$$',
+              steps: [
+                {
+                  title: 'Multiplicar por el conjugado (√(x+1) + √(3x-1))',
+                  math: '\\frac{(\\sqrt{x+1})^2 - (\\sqrt{3x-1})^2}{(x - 1)(\\sqrt{x+1} + \\sqrt{3x-1})} = \\frac{(x + 1) - (3x - 1)}{(x - 1)(\\sqrt{x+1} + \\sqrt{3x-1})}',
+                  reason: 'Restamos el segundo radicando completo entre paréntesis para no errar el signo.'
+                },
+                {
+                  title: 'Factorizar -2 en el numerador y simplificar (x - 1)',
+                  math: '\\frac{-2x + 2}{(x - 1)(\\sqrt{x+1} + \\sqrt{3x-1})} = \\frac{-2(x - 1)}{(x - 1)(\\sqrt{x+1} + \\sqrt{3x-1})} = \\frac{-2}{\\sqrt{x + 1} + \\sqrt{3x - 1}}',
+                  reason: 'Cuando x tiende a 1, la fracción simplificada tiende a -2 / (2√2) = -1/√2 ≈ -0.7071.'
+                }
+              ],
+              graphPayload: { kind: 'limit', expr: '(sqrt(x + 1) - sqrt(3*x - 1))/(x - 1)', tangentX: 1 }
             }
           ],
           commonMistakes: [
@@ -775,6 +1025,44 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
                 '$\\frac{(\\sqrt{x + 4} - 2)(\\sqrt{x + 4} + 2)}{x(\\sqrt{x + 4} + 2)} = \\frac{x + 4 - 4}{x(\\sqrt{x + 4} + 2)}$.',
                 'Simplificando $x$: $\\frac{1}{\\sqrt{x + 4} + 2}$.'
               ]
+            },
+            {
+              id: 'alg-2-ex4',
+              level: 'intermedio',
+              statement: 'Para calibrar el alcance neto de un láser sin división entre cero, se racionaliza la expresión $\\frac{x - 9}{\\sqrt{x} - 3}$ y luego se evalúa en $x = 9$. ¿Qué valor numérico exacto resulta?',
+              answer: '6',
+              alternatives: ['6'],
+              placeholder: 'Valor evaluado...',
+              whyCorrect: 'Multiplicando por el conjugado $\\sqrt{x} + 3$ se obtiene $\\frac{(x - 9)(\\sqrt{x} + 3)}{x - 9} = \\sqrt{x} + 3$, que en $x = 9$ vale $\\sqrt{9} + 3 = 6$.',
+              reviewTip: 'Usa $(a - b)(a + b) = a^2 - b^2$ para eliminar el radical del denominador.',
+              hints: [
+                'Multiplica numerador y denominador por el conjugado $\\sqrt{x} + 3$.',
+                'El denominador se transforma en $(\\sqrt{x})^2 - 3^2 = x - 9$.',
+                'Cancela $(x - 9)$ y sustituye $x = 9$ en $\\sqrt{x} + 3$.'
+              ],
+              solutionSteps: [
+                '$\\frac{(x - 9)(\\sqrt{x} + 3)}{(\\sqrt{x} - 3)(\\sqrt{x} + 3)} = \\frac{(x - 9)(\\sqrt{x} + 3)}{x - 9} = \\sqrt{x} + 3$.',
+                'Evaluando en $x = 9$: $\\sqrt{9} + 3 = 3 + 3 = 6$.'
+              ]
+            },
+            {
+              id: 'alg-2-ex5',
+              level: 'avanzado',
+              statement: 'Al analizar una caída de presión cerca de $h = 0$ aparece la razón $\\frac{\\sqrt{4 + h} - 2}{h}$. Racionaliza el numerador con su conjugado y evalúa la expresión equivalente en $h = 0$.',
+              answer: '1/4',
+              alternatives: ['1/4', '0.25', '\\frac{1}{4}'],
+              placeholder: 'Fracción simplificada (ej: 1/4)...',
+              whyCorrect: 'Multiplicando por $\\sqrt{4+h}+2$, el numerador queda $(4+h)-4 = h$, que cancela la $h$ del denominador dejando $\\frac{1}{\\sqrt{4+h}+2}$; en $h = 0$ da $\\frac{1}{4}$.',
+              reviewTip: 'Racionalizar el numerador sirve para cancelar la indeterminación $\\frac{h}{h}$ típica de derivadas por definición.',
+              hints: [
+                'Multiplica arriba y abajo por $(\\sqrt{4 + h} + 2)$.',
+                'En el numerador obtienes $(4 + h) - 4 = h$.',
+                'Cancela $h$ y evalúa $\\frac{1}{\\sqrt{4+0} + 2}$.'
+              ],
+              solutionSteps: [
+                '$\\frac{(\\sqrt{4+h}-2)(\\sqrt{4+h}+2)}{h(\\sqrt{4+h}+2)} = \\frac{h}{h(\\sqrt{4+h}+2)} = \\frac{1}{\\sqrt{4+h}+2}$.',
+                'Con $h = 0$: $\\frac{1}{\\sqrt{4} + 2} = \\frac{1}{4}$.'
+              ]
             }
           ],
           quiz: [
@@ -832,6 +1120,20 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
                 expr: 'x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a} \\quad ; \\quad x_1 + x_2 = -\\frac{b}{a}, \\quad x_1 \\cdot x_2 = \\frac{c}{a}',
                 note: 'Condición indispensable: el coeficiente cuadrático debe cumplir a ≠ 0 y la ecuación debe estar igualada a 0.'
               }
+            ],
+            theorems: [
+              {
+                badge: 'Teorema de Resolución Cuadrática',
+                title: 'Deducción de la Fórmula General por Completación de Cuadrados',
+                hypothesis: 'Sea $a x^2 + b x + c = 0$ con coeficientes reales $a, b, c \\in \\mathbb{R}$ y $a \\neq 0$.',
+                statement: 'Si $\\Delta = b^2 - 4ac \\ge 0$, las soluciones reales exactas son $x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$; si $\\Delta < 0$, no existen soluciones en $\\mathbb{R}$.',
+                proofSteps: [
+                  'Como $a \\neq 0$, dividimos toda la ecuación entre $a$ y pasamos $\\frac{c}{a}$ al lado derecho: $x^2 + \\frac{b}{a}x = -\\frac{c}{a}$.',
+                  'Sumamos $\\left(\\frac{b}{2a}\\right)^2 = \\frac{b^2}{4a^2}$ en ambos miembros para completar un trinomio cuadrado perfecto: $\\left(x + \\frac{b}{2a}\\right)^2 = \\frac{b^2 - 4ac}{4a^2}$.',
+                  'Si $\\Delta = b^2 - 4ac < 0$, el lado derecho es negativo y ningún cuadrado real puede igualarlo. Si $\\Delta \\ge 0$, tomamos raíz cuadrada (recordando $\\sqrt{4a^2} = 2|a|$ absorbibles en $\\pm$): $x + \\frac{b}{2a} = \\pm\\frac{\\sqrt{b^2 - 4ac}}{2a}$.',
+                  'Despejando $x$ se obtiene $x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$. $\\blacksquare$'
+                ]
+              }
             ]
           },
           interactiveGraph: {
@@ -861,7 +1163,41 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
                   math: 'x = \\frac{7 \\pm 5}{4} \\Rightarrow x_1 = \\frac{12}{4} = 3, \\quad x_2 = \\frac{2}{4} = \\frac{1}{2}',
                   reason: 'Nota que -b = -(-7) = +7.'
                 }
+              ],
+              graphPayload: { kind: 'function', expr: '2*x^2 - 7*x + 3', tangentX: 3 }
+            },
+            {
+              title: 'Sistema lineal 2×2 resuelto por método de reducción',
+              problem: 'Resuelve el sistema de ecuaciones: $$\\begin{cases} 3x + 2y = 16 \\\\ 2x - y = 6 \\end{cases}$$',
+              steps: [
+                {
+                  title: 'Multiplicar la segunda ecuación por 2 para igualar el coeficiente de y',
+                  math: '4x - 2y = 12',
+                  reason: 'Al sumar +2y y -2y se cancelará la variable y.'
+                },
+                {
+                  title: 'Sumar ambas ecuaciones y despejar x e y',
+                  math: '(3x + 2y) + (4x - 2y) = 16 + 12 \\implies 7x = 28 \\implies x = 4 \\quad ; \\quad y = 2(4) - 6 = 2',
+                  reason: 'Verificamos en la primera ecuación: 3(4) + 2(2) = 12 + 4 = 16.'
+                }
               ]
+            },
+            {
+              title: 'Ecuación cuadrática con raíz doble (Δ = 0)',
+              problem: 'Resuelve $9x^2 - 12x + 4 = 0$ e interpreta geométricamente el discriminante.',
+              steps: [
+                {
+                  title: 'Evaluar el discriminante Δ = b² - 4ac',
+                  math: '\\Delta = (-12)^2 - 4(9)(4) = 144 - 144 = 0',
+                  reason: 'Cuando Δ = 0, el trinomio es un cuadrado perfecto y tiene una única raíz real de multiplicidad 2.'
+                },
+                {
+                  title: 'Factorizar como binomio al cuadrado',
+                  math: '(3x - 2)^2 = 0 \\implies x = \\frac{2}{3}',
+                  reason: 'La parábola y = 9x² - 12x + 4 es tangente al eje X exactamente en x = 2/3.'
+                }
+              ],
+              graphPayload: { kind: 'derivative', expr: '9*x^2 - 12*x + 4', tangentX: 0.6667, showDerivative: true }
             }
           ],
           commonMistakes: [
@@ -928,6 +1264,45 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
               solutionSteps: [
                 'Método de reducción: $(2x + y) + (3x - y) = 11 + 9 \\Rightarrow 5x = 20 \\Rightarrow x = 4$.',
                 'Sustitución: $2(4) + y = 11 \\Rightarrow y = 3$. Solución: $(4, 3)$.'
+              ]
+            },
+            {
+              id: 'alg-3-ex4',
+              level: 'basico',
+              statement: 'Un boleto de tren rápido más un pase de equipaje cuesta $420$ pesos en total. Si el boleto cuesta $180$ pesos más que el pase de equipaje, ¿cuál es el precio del boleto en pesos?',
+              answer: '300',
+              alternatives: ['300'],
+              placeholder: 'Precio en pesos...',
+              whyCorrect: 'Del sistema $b + e = 420$ y $b - e = 180$, al sumar ambas ecuaciones resulta $2b = 600$, de donde $b = 300$ pesos (y el pase $120$ pesos).',
+              reviewTip: 'Traduce cada condición del enunciado a una ecuación con dos incógnitas y suma las ecuaciones para eliminar $e$.',
+              hints: [
+                'Llama $b$ al boleto y $e$ al equipaje: $b + e = 420$ y $b - e = 180$.',
+                'Suma ambas ecuaciones término a término: $(b + b) + (e - e) = 420 + 180$.',
+                'Divide $600$ entre $2$.'
+              ],
+              solutionSteps: [
+                'Sistema: $b + e = 420$ y $b - e = 180$.',
+                'Sumando: $2b = 600 \\Rightarrow b = 300$ pesos.'
+              ]
+            },
+            {
+              id: 'alg-3-ex5',
+              level: 'avanzado',
+              statement: 'Un dron agrícola delimita un terreno rectangular cuyo perímetro es $34\\text{ m}$ y cuya área es $60\\text{ m}^2$. Calcula la longitud en metros del lado más largo del terreno.',
+              answer: '12',
+              alternatives: ['12'],
+              placeholder: 'Lado mayor en metros...',
+              whyCorrect: 'Si el semiperímetro es $L + A = 17$ y $LA = 60$, los lados cumplen $t^2 - 17t + 60 = (t - 12)(t - 5) = 0$; el lado mayor mide $12\\text{ m}$.',
+              reviewTip: 'De $2L + 2A = P$ despeja $A = \\frac{P}{2} - L$ y sustituye en el área para formar una cuadrática.',
+              hints: [
+                'Divide el perímetro entre $2$: $L + A = 17$, así que $A = 17 - L$.',
+                'Sustituye en el área: $L(17 - L) = 60 \\Rightarrow L^2 - 17L + 60 = 0$.',
+                'Busca dos números que sumen $17$ y multipliquen $60$.'
+              ],
+              solutionSteps: [
+                'De $2(L + A) = 34$ tenemos $A = 17 - L$.',
+                'Área: $L(17 - L) = 60 \\Rightarrow L^2 - 17L + 60 = 0 \\Rightarrow (L - 12)(L - 5) = 0$.',
+                'Los lados miden $12\\text{ m}$ y $5\\text{ m}$; el lado más largo es $12$.'
               ]
             }
           ],
@@ -997,6 +1372,20 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
                 expr: 'a^2 + b^2 = c^2 \\quad ; \\quad A_{\\circ} = \\pi r^2, \\quad P_{\\circ} = 2\\pi r \\quad ; \\quad V_{\\text{cil}} = \\pi r^2 h',
                 note: 'Todas las longitudes (a, b, c, r, h) representan magnitudes positivas (> 0).'
               }
+            ],
+            theorems: [
+              {
+                badge: 'Teorema Geométrico',
+                title: 'Demostración Algebraica del Teorema de Pitágoras',
+                hypothesis: 'Considérese un triángulo rectángulo en el plano euclidiano con catetos $a, b > 0$ e hipotenusa $c > 0$.',
+                statement: 'Siempre se cumple $a^2 + b^2 = c^2$.',
+                proofSteps: [
+                  'Colocamos cuatro copias congruentes de dicho triángulo en las esquinas de un cuadrado exterior de lado $a + b$, de modo que los catetos $a$ y $b$ formen los cuatro bordes.',
+                  'En el centro queda un cuadrilátero de lado $c$ cuyos ángulos interiores miden $180^\\circ - (\\alpha + \\beta) = 180^\\circ - 90^\\circ = 90^\\circ$, es decir, un cuadrado de área $c^2$.',
+                  'Igualando el área total del cuadrado grande a la suma de sus cinco piezas: $(a + b)^2 = c^2 + 4\\left(\\frac{ab}{2}\\right)$.',
+                  'Desarrollando: $a^2 + 2ab + b^2 = c^2 + 2ab \\implies a^2 + b^2 = c^2$. $\\blacksquare$'
+                ]
+              }
             ]
           },
           interactiveGraph: {
@@ -1026,6 +1415,39 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
                   reason: 'Multiplicamos la base por la altura y dividimos entre 2.'
                 }
               ]
+            },
+            {
+              title: 'Volumen y área superficial de una esfera y un cilindro',
+              problem: 'Calcula el volumen exacto de una esfera de radio $r = 3\\text{ cm}$ y compáralo con el volumen de un cilindro de igual radio $r = 3\\text{ cm}$ y altura $h = 4\\text{ cm}$.',
+              steps: [
+                {
+                  title: 'Calcular el volumen de la esfera con V = (4/3)π r³',
+                  math: 'V_{\\text{esf}} = \\frac{4}{3}\\pi(3)^3 = \\frac{4}{3}\\pi(27) = 36\\pi\\text{ cm}^3 \\approx 113.10\\text{ cm}^3',
+                  reason: 'Sustituimos r = 3 y simplificamos 27/3 = 9.'
+                },
+                {
+                  title: 'Calcular el volumen del cilindro con V = π r² h',
+                  math: 'V_{\\text{cil}} = \\pi(3)^2(4) = 36\\pi\\text{ cm}^3 \\approx 113.10\\text{ cm}^3',
+                  reason: 'Ambos sólidos tienen exactamente el mismo volumen de 36π cm³.'
+                }
+              ]
+            },
+            {
+              title: 'Área exacta mediante la fórmula de Herón y altura perpendicular',
+              problem: 'Un triángulo escaleno tiene lados $a = 13\\text{ cm}$, $b = 14\\text{ cm}$ y $c = 15\\text{ cm}$. Calcula su área mediante Herón y la altura relativa al lado $b$.',
+              steps: [
+                {
+                  title: 'Obtener el semiperímetro s y aplicar Herón',
+                  math: 's = \\frac{13 + 14 + 15}{2} = 21 \\implies A = \\sqrt{21(21-13)(21-14)(21-15)} = \\sqrt{21 \\cdot 8 \\cdot 7 \\cdot 6}',
+                  reason: 'Agrupamos factores primos: 21·8·7·6 = (3·7)·2³·7·(2·3) = 2⁴·3²·7².'
+                },
+                {
+                  title: 'Extraer raíces exactas y despejar la altura h_b',
+                  math: 'A = 2^2 \\cdot 3 \\cdot 7 = 84\\text{ cm}^2 \\quad ; \\quad h_b = \\frac{2A}{b} = \\frac{168}{14} = 12\\text{ cm}',
+                  reason: 'Esta altura divide la base 14 en dos segmentos 5 y 9, formando las ternas pitagóricas 5-12-13 y 9-12-15.'
+                }
+              ],
+              graphPayload: { kind: 'function', expr: 'sqrt(25 - x^2)', tangentX: 3 }
             }
           ],
           commonMistakes: [
@@ -1093,6 +1515,43 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
                 'Altura por Pitágoras: $h = \\sqrt{4^2 - 2^2} = \\sqrt{12} = 2\\sqrt{3}\\text{ cm}$.',
                 'Área: $A = \\frac{4 \\cdot 2\\sqrt{3}}{2} = 4\\sqrt{3}\\text{ cm}^2$.'
               ]
+            },
+            {
+              id: 'geo-1-ex4',
+              level: 'intermedio',
+              statement: 'Una rampa recta de acceso mide $10\\text{ m}$ de longitud inclinada y alcanza una plataforma a $6\\text{ m}$ de altura vertical. ¿Cuántos metros mide su proyección horizontal sobre el suelo?',
+              answer: '8',
+              alternatives: ['8'],
+              placeholder: 'Distancia horizontal en m...',
+              whyCorrect: 'Por el Teorema de Pitágoras con hipotenusa $c = 10$ y cateto vertical $b = 6$: $a = \\sqrt{10^2 - 6^2} = \\sqrt{64} = 8\\text{ m}$.',
+              reviewTip: 'La longitud inclinada de la rampa es siempre la hipotenusa del triángulo rectángulo.',
+              hints: [
+                'Identifica la hipotenusa $c = 10\\text{ m}$ y el cateto conocido $b = 6\\text{ m}$.',
+                'Despeja el cateto horizontal: $a^2 = 10^2 - 6^2 = 100 - 36$.',
+                'Saca raíz cuadrada de $64$.'
+              ],
+              solutionSteps: [
+                'Teorema de Pitágoras: $a^2 + 6^2 = 10^2$.',
+                '$a = \\sqrt{100 - 36} = \\sqrt{64} = 8\\text{ m}$.'
+              ]
+            },
+            {
+              id: 'geo-1-ex5',
+              level: 'avanzado',
+              statement: 'Un tanque cilíndrico para almacenar agua destilada tiene radio $r = 3\\text{ m}$ y altura $h = 5\\text{ m}$. Calcula su volumen exacto en $\\text{m}^3$ dejando la respuesta en términos de $\\pi$ (ej. `15*pi` o `15pi`).',
+              answer: '45*pi',
+              alternatives: ['45pi', '45*pi', '45\\pi'],
+              placeholder: 'Volumen exacto (ej: 45pi)...',
+              whyCorrect: 'El volumen del cilindro es $V = \\pi r^2 h = \\pi (3)^2 (5) = 9 \\cdot 5\\pi = 45\\pi\\text{ m}^3$.',
+              reviewTip: 'Aplica $V = \\pi r^2 h$ multiplicando el radio al cuadrado por la altura.',
+              hints: [
+                'Usa la fórmula del volumen del cilindro: $V = \\pi r^2 h$.',
+                'Eleva primero el radio al cuadrado: $r^2 = 3^2 = 9$.',
+                'Multiplica $9 \\times 5$ manteniendo $\\pi$ simbólico.'
+              ],
+              solutionSteps: [
+                '$V = \\pi r^2 h = \\pi (3)^2 (5) = 45\\pi\\text{ m}^3$.'
+              ]
             }
           ],
           quiz: [
@@ -1139,6 +1598,20 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
                 expr: 'd = \\sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2} \\quad ; \\quad m = \\frac{y_2 - y_1}{x_2 - x_1} \\quad ; \\quad y - y_0 = m(x - x_0)',
                 note: 'Si x₂ = x₁, la recta es vertical (x = x₁) y su pendiente no está definida en ℝ.'
               }
+            ],
+            theorems: [
+              {
+                badge: 'Teorema de Ortogonalidad',
+                title: 'Condición de Perpendicularidad entre Rectas No Verticales',
+                hypothesis: 'Sean dos rectas no verticales y no horizontales con pendientes $m_1 \\neq 0$ y $m_2 \\neq 0$ en el plano cartesiano.',
+                statement: 'Ambas rectas son perpendiculares ($90^\\circ$) si y solo si $m_1 \\cdot m_2 = -1$, es decir, $m_2 = -\\frac{1}{m_1}$.',
+                proofSteps: [
+                  'Trasladando el punto de intersección al origen sin alterar pendientes, tomamos $P(1, m_1)$ sobre la primera recta y $Q(1, m_2)$ sobre la segunda.',
+                  'Por el Teorema de Pitágoras y su recíproco, el triángulo $POQ$ es rectángulo en el origen $O(0,0)$ si y solo si $OP^2 + OQ^2 = PQ^2$.',
+                  'Calculando distancias: $(1 + m_1^2) + (1 + m_2^2) = (1 - 1)^2 + (m_1 - m_2)^2 = m_1^2 - 2m_1m_2 + m_2^2$.',
+                  'Cancelando $m_1^2$ y $m_2^2$ queda $2 = -2 m_1 m_2 \\iff m_1 \\cdot m_2 = -1$. $\\blacksquare$'
+                ]
+              }
             ]
           },
           interactiveGraph: {
@@ -1169,6 +1642,40 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
                   reason: 'Despejamos y para obtener la forma pendiente-ordenada al origen.'
                 }
               ]
+            },
+            {
+              title: 'Distancia entre puntos y ecuación de la mediatriz perpendicular',
+              problem: 'Dados $P(-2, 1)$ y $Q(4, 9)$, calcula la distancia $d(P, Q)$ y halla la recta perpendicular al segmento $PQ$ que pasa por su punto medio $M$.',
+              steps: [
+                {
+                  title: 'Calcular distancia d(P, Q) y punto medio M',
+                  math: 'd = \\sqrt{(4 - (-2))^2 + (9 - 1)^2} = \\sqrt{6^2 + 8^2} = \\sqrt{100} = 10 \\quad ; \\quad M = \\left(\\frac{-2+4}{2}, \\frac{1+9}{2}\\right) = (1, 5)',
+                  reason: 'Obtenemos exactamente la terna pitagórica 6-8-10 y el punto medio M(1, 5).'
+                },
+                {
+                  title: 'Hallar la pendiente del segmento y su perpendicular para la mediatriz',
+                  math: 'm_{PQ} = \\frac{9 - 1}{4 - (-2)} = \\frac{8}{6} = \\frac{4}{3} \\implies m_{\\perp} = -\\frac{3}{4} \\implies y - 5 = -\\frac{3}{4}(x - 1) \\implies y = -\\frac{3}{4}x + \\frac{23}{4}',
+                  reason: 'Como m_PQ · m_⊥ = (4/3)(-3/4) = -1, la recta es ortogonal al segmento PQ.'
+                }
+              ],
+              graphPayload: { kind: 'function', expr: '-(3/4)*x + 23/4', tangentX: 1 }
+            },
+            {
+              title: 'Distancia mínima desde un punto exterior hasta una recta',
+              problem: 'Determina la distancia perpendicular desde $P_0(4, 5)$ hasta la recta $L: 3x + 4y - 12 = 0$ y encuentra el punto $Q$ más cercano sobre $L$.',
+              steps: [
+                {
+                  title: 'Aplicar la fórmula analítica d(P₀, L) = |Ax₀ + By₀ + C| / √(A² + B²)',
+                  math: 'd = \\frac{|3(4) + 4(5) - 12|}{\\sqrt{3^2 + 4^2}} = \\frac{|12 + 20 - 12|}{5} = \\frac{20}{5} = 4\\text{ unidades}',
+                  reason: 'El vector normal (3, 4) tiene norma 5 y mide la proyección ortogonal hacia la recta.'
+                },
+                {
+                  title: 'Encontrar la recta perpendicular que pasa por P₀(4, 5) y su intersección Q',
+                  math: 'L_{\\perp}: y - 5 = \\frac{4}{3}(x - 4) \\implies 4x - 3y = 1 \\implies Q\\left(\\frac{8}{5},\\; \\frac{9}{5}\\right)',
+                  reason: 'Comprobación: (4 - 8/5)² + (5 - 9/5)² = (12/5)² + (16/5)² = 400/25 = 16, luego √16 = 4.'
+                }
+              ],
+              graphPayload: { kind: 'function', expr: '(12 - 3*x)/4', tangentX: 1.6 }
             }
           ],
           commonMistakes: [
@@ -1234,6 +1741,43 @@ window.MatInteractiva.Curriculum = window.MatInteractiva.Curriculum || [];
               solutionSteps: [
                 'Despejando $y$: $y = -\\frac{1}{3}x + \\frac{5}{6} \\Rightarrow m_1 = -\\frac{1}{3}$.',
                 'Pendiente perpendicular: $m_2 = -\\frac{1}{-1/3} = 3$.'
+              ]
+            },
+            {
+              id: 'geo-2-ex4',
+              level: 'basico',
+              statement: 'Una carretera asciende en línea recta desde la estación $A(2, 5)$ hasta el mirador $B(6, 17)$ (coordenadas en kilómetros). ¿Cuál es la pendiente constante de ascenso de la carretera?',
+              answer: '3',
+              alternatives: ['3'],
+              placeholder: 'Valor de la pendiente...',
+              whyCorrect: 'La pendiente entre $A(2, 5)$ y $B(6, 17)$ es $m = \\frac{17 - 5}{6 - 2} = \\frac{12}{4} = 3$.',
+              reviewTip: 'Usa $m = \\frac{y_2 - y_1}{x_2 - x_1}$ respetando el orden de la resta en numerador y denominador.',
+              hints: [
+                'Calcula el cambio vertical: $\\Delta y = 17 - 5 = 12$.',
+                'Calcula el cambio horizontal: $\\Delta x = 6 - 2 = 4$.',
+                'Divide $\\frac{\\Delta y}{\\Delta x}$.'
+              ],
+              solutionSteps: [
+                '$m = \\frac{17 - 5}{6 - 2} = \\frac{12}{4} = 3$.'
+              ]
+            },
+            {
+              id: 'geo-2-ex5',
+              level: 'avanzado',
+              statement: 'Un brazo robótico recorre una recta con pendiente $m_1 = 2$. Se coloca una guía perpendicular (normal) que pasa por $(1, 4)$ y cruza el eje $y$ en $(0, b)$. Calcula el valor exacto de la ordenada al origen $b$.',
+              answer: '9/2',
+              alternatives: ['9/2', '4.5', '\\frac{9}{2}'],
+              placeholder: 'Valor de b (ej: 9/2)...',
+              whyCorrect: 'La pendiente perpendicular es $m_2 = -\\frac{1}{2}$. Sustituyendo $(1, 4)$ en $y = -\\frac{1}{2}x + b$: $4 = -\\frac{1}{2} + b \\Rightarrow b = \\frac{9}{2}$.',
+              reviewTip: 'Dos rectas perpendiculares cumplen $m_1 \\cdot m_2 = -1$. Luego sustituye el punto conocido.',
+              hints: [
+                'Halla la pendiente perpendicular: $m_2 = -\\frac{1}{m_1} = -\\frac{1}{2}$.',
+                'Usa la ecuación punto-pendiente: $y - 4 = -\\frac{1}{2}(x - 1)$.',
+                'Evalúa en $x = 0$ para hallar $b = 4 + \\frac{1}{2}$.'
+              ],
+              solutionSteps: [
+                'Pendiente perpendicular: $m_2 = -\\frac{1}{2}$.',
+                'Recta: $y = -\\frac{1}{2}x + b$. Con $(1, 4)$: $4 = -\\frac{1}{2}(1) + b \\Rightarrow b = \\frac{9}{2} = 4.5$.'
               ]
             }
           ],

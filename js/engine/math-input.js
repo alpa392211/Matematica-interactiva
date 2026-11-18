@@ -1,5 +1,5 @@
 /* ==========================================================================
-   MATEMÁTICA INTERACTIVA - Componente <math-field> (MathLive) y Teclado Visual
+   MATETIC - Componente <math-field> (MathLive) y Teclado Visual
    Archivo: js/engine/math-input.js
    Gestiona:
    1. Creación, configuración híbrida y fallback de campos <math-field> (MathLive).
@@ -710,6 +710,42 @@ window.MatInteractiva = window.MatInteractiva || {};
   ];
 
   /**
+   * Configura las rutas locales de recursos de MathLive (fuentes locales y
+   * desactivación de sonidos/motores externos) antes de instanciar <math-field>.
+   */
+  let mathLiveGlobalsConfigured = false;
+  function configureMathLiveGlobals() {
+    if (typeof window === 'undefined' || !window.MathfieldElement || mathLiveGlobalsConfigured) {
+      return;
+    }
+    mathLiveGlobalsConfigured = true;
+    try {
+      // Desactivar carga de sonidos .wav externos e impedir peticiones de audio
+      window.MathfieldElement.soundsDirectory = null;
+      window.MathfieldElement.keypressSound = null;
+      window.MathfieldElement.plonkSound = null;
+      window.MathfieldElement.computeEngine = null;
+      // './fonts' respecto a vendor/mathlive/mathlive.min.js resuelve a vendor/mathlive/fonts;
+      // también fijamos ruta relativa explícita derivada del documento cuando difiera.
+      if (typeof document !== 'undefined' && document.baseURI) {
+        const localFontsUrl = new URL('vendor/mathlive/fonts', document.baseURI).href.replace(/\/$/, '');
+        if (window.MathfieldElement.fontsDirectory !== './fonts' && window.MathfieldElement.fontsDirectory !== localFontsUrl) {
+          window.MathfieldElement.fontsDirectory = localFontsUrl;
+        }
+      }
+    } catch (_) {
+      // Ignorar si el entorno de test simula un MathfieldElement parcial
+    }
+  }
+
+  configureMathLiveGlobals();
+  if (typeof window !== 'undefined' && window.customElements && typeof window.customElements.whenDefined === 'function') {
+    window.customElements.whenDefined('math-field').then(() => {
+      configureMathLiveGlobals();
+    }).catch(() => {});
+  }
+
+  /**
    * Comprueba si el Web Component `<math-field>` de MathLive ya está registrado
    * en el navegador.
    */
@@ -731,6 +767,7 @@ window.MatInteractiva = window.MatInteractiva || {};
    * para permitir escritura híbrida natural en español e inglés.
    */
   function configureMathFieldElement(mf) {
+    configureMathLiveGlobals();
     if (!mf || mf.__matConfigured) return;
     mf.__matConfigured = true;
 
