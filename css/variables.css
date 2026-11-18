@@ -521,12 +521,14 @@ html[data-theme="dark"][data-bg-dark="nebulosa"] {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  -webkit-tap-highlight-color: transparent;
 }
 
 html {
   font-size: 16px;
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
@@ -581,9 +583,30 @@ button {
   background: none;
 }
 
+a,
+button,
+[role="button"],
+[role="tab"],
+summary,
+label {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+button,
+[role="button"],
+[role="tab"] {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
 a {
   color: var(--primary-600);
   text-decoration: none;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
 }
 
 :focus-visible {
@@ -596,6 +619,19 @@ textarea:focus-visible,
 select:focus-visible {
   outline: 2px solid var(--border-focus);
   outline-offset: 1px;
+}
+
+@media (pointer: coarse) {
+  button:focus,
+  button:focus-visible,
+  a:focus,
+  a:focus-visible,
+  [role="button"]:focus,
+  [role="button"]:focus-visible,
+  [role="tab"]:focus,
+  [role="tab"]:focus-visible {
+    outline: none;
+  }
 }
 
 ul, ol {

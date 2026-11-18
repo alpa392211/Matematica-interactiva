@@ -383,6 +383,21 @@ Este archivo documenta de forma acumulativa cada fase ejecutada, sus archivos mo
   - Chromium headless (`1280×800` y `390×844`, claro y oscuro): verificados `#numerus-cas-modal` en modo claro sin `#btn-numerus-close-footer`, bloqueo real de botones de fondo opuesto en modos Claro y Oscuro, aviso dinámico en Automático, deslizamiento líquido sin recrear nodos en PrepMat, `overflowX: false`, `consoleErrors: []` y `externalAttempts: []`.
 - **Hash del commit de cierre**: registrado en `git log` tras el cierre de `v1.4.1`.
 
+---
+## v1.4.2 — Eliminación global del recuadro azul de resalte táctil móvil
+- **Qué cambió**:
+  - **Eliminación de resalte táctil nativo y contornos residuales ([css/variables.css](file:///c:/Users/user/Documents/PROYECTOS%20ANTIGRAVITY/Matematica-Interactiva/css/variables.css))**:
+    - Añadido `-webkit-tap-highlight-color: transparent;` de forma global en `*, *::before, *::after`, `html` y controles interactivos (`a, button, [role="button"], [role="tab"], summary, label`), junto con `-webkit-touch-callout: none;` para suprimir por completo el cuadro azul traslúcido y los menús emergentes táctiles al presionar elementos en dispositivos móviles.
+    - Añadido `-webkit-user-select: none; user-select: none;` en `button, [role="button"], [role="tab"]` para evitar selección accidental de texto al mantener pulsados botones.
+    - Añadido `:focus:not(:focus-visible) { outline: none; }` y supresión de `outline` en `@media (pointer: coarse)` para botones, enlaces y elementos con `role="button"` / `role="tab"`, conservando `:focus-visible` para navegación por teclado en escritorio y campos de entrada (`input`, `textarea`, `select`).
+    - Sin modificaciones en archivos JavaScript ni en el comportamiento funcional de la aplicación.
+  - **Versionado ([js/version.js](file:///c:/Users/user/Documents/PROYECTOS%20ANTIGRAVITY/Matematica-Interactiva/js/version.js))**:
+    - Subida de `APP_VERSION` a `1.4.2` mediante `scripts/bump-version.mjs patch` con 7 notas en `RELEASE_NOTES`.
+- **Verificación**:
+  - `node --test tests/`: `52/52` pruebas aprobadas (`0` fallos).
+  - `git diff --name-only`: confirmados únicamente cambios en `css/variables.css`, `js/version.js` y `docs/CAMBIOS.md`.
+
+
 
 
 
