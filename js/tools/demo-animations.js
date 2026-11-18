@@ -136,8 +136,9 @@ window.MatInteractiva = window.MatInteractiva || {};
       const jumpRightX = 0 + dist;
       const jumpLeftY = -1 - 0.35 * dist;
       const jumpRightY = 2 + 0.4 * dist;
-      const asymX = 1 - Math.max(0.18, dist * 0.85);
-      const asymY = Math.min(18, 1 / ((asymX - 1) * (asymX - 1)));
+      // Mantener el punto móvil estrictamente dentro del rango visible y <= 15 de la gráfica
+      const asymX = 1 - Math.max(0.27, dist * 0.85);
+      const asymY = 1 / ((asymX - 1) * (asymX - 1));
       return {
         id: modelId,
         t,
@@ -452,7 +453,12 @@ window.MatInteractiva = window.MatInteractiva || {};
     ctx.restore();
   }
 
-  function plotCurveInRect(ctx, rect, xMin, xMax, yMin, yMax, fn, color, lineWidth = 2.4, gapAtX = null) {
+  /**
+   * Traza una curva manteniendo fijo el sistema de coordenadas [xMin, xMax] × [yMin, yMax]
+   * y evaluando únicamente sobre el subdominio [evalMin, evalMax].
+   */
+  function plotCurveInRect(ctx, rect, xMin, xMax, yMin, yMax, fn, color, lineWidth = 2.4, gapAtX = null, evalMin = xMin, evalMax = xMax) {
+    if (evalMax <= evalMin) return;
     ctx.save();
     ctx.beginPath();
     ctx.rect(rect.x, rect.y, rect.w, rect.h);
@@ -462,17 +468,26 @@ window.MatInteractiva = window.MatInteractiva || {};
     ctx.lineWidth = lineWidth;
     ctx.beginPath();
     let started = false;
-    const steps = 160;
+    let prevY = null;
+    const steps = 180;
+    const ySpan = Math.max(1, yMax - yMin);
+    const gapRadius = ((xMax - xMin) / steps) * 1.4;
+
     for (let i = 0; i <= steps; i++) {
-      const x = xMin + (i / steps) * (xMax - xMin);
-      if (gapAtX !== null && Math.abs(x - gapAtX) < (xMax - xMin) / steps * 1.2) {
+      const x = evalMin + (i / steps) * (evalMax - evalMin);
+      if (gapAtX !== null && Math.abs(x - gapAtX) < gapRadius) {
         started = false;
+        prevY = null;
         continue;
       }
       const y = fn(x);
-      if (!isFinite(y) || y < yMin - 5 || y > yMax + 5) {
+      if (!isFinite(y) || y < yMin - ySpan * 4 || y > yMax + ySpan * 4) {
         started = false;
+        prevY = null;
         continue;
+      }
+      if (prevY !== null && Math.abs(y - prevY) > ySpan * 2.5) {
+        started = false;
       }
       const p = mapBox(x, y, xMin, xMax, yMin, yMax, rect);
       if (!started) {
@@ -481,8 +496,52 @@ window.MatInteractiva = window.MatInteractiva || {};
       } else {
         ctx.lineTo(p.px, p.py);
       }
+      prevY = y;
     }
     ctx.stroke();
+    ctx.restore();
+  }
+
+  /**
+   * Traza un segmento recto exacto entre (x1, y1) y (x2, y2) en el sistema [xMin, xMax] × [yMin, yMax].
+   * Garantiza alineación exacta de rectas tangentes y secantes con sus puntos de contacto.
+   */
+  function drawLineSegmentInRect(ctx, rect, xMin, xMax, yMin, yMax, x1, y1, x2, y2, color, lineWidth = 2.2, dash = null) {
+    if (!isFinite(x1) || !isFinite(y1) || !isFinite(x2) || !isFinite(y2)) return;
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(rect.x, rect.y, rect.w, rect.h);
+    ctx.clip();
+    if (Array.isArray(dash) && dash.length && typeof ctx.setLineDash === 'function') {
+      ctx.setLineDash(dash);
+    }
+    const p1 = mapBox(x1, y1, xMin, xMax, yMin, yMax, rect);
+    const p2 = mapBox(x2, y2, xMin, xMax, yMin, yMax, rect);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = lineWidth;
+    ctx.beginPath();
+    ctx.moveTo(p1.px, p1.py);
+    ctx.lineTo(p2.px, p2.py);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawClampedLabel(ctx, text, desiredX, desiredY, rect, color, font = '600 12px system-ui, sans-serif', bgPlateColor = null) {
+    ctx.save();
+    ctx.font = font;
+    const measured = typeof ctx.measureText === 'function' ? ctx.measureText(text).width : text.length * 6.5;
+    const minX = rect.x + 4;
+    const maxX = Math.max(minX, rect.x + rect.w - measured - 4);
+    const x = Math.max(minX, Math.min(maxX, desiredX));
+    const y = Math.max(rect.y + 13, Math.min(rect.y + rect.h - 4, desiredY));
+    if (bgPlateColor && typeof ctx.fillRect === 'function') {
+      ctx.globalAlpha = 0.88;
+      ctx.fillStyle = bgPlateColor;
+      ctx.fillRect(x - 3, y - 11, measured + 6, 15);
+      ctx.globalAlpha = 1;
+    }
+    ctx.fillStyle = color;
+    ctx.fillText(text, x, y);
     ctx.restore();
   }
 
@@ -505,7 +564,7 @@ window.MatInteractiva = window.MatInteractiva || {};
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const dpr = Math.min((typeof window !== 'undefined' && window.devicePixelRatio) || 1, 2);
     const w = canvas.width / dpr;
     const h = canvas.height / dpr;
     const pal = getCanvasPalette();
@@ -545,45 +604,33 @@ window.MatInteractiva = window.MatInteractiva || {};
       drawPoint(ctx, pL.px, pL.py, pal.secondary, '#ffffff', 5.5);
       drawPoint(ctx, pR.px, pR.py, pal.amber, '#ffffff', 5.5);
 
-      ctx.fillStyle = pal.text;
-      ctx.font = '600 12px system-ui, sans-serif';
-      ctx.fillText('L = 4 (hueco en x = 2)', pLim.px + 10, pLim.py - 8);
+      drawClampedLabel(ctx, 'L = 4 (hueco x = 2)', pLim.px + 10, pLim.py - 8, fullRect, pal.text, '600 12px system-ui, sans-serif', pal.bg);
     } else if (model.id === 'lim-salto-infinito') {
       const leftRect = { x: pad, y: pad, w: (w - pad * 3) / 2, h: h - pad * 2 };
       const rightRect = { x: pad * 2 + leftRect.w, y: pad, w: leftRect.w, h: h - pad * 2 };
+      const titleFont = `700 ${w < 330 ? 10.5 : 12}px system-ui, sans-serif`;
 
-      // Panel izquierdo: Salto finito en x = 0
+      // Panel izquierdo: Salto finito en x = 0 (sistema fijo [-2.5, 2.5])
       drawAxesInRect(ctx, leftRect, -2.5, 2.5, -2.5, 3.5, pal);
-      plotCurveInRect(ctx, leftRect, -2.5, 0, -2.5, 3.5, x => -1 + 0.35 * x, pal.primary, 2.4);
-      plotCurveInRect(ctx, leftRect, 0, 2.5, -2.5, 3.5, x => 2 + 0.4 * x, pal.primary, 2.4);
+      plotCurveInRect(ctx, leftRect, -2.5, 2.5, -2.5, 3.5, x => -1 + 0.35 * x, pal.primary, 2.4, null, -2.5, -0.02);
+      plotCurveInRect(ctx, leftRect, -2.5, 2.5, -2.5, 3.5, x => 2 + 0.4 * x, pal.primary, 2.4, null, 0.02, 2.5);
       const pHoleL = mapBox(0, -1, -2.5, 2.5, -2.5, 3.5, leftRect);
       const pHoleR = mapBox(0, 2, -2.5, 2.5, -2.5, 3.5, leftRect);
       drawPoint(ctx, pHoleL.px, pHoleL.py, pal.holeFill, pal.primary, 5);
       drawPoint(ctx, pHoleR.px, pHoleR.py, pal.primary, '#ffffff', 5);
       const pJL = mapBox(pd.jumpLeftX, pd.jumpLeftY, -2.5, 2.5, -2.5, 3.5, leftRect);
       const pJR = mapBox(pd.jumpRightX, pd.jumpRightY, -2.5, 2.5, -2.5, 3.5, leftRect);
-      drawPoint(ctx, pJL.px, pJL.py, pal.secondary, null, 5);
-      drawPoint(ctx, pJR.px, pJR.py, pal.accent, null, 5);
-      ctx.fillStyle = pal.text;
-      ctx.font = `700 ${Math.max(11, w < 320 ? 11 : 12)}px system-ui, sans-serif`;
-      ctx.fillText('Salto finito (x = 0)', leftRect.x + 6, leftRect.y + 14);
+      drawPoint(ctx, pJL.px, pJL.py, pal.secondary, '#ffffff', 5);
+      drawPoint(ctx, pJR.px, pJR.py, pal.accent, '#ffffff', 5);
+      drawClampedLabel(ctx, 'Salto (x = 0)', leftRect.x + 6, leftRect.y + 14, leftRect, pal.text, titleFont, pal.bg);
 
-      // Panel derecho: Asíntota vertical 1/(x-1)²
-      drawAxesInRect(ctx, rightRect, -1, 3, -1, 14, pal);
-      const pAsymTop = mapBox(1, 14, -1, 3, -1, 14, rightRect);
-      const pAsymBot = mapBox(1, -1, -1, 3, -1, 14, rightRect);
-      ctx.setLineDash([4, 4]);
-      ctx.strokeStyle = pal.accent;
-      ctx.beginPath();
-      ctx.moveTo(pAsymTop.px, pAsymTop.py);
-      ctx.lineTo(pAsymBot.px, pAsymBot.py);
-      ctx.stroke();
-      ctx.setLineDash([]);
-      plotCurveInRect(ctx, rightRect, -1, 3, -1, 14, x => 1 / ((x - 1) * (x - 1)), pal.primary, 2.4, 1);
-      const pAsymPt = mapBox(pd.asymX, Math.min(13.5, pd.asymY), -1, 3, -1, 14, rightRect);
+      // Panel derecho: Asíntota vertical 1/(x-1)² en [-1, 3] × [-1, 15]
+      drawAxesInRect(ctx, rightRect, -1, 3, -1, 15, pal);
+      drawLineSegmentInRect(ctx, rightRect, -1, 3, -1, 15, 1, -1, 1, 15, pal.accent, 1.5, [4, 4]);
+      plotCurveInRect(ctx, rightRect, -1, 3, -1, 15, x => 1 / ((x - 1) * (x - 1)), pal.primary, 2.4, 1);
+      const pAsymPt = mapBox(pd.asymX, pd.asymY, -1, 3, -1, 15, rightRect);
       drawPoint(ctx, pAsymPt.px, pAsymPt.py, pal.amber, '#ffffff', 5.5);
-      ctx.fillStyle = pal.text;
-      ctx.fillText('Asíntota x = 1 → +∞', rightRect.x + 6, rightRect.y + 14);
+      drawClampedLabel(ctx, 'Asíntota x = 1 → +∞', rightRect.x + 6, rightRect.y + 14, rightRect, pal.text, titleFont, pal.bg);
     } else if (model.id === 'lim-epsilon-banda') {
       const [xMin, xMax, yMin, yMax] = [0.2, 3.8, 0, 5.8];
       drawAxesInRect(ctx, fullRect, xMin, xMax, yMin, yMax, pal);
@@ -601,14 +648,12 @@ window.MatInteractiva = window.MatInteractiva || {};
       ctx.fillRect(fullRect.x, yTop.py, fullRect.w, yBot.py - yTop.py);
 
       // Recta f(x) = 2x - 1
-      plotCurveInRect(ctx, fullRect, xMin, xMax, yMin, yMax, x => 2 * x - 1, pal.primary, 2.6);
+      drawLineSegmentInRect(ctx, fullRect, xMin, xMax, yMin, yMax, xMin, 2 * xMin - 1, xMax, 2 * xMax - 1, pal.primary, 2.6);
       const pCenter = mapBox(pd.a, pd.L, xMin, xMax, yMin, yMax, fullRect);
       drawPoint(ctx, pCenter.px, pCenter.py, pal.secondary, '#ffffff', 5.5);
 
-      ctx.fillStyle = pal.text;
-      ctx.font = '700 12px system-ui, sans-serif';
-      ctx.fillText(`ε = ${fmt(pd.eps, 2)}`, fullRect.x + 8, yTop.py - 5);
-      ctx.fillText(`δ = ${fmt(pd.delta, 2)}`, xR.px + 5, fullRect.y + 18);
+      drawClampedLabel(ctx, `ε = ${fmt(pd.eps, 2)}`, fullRect.x + 8, yTop.py - 5, fullRect, pal.text, '700 12px system-ui, sans-serif');
+      drawClampedLabel(ctx, `δ = ${fmt(pd.delta, 2)}`, xR.px + 5, fullRect.y + 18, fullRect, pal.text, '700 12px system-ui, sans-serif');
     } else if (model.id === 'der-razon-promedio' || model.id === 'der-secante-tangente') {
       const [xMin, xMax, yMin, yMax] = [-0.6, 3.6, -0.4, 5.2];
       drawAxesInRect(ctx, fullRect, xMin, xMax, yMin, yMax, pal);
@@ -626,19 +671,23 @@ window.MatInteractiva = window.MatInteractiva || {};
         ctx.lineTo(p1.px, p1.py);
         ctx.stroke();
 
-        ctx.strokeStyle = pal.accent;
-        ctx.beginPath();
-        ctx.moveTo(p0.px, p0.py);
-        ctx.lineTo(p1.px, p1.py);
-        ctx.stroke();
-
+        drawLineSegmentInRect(ctx, fullRect, xMin, xMax, yMin, yMax, pd.x0, pd.y0, pd.x1, pd.y1, pal.accent, 2.4);
         drawPoint(ctx, p0.px, p0.py, pal.primary, '#ffffff', 5);
         drawPoint(ctx, p1.px, p1.py, pal.amber, '#ffffff', 5);
       } else {
-        // Tangente verdadera en x0 = 1
-        plotCurveInRect(ctx, fullRect, xMin, xMax, yMin, yMax, x => pd.y0 + pd.mTan * (x - pd.x0), pal.secondary, 1.8);
-        // Secante móvil
-        plotCurveInRect(ctx, fullRect, xMin, xMax, yMin, yMax, x => pd.y0 + pd.mSec * (x - pd.x0), pal.accent, 2.4);
+        // Tangente verdadera en x0 = 1 y secante móvil pasando exactamente por P y Q
+        drawLineSegmentInRect(
+          ctx, fullRect, xMin, xMax, yMin, yMax,
+          xMin, pd.y0 + pd.mTan * (xMin - pd.x0),
+          xMax, pd.y0 + pd.mTan * (xMax - pd.x0),
+          pal.secondary, 1.9
+        );
+        drawLineSegmentInRect(
+          ctx, fullRect, xMin, xMax, yMin, yMax,
+          xMin, pd.y0 + pd.mSec * (xMin - pd.x0),
+          xMax, pd.y0 + pd.mSec * (xMax - pd.x0),
+          pal.accent, 2.4
+        );
         drawPoint(ctx, p0.px, p0.py, pal.secondary, '#ffffff', 5.5);
         if (pd.h > 0.02) {
           const p1 = mapBox(pd.x1, pd.y1, xMin, xMax, yMin, yMax, fullRect);
@@ -648,39 +697,46 @@ window.MatInteractiva = window.MatInteractiva || {};
     } else if (model.id === 'der-construccion-fprima') {
       const topRect = { x: pad, y: pad, w: w - pad * 2, h: (h - pad * 3) / 2 };
       const botRect = { x: pad, y: pad * 2 + topRect.h, w: w - pad * 2, h: topRect.h };
+      const [xMin, xMax, yMin, yMax] = [pd.xMin, pd.xMax, -1.4, 1.4];
+      const titleFont = `700 ${w < 330 ? 11 : 12}px system-ui, sans-serif`;
 
-      drawAxesInRect(ctx, topRect, pd.xMin, pd.xMax, -1.4, 1.4, pal);
-      plotCurveInRect(ctx, topRect, pd.xMin, pd.xMax, -1.4, 1.4, x => Math.sin(x), pal.primary, 2.4);
-      // Tangente deslizante local
-      plotCurveInRect(
-        ctx,
-        topRect,
-        pd.xCur - 0.9,
-        pd.xCur + 0.9,
-        -1.4,
-        1.4,
-        x => pd.fx + pd.dfx * (x - pd.xCur),
-        pal.accent,
-        2.2
+      drawAxesInRect(ctx, topRect, xMin, xMax, yMin, yMax, pal);
+      plotCurveInRect(ctx, topRect, xMin, xMax, yMin, yMax, x => Math.sin(x), pal.primary, 2.4);
+
+      // Guía vertical alineada entre xCur superior e inferior
+      drawLineSegmentInRect(ctx, topRect, xMin, xMax, yMin, yMax, pd.xCur, yMin, pd.xCur, yMax, pal.muted, 1.1, [3, 3]);
+
+      // Tangente deslizante local centrada exactamente en (xCur, fx)
+      const tanSpan = 0.85;
+      const tX1 = pd.xCur - tanSpan;
+      const tX2 = pd.xCur + tanSpan;
+      drawLineSegmentInRect(
+        ctx, topRect, xMin, xMax, yMin, yMax,
+        tX1, pd.fx + pd.dfx * (tX1 - pd.xCur),
+        tX2, pd.fx + pd.dfx * (tX2 - pd.xCur),
+        pal.accent, 2.4
       );
-      const pTop = mapBox(pd.xCur, pd.fx, pd.xMin, pd.xMax, -1.4, 1.4, topRect);
+      const pTop = mapBox(pd.xCur, pd.fx, xMin, xMax, yMin, yMax, topRect);
       drawPoint(ctx, pTop.px, pTop.py, pal.accent, '#ffffff', 5);
-      ctx.fillStyle = pal.text;
-      ctx.font = `700 ${Math.max(11, w < 320 ? 11 : 12)}px system-ui, sans-serif`;
-      ctx.fillText('f(x) = sen(x) con tangente móvil', topRect.x + 8, topRect.y + 14);
+      drawClampedLabel(ctx, 'f(x) = sen(x) con tangente móvil', topRect.x + 8, topRect.y + 14, topRect, pal.text, titleFont, pal.bg);
 
-      drawAxesInRect(ctx, botRect, pd.xMin, pd.xMax, -1.4, 1.4, pal);
-      plotCurveInRect(ctx, botRect, pd.xMin, pd.xCur, -1.4, 1.4, x => Math.cos(x), pal.secondary, 2.6);
-      const pBot = mapBox(pd.xCur, pd.dfx, pd.xMin, pd.xMax, -1.4, 1.4, botRect);
+      drawAxesInRect(ctx, botRect, xMin, xMax, yMin, yMax, pal);
+      // Curva completa tenue de referencia + trazo acumulado exacto hasta xCur
+      plotCurveInRect(ctx, botRect, xMin, xMax, yMin, yMax, x => Math.cos(x), pal.grid, 1.5);
+      drawLineSegmentInRect(ctx, botRect, xMin, xMax, yMin, yMax, pd.xCur, yMin, pd.xCur, yMax, pal.muted, 1.1, [3, 3]);
+      if (pd.xCur > xMin + 1e-4) {
+        plotCurveInRect(ctx, botRect, xMin, xMax, yMin, yMax, x => Math.cos(x), pal.secondary, 2.6, null, xMin, pd.xCur);
+      }
+      const pBot = mapBox(pd.xCur, pd.dfx, xMin, xMax, yMin, yMax, botRect);
       drawPoint(ctx, pBot.px, pBot.py, pal.secondary, '#ffffff', 5);
-      ctx.fillStyle = pal.text;
-      ctx.fillText("f'(x) = cos(x) trazada desde la pendiente", botRect.x + 8, botRect.y + 14);
+      drawClampedLabel(ctx, "f'(x) = cos(x) trazada desde la pendiente", botRect.x + 8, botRect.y + 14, botRect, pal.text, titleFont, pal.bg);
     } else if (model.id === 'der-velocidad-instantanea') {
-      const trackY = pad + 14;
-      const graphRect = { x: pad, y: pad + 38, w: w - pad * 2, h: h - pad * 2 - 38 };
+      const trackY = pad + 24;
+      const graphRect = { x: pad, y: pad + 40, w: w - pad * 2, h: h - pad * 2 - 40 };
+      const [xMin, xMax, yMin, yMax] = [-0.2, 3.2, -0.5, 9.5];
 
       // Pista lineal superior s(t) de 0 a 9 m
-      ctx.strokeStyle = pal.border || pal.axis;
+      ctx.strokeStyle = pal.axis;
       ctx.lineWidth = 3;
       ctx.beginPath();
       ctx.moveTo(pad + 12, trackY);
@@ -688,28 +744,36 @@ window.MatInteractiva = window.MatInteractiva || {};
       ctx.stroke();
       const partX = pad + 12 + (pd.posM / 9) * (w - pad * 2 - 24);
       drawPoint(ctx, partX, trackY, pal.accent, '#ffffff', 6.5);
-      ctx.fillStyle = pal.text;
-      ctx.font = `700 ${Math.max(11, w < 320 ? 11 : 12)}px system-ui, sans-serif`;
-      ctx.fillText(`Posición actual: ${fmt(pd.posM, 2)} m`, pad + 10, trackY - 6);
-
-      drawAxesInRect(ctx, graphRect, -0.2, 3.2, -0.5, 9.5, pal);
-      plotCurveInRect(ctx, graphRect, 0, 3.1, -0.5, 9.5, tVal => tVal * tVal, pal.primary, 2.5);
-      plotCurveInRect(
+      drawClampedLabel(
         ctx,
-        graphRect,
-        Math.max(0, pd.timeSec - 0.7),
-        Math.min(3.1, pd.timeSec + 0.7),
-        -0.5,
-        9.5,
-        tVal => pd.posM + pd.velMs * (tVal - pd.timeSec),
-        pal.accent,
-        2.2
+        `Posición actual: ${fmt(pd.posM, 2)} m`,
+        pad + 10,
+        trackY - 13,
+        { x: pad, y: pad - 6, w: w - pad * 2, h: 30 },
+        pal.text,
+        `700 ${w < 330 ? 11 : 12}px system-ui, sans-serif`
       );
-      const pV = mapBox(pd.timeSec, pd.posM, -0.2, 3.2, -0.5, 9.5, graphRect);
+
+      drawAxesInRect(ctx, graphRect, xMin, xMax, yMin, yMax, pal);
+      // Curva s(t) = t² en el mismo sistema de coordenadas [-0.2, 3.2] × [-0.5, 9.5]
+      plotCurveInRect(ctx, graphRect, xMin, xMax, yMin, yMax, tVal => tVal * tVal, pal.primary, 2.5, null, 0, 3.1);
+
+      // Tangente exacta centrada en (timeSec, posM) con pendiente velMs = 2*timeSec
+      const tanHalfSpan = 0.65;
+      const tA = Math.max(-0.1, pd.timeSec - tanHalfSpan);
+      const tB = Math.min(3.15, pd.timeSec + tanHalfSpan);
+      drawLineSegmentInRect(
+        ctx, graphRect, xMin, xMax, yMin, yMax,
+        tA, pd.posM + pd.velMs * (tA - pd.timeSec),
+        tB, pd.posM + pd.velMs * (tB - pd.timeSec),
+        pal.accent, 2.4
+      );
+      const pV = mapBox(pd.timeSec, pd.posM, xMin, xMax, yMin, yMax, graphRect);
       drawPoint(ctx, pV.px, pV.py, pal.secondary, '#ffffff', 5.5);
     } else if (model.id === 'der-no-derivable') {
       const leftRect = { x: pad, y: pad, w: (w - pad * 3) / 2, h: h - pad * 2 };
       const rightRect = { x: pad * 2 + leftRect.w, y: pad, w: leftRect.w, h: h - pad * 2 };
+      const titleFont = `700 ${w < 330 ? 10.5 : 12}px system-ui, sans-serif`;
 
       // Izquierda: |x|
       drawAxesInRect(ctx, leftRect, -2, 2, -0.4, 2.4, pal);
@@ -718,20 +782,23 @@ window.MatInteractiva = window.MatInteractiva || {};
       const pR = mapBox(pd.h, Math.abs(pd.h), -2, 2, -0.4, 2.4, leftRect);
       drawPoint(ctx, pL.px, pL.py, pal.accent, '#ffffff', 5);
       drawPoint(ctx, pR.px, pR.py, pal.secondary, '#ffffff', 5);
-      ctx.fillStyle = pal.text;
-      ctx.font = `700 ${Math.max(11, w < 320 ? 11 : 12)}px system-ui, sans-serif`;
-      ctx.fillText('Pico |x| (pend. -1 y +1)', leftRect.x + 6, leftRect.y + 14);
+      drawClampedLabel(ctx, 'Pico |x| (pend. -1 / +1)', leftRect.x + 6, leftRect.y + 14, leftRect, pal.text, titleFont, pal.bg);
 
-      // Derecha: cbrt(x) con secante volviéndose vertical
+      // Derecha: cbrt(x) con secante volviéndose vertical (trazo exacto pasando por (-h, -h^(1/3)) y (h, h^(1/3)))
       drawAxesInRect(ctx, rightRect, -2, 2, -1.6, 1.6, pal);
       plotCurveInRect(ctx, rightRect, -2, 2, -1.6, 1.6, x => Math.cbrt(x), pal.primary, 2.5);
-      plotCurveInRect(ctx, rightRect, -2, 2, -1.6, 1.6, x => pd.slopeCbrt * x, pal.accent, 2.0);
+      const xLim = Math.min(2, 1.65 / Math.max(0.1, pd.slopeCbrt));
+      drawLineSegmentInRect(
+        ctx, rightRect, -2, 2, -1.6, 1.6,
+        -xLim, -pd.slopeCbrt * xLim,
+        xLim, pd.slopeCbrt * xLim,
+        pal.accent, 2.1
+      );
       const pC1 = mapBox(-pd.h, Math.cbrt(-pd.h), -2, 2, -1.6, 1.6, rightRect);
       const pC2 = mapBox(pd.h, Math.cbrt(pd.h), -2, 2, -1.6, 1.6, rightRect);
       drawPoint(ctx, pC1.px, pC1.py, pal.accent, '#ffffff', 4.5);
       drawPoint(ctx, pC2.px, pC2.py, pal.accent, '#ffffff', 4.5);
-      ctx.fillStyle = pal.text;
-      ctx.fillText('Tangente vertical ∛x', rightRect.x + 6, rightRect.y + 14);
+      drawClampedLabel(ctx, 'Tangente vertical ∛x', rightRect.x + 6, rightRect.y + 14, rightRect, pal.text, titleFont, pal.bg);
     } else if (model.id === 'int-suma-riemann') {
       const [xMin, xMax, yMin, yMax] = [-0.3, 2.3, -0.3, 4.4];
       drawAxesInRect(ctx, fullRect, xMin, xMax, yMin, yMax, pal);
@@ -1109,6 +1176,8 @@ window.MatInteractiva = window.MatInteractiva || {};
   ns.DemoAnimations = {
     ANIMATION_CATALOG,
     evaluateAnimationModel,
+    drawModelFrame,
+    mapBox,
     renderDemoSuite,
     refreshAllThemes
   };

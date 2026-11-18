@@ -10,12 +10,25 @@
 
   const APP_NAME = 'MateTic';
   const APP_TAGLINE = 'Matemáticas Interactivas';
-  const APP_VERSION = '1.7.0';
+  const APP_VERSION = '1.8.0';
   const APP_RELEASE_DATE = '2026-11-18';
   const STUDIO_NAME = 'ALPA Studio';
   const STUDIO_MEANING = '';
 
   const RELEASE_NOTES = [
+    {
+      version: '1.8.0',
+      date: '2026-11-18',
+      items: [
+        'Múltiples formas de resolver problemas en los 24 temas: cada lección incorpora estrategias alternativas y métodos distintos en ejemplos resueltos (con enfoque profundo en Límites, Derivadas e Integrales, incluyendo t - x cuando t → x).',
+        'Botón Explicar en palabras más sencillas en cada apunte: disponible en introducciones, conocimientos previos, conceptos, teoremas, fórmulas, errores frecuentes, estrategias y ejemplos.',
+        'Animaciones matemáticas reparadas: corregida la alineación exacta de la recta tangente sobre la curva en Velocidad Instantánea, la construcción de f\'(x), límites con asíntotas y el espaciado entre textos y marcadores.',
+        'Cabecera móvil más minimalista: barra superior compactada en una sola fila sin recuadro pesado y acceso cómodo con los botones laterales flotantes (☰ a la izquierda y 🧮 a la derecha) al desplazarse.',
+        'Flechas de desplazamiento lateral más amplias y nítidas: los controles ‹ y › en selectores de temas, pestañas e índices crecieron conservando proporción circular dentro de su contenedor.',
+        'Estilo de PrepMat equilibrado: suavizado en menú lateral, accesos rápidos y tarjeta principal para mantener un aspecto discreto similar al de NUMERUS CAS.',
+        'Validación visual, contraste claro/oscuro, fórmulas matemáticas y caché sin conexión actualizados.'
+      ]
+    },
     {
       version: '1.7.0',
       date: '2026-11-18',

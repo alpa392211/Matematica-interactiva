@@ -1566,7 +1566,7 @@ window.MatInteractiva = window.MatInteractiva || {};
           <button class="nav-item nav-item-prepmat ${isPrepMatActive ? 'active' : ''}" data-nav-tool="prepmat">
             <span class="nav-icon">🎓</span>
             <span class="nav-label">PrepMat · Exámenes</span>
-            <span class="nav-badge nav-badge-prepmat">★ PRO</span>
+            <span class="nav-badge nav-badge-prepmat">PRO</span>
           </button>
         </div>
 
@@ -1970,7 +1970,7 @@ window.MatInteractiva = window.MatInteractiva || {};
               <div class="hero-more-panel">
                 <button type="button" class="btn btn-hero-prepmat-featured" id="btn-hero-prepmat">
                   <span class="hero-prepmat-label">🎓 PrepMat · Exámenes</span>
-                  <span class="hero-prepmat-tag">★ Destacado</span>
+                  <span class="hero-prepmat-tag">PRO</span>
                 </button>
                 <div class="hero-more-divider" aria-hidden="true"></div>
                 <div class="hero-more-links-grid">
@@ -2248,7 +2248,7 @@ window.MatInteractiva = window.MatInteractiva || {};
         <button type="button" class="dash-prepmat-spotlight" data-dash-tool="prepmat">
           <div class="dash-prepmat-spotlight-main">
             <div class="dash-prepmat-spotlight-badges">
-              <span class="dash-prepmat-star-badge">★ HERRAMIENTA DESTACADA</span>
+              <span class="dash-prepmat-star-badge">PRO · Simulador</span>
               <span class="dash-prepmat-meta-pill">9 ramas · Bachillerato &amp; Licenciatura</span>
             </div>
             <div class="dash-prepmat-spotlight-title">🎓 PrepMat — Simulador Analítico de Exámenes</div>
@@ -2603,14 +2603,60 @@ window.MatInteractiva = window.MatInteractiva || {};
     }
   }
 
-  /* --- Pestaña 1: Etapas 1 a 5 (+ vista rápida de 6 y 7) --- */
+  function renderSimpleExplainBlock(simpleText, domId, extraClass = '') {
+    if (!simpleText) return '';
+    const safeId = String(domId || 'simple').replace(/[^a-zA-Z0-9_-]/g, '-');
+    return `
+      <div class="simple-explain-wrap ${extraClass}">
+        <button type="button" class="simple-explain-btn" aria-expanded="false" aria-controls="${safeId}">
+          <span class="simple-explain-icon" aria-hidden="true">💬</span>
+          <span class="simple-explain-label">Explicar en palabras más sencillas</span>
+        </button>
+        <div class="simple-explain-panel" id="${safeId}" hidden>
+          <div class="simple-explain-panel-head">💡 En palabras más sencillas</div>
+          <div class="simple-explain-panel-body">${ns.MathRenderer.formatRichText(simpleText)}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  function bindSimpleExplainEvents(container) {
+    if (!container) return;
+    container.querySelectorAll('.simple-explain-btn').forEach((btn) => {
+      if (btn.dataset.simpleBound === '1') return;
+      btn.dataset.simpleBound = '1';
+      btn.addEventListener('click', () => {
+        haptic('light');
+        const panelId = btn.getAttribute('aria-controls');
+        const panel = panelId ? container.querySelector('#' + panelId) : btn.nextElementSibling;
+        if (!panel) return;
+        const willOpen = panel.hidden;
+        panel.hidden = !willOpen;
+        btn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+        btn.classList.toggle('is-open', willOpen);
+        const lbl = btn.querySelector('.simple-explain-label');
+        if (lbl) {
+          lbl.textContent = willOpen ? 'Ocultar explicación sencilla' : 'Explicar en palabras más sencillas';
+        }
+      });
+    });
+    container.querySelectorAll('.alt-methods-summary').forEach((sum) => {
+      if (sum.dataset.altBound === '1') return;
+      sum.dataset.altBound = '1';
+      sum.addEventListener('click', () => haptic('light'));
+    });
+  }
+
+  /* --- Pestaña 1: Etapas 1 a 5 (+ vista rápida de 6 y 7 + múltiples enfoques) --- */
   function renderTheoryTab(box, subj, topic) {
     const th = topic.theory || {};
     const prereqs = th.prerequisites || [];
     const detailed = th.detailedExplanation || [];
+    const detailedSimple = th.detailedSimple || [];
     const concepts = th.concepts || [];
     const formulas = th.formulas || [];
     const theorems = th.theorems || [];
+    const approaches = topic.solvingApproaches || [];
     const mistakes = topic.commonMistakes || [];
     const isDesktopLayout = typeof window !== 'undefined' && window.innerWidth >= 1024;
     const theoryGraphPayloads = {};
@@ -2635,6 +2681,7 @@ window.MatInteractiva = window.MatInteractiva || {};
           <button type="button" class="lesson-toc-btn" data-jump-sec="sec-etapa-3">3. Teoría y Conceptos</button>
           ${theorems.length ? `<button type="button" class="lesson-toc-btn" data-jump-sec="sec-teoremas">📐 Teoremas (${theorems.length})</button>` : ''}
           ${formulas.length ? `<button type="button" class="lesson-toc-btn" data-jump-sec="sec-etapa-4">4. Fórmulas</button>` : ''}
+          ${approaches.length ? `<button type="button" class="lesson-toc-btn" data-jump-sec="sec-metodos">🧭 Formas de resolver (${approaches.length})</button>` : ''}
           <button type="button" class="lesson-toc-btn" data-jump-sec="sec-etapa-5">5. Visualización Gráfica</button>
           ${mistakes.length ? `<button type="button" class="lesson-toc-btn" data-jump-sec="sec-etapa-7">7. Errores Frecuentes</button>` : ''}
         </div>
@@ -2645,6 +2692,7 @@ window.MatInteractiva = window.MatInteractiva || {};
         <div class="didactic-step-badge"><span>1</span> Etapa 1 de 9 · Introducción</div>
         <h2>¿Qué es este concepto y para qué sirve?</h2>
         ${(th.intro || []).map(p => `<p class="theory-paragraph">${ns.MathRenderer.formatRichText(p)}</p>`).join('')}
+        ${renderSimpleExplainBlock(th.simpleIntro, `simple-${topic.id}-intro`, 'is-compact')}
 
         <!-- ETAPA 2: CONOCIMIENTOS PREVIOS NECESARIOS -->
         ${prereqs.length ? `
@@ -2655,6 +2703,7 @@ window.MatInteractiva = window.MatInteractiva || {};
               <ul class="prereq-list">
                 ${prereqs.map(pr => `<li>${ns.MathRenderer.formatRichText(pr)}</li>`).join('')}
               </ul>
+              ${renderSimpleExplainBlock(th.simplePrereqs, `simple-${topic.id}-prereqs`, 'is-compact')}
             </div>
           </div>
         ` : ''}
@@ -2663,7 +2712,12 @@ window.MatInteractiva = window.MatInteractiva || {};
         <div class="theory-section-block" id="sec-etapa-3">
           <div class="didactic-step-badge"><span>3</span> Etapa 3 de 9 · Explicación Teórica Detallada</div>
           <h2>Desarrollo Teórico Progresivo desde Cero</h2>
-          ${detailed.map(p => `<p class="theory-paragraph">${ns.MathRenderer.formatRichText(p)}</p>`).join('')}
+          ${detailed.map((p, idx) => `
+            <div class="theory-detailed-item">
+              <p class="theory-paragraph">${ns.MathRenderer.formatRichText(p)}</p>
+              ${renderSimpleExplainBlock(detailedSimple[idx], `simple-${topic.id}-det-${idx}`, 'is-compact')}
+            </div>
+          `).join('')}
 
           <div class="concept-grid">
             ${concepts.map((c, idx) => `
@@ -2675,6 +2729,7 @@ window.MatInteractiva = window.MatInteractiva || {};
                     📈 ${c.graphLabel || 'Ver en graficador'}
                   </button>
                 ` : ''}
+                ${renderSimpleExplainBlock(c.simple, `simple-${topic.id}-con-${idx}`, 'is-compact')}
               </div>
             `).join('')}
           </div>
@@ -2683,7 +2738,7 @@ window.MatInteractiva = window.MatInteractiva || {};
             <div class="theorems-section" id="sec-teoremas">
               <h3 class="theorems-heading">📐 Definiciones Formales, Teoremas y Demostraciones</h3>
               <div class="theorems-grid">
-                ${theorems.map(thm => `
+                ${theorems.map((thm, tIdx) => `
                   <article class="theorem-card">
                     <div class="theorem-header">
                       <span class="theorem-badge">${thm.badge || 'Teorema'}</span>
@@ -2706,6 +2761,7 @@ window.MatInteractiva = window.MatInteractiva || {};
                         </div>
                       </details>
                     ` : (thm.note ? `<div class="theorem-note"><strong>Observación:</strong> ${ns.MathRenderer.formatRichText(thm.note)}</div>` : '')}
+                    ${renderSimpleExplainBlock(thm.simple, `simple-${topic.id}-thm-${tIdx}`, 'is-compact')}
                   </article>
                 `).join('')}
               </div>
@@ -2730,6 +2786,7 @@ window.MatInteractiva = window.MatInteractiva || {};
                 </div>
                 <div class="formula-expression">${ns.MathRenderer.renderMath(f.expr, true)}</div>
                 <span class="formula-note">${ns.MathRenderer.formatRichText(f.note)}</span>
+                ${renderSimpleExplainBlock(f.simple, `simple-${topic.id}-form-${idx}`, 'is-compact')}
               </div>
             `).join('')}
             ${topic.graphPreset ? `
@@ -2740,6 +2797,41 @@ window.MatInteractiva = window.MatInteractiva || {};
           </div>
         ` : ''}
       </div>
+
+      <!-- MÚLTIPLES FORMAS DE ABORDAR Y RESOLVER ESTE TEMA -->
+      ${approaches.length ? `
+        <div class="content-card" id="sec-metodos">
+          <div class="didactic-step-badge"><span>🧭</span> Estrategias y Enfoques Múltiples</div>
+          <h2>Múltiples Formas de Abordar y Resolver: ${topic.title}</h2>
+          <p class="theory-paragraph">
+            En matemáticas hay varios caminos equivalentes para llegar al mismo resultado. Domina estas <strong>${approaches.length} maneras de pensar y resolver</strong> los problemas de este tema para entender el porqué de cada regla y poder verificar tus respuestas por más de una ruta:
+          </p>
+          <div class="approaches-grid">
+            ${approaches.map((ap, aIdx) => `
+              <article class="approach-card">
+                <div class="approach-card-head">
+                  <span class="approach-badge">${ap.badge || `Enfoque ${aIdx + 1}`}</span>
+                  <h3 class="approach-title">${ns.MathRenderer.formatRichText(ap.title)}</h3>
+                </div>
+                ${ap.when ? `<div class="approach-when"><strong>🎯 Cuándo conviene:</strong> ${ns.MathRenderer.formatRichText(ap.when)}</div>` : ''}
+                ${ap.idea ? `<p class="approach-idea">${ns.MathRenderer.formatRichText(ap.idea)}</p>` : ''}
+                ${Array.isArray(ap.steps) && ap.steps.length ? `
+                  <ol class="approach-steps-list">
+                    ${ap.steps.map(st => `<li>${ns.MathRenderer.formatRichText(st)}</li>`).join('')}
+                  </ol>
+                ` : ''}
+                ${ap.miniExample ? `
+                  <div class="approach-mini-example">
+                    <span class="approach-mini-tag">⚡ Ejemplo rápido con este método</span>
+                    <div>${ns.MathRenderer.formatRichText(ap.miniExample)}</div>
+                  </div>
+                ` : ''}
+                ${renderSimpleExplainBlock(ap.simple, `simple-${topic.id}-ap-${aIdx}`, 'is-compact')}
+              </article>
+            `).join('')}
+          </div>
+        </div>
+      ` : ''}
 
       <!-- ETAPA 5: INTERPRETACIÓN GRÁFICA INTERACTIVA -->
       <div class="content-card" id="sec-etapa-5">
@@ -2763,7 +2855,7 @@ window.MatInteractiva = window.MatInteractiva || {};
           <div class="didactic-step-badge"><span>7</span> Etapa 7 de 9 · Prevención de Errores Algebraicos y de Cálculo</div>
           <h2>⚠️ Errores Frecuentes y Cómo Evitarlos</h2>
           <div class="mistakes-grid">
-            ${mistakes.map(m => `
+            ${mistakes.map((m, mIdx) => `
               <div class="mistake-card">
                 ${m.title ? `<div class="mistake-card-title">${ns.MathRenderer.formatRichText(m.title)}</div>` : ''}
                 <div class="mistake-wrong">
@@ -2777,6 +2869,7 @@ window.MatInteractiva = window.MatInteractiva || {};
                 <div class="mistake-why">
                   💡 <strong>Por qué ocurre:</strong> ${ns.MathRenderer.formatRichText(m.why || m.advice)}
                 </div>
+                ${renderSimpleExplainBlock(m.simple, `simple-${topic.id}-th-err-${mIdx}`, 'is-compact')}
               </div>
             `).join('')}
           </div>
@@ -2785,7 +2878,7 @@ window.MatInteractiva = window.MatInteractiva || {};
 
       <div class="lesson-nav-footer">
         <span class="lesson-nav-hint">
-          Continúa con la Etapa 6 (Ejemplos resueltos paso a paso) y la Etapa 8 (Ejercicios interactivos).
+          Continúa con la Etapa 6 (Ejemplos resueltos por múltiples métodos) y la Etapa 8 (Ejercicios interactivos).
         </span>
         <div class="lesson-nav-actions">
           <button class="btn btn-primary" id="btn-go-examples">
@@ -2818,6 +2911,8 @@ window.MatInteractiva = window.MatInteractiva || {};
     box.querySelectorAll('summary.proof-summary').forEach(sum => {
       sum.addEventListener('click', () => haptic('light'));
     });
+
+    bindSimpleExplainEvents(box);
 
     box.querySelectorAll('[data-jump-sec]').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -2940,6 +3035,35 @@ window.MatInteractiva = window.MatInteractiva || {};
                     </div>
                   `;
                 }).join('')}
+
+                ${renderSimpleExplainBlock(ex.simple, `simple-${topic.id}-ex-${exIdx}`, 'is-compact')}
+
+                ${Array.isArray(ex.alternativeMethods) && ex.alternativeMethods.length ? `
+                  <details class="alt-methods-details" ${exIdx === 0 ? 'open' : ''}>
+                    <summary class="alt-methods-summary">
+                      <span>🔄 Otras ${ex.alternativeMethods.length} ${ex.alternativeMethods.length === 1 ? 'forma' : 'formas'} de resolver este mismo problema</span>
+                      <span class="alt-methods-chevron" aria-hidden="true">▾</span>
+                    </summary>
+                    <div class="alt-methods-list">
+                      ${ex.alternativeMethods.map((am, amIdx) => `
+                        <article class="alt-method-card">
+                          <div class="alt-method-head">
+                            <span class="alt-method-badge">${am.badge || `Método ${amIdx + 2}`}</span>
+                            <strong class="alt-method-title">${ns.MathRenderer.formatRichText(am.title)}</strong>
+                          </div>
+                          ${am.when ? `<div class="alt-method-when"><strong>💡 Idea clave:</strong> ${ns.MathRenderer.formatRichText(am.when)}</div>` : ''}
+                          ${Array.isArray(am.steps) && am.steps.length ? `
+                            <ol class="alt-method-steps">
+                              ${am.steps.map(st => `<li>${ns.MathRenderer.formatRichText(st)}</li>`).join('')}
+                            </ol>
+                          ` : ''}
+                          ${am.result ? `<div class="alt-method-result"><strong>✓ Resultado:</strong> ${ns.MathRenderer.formatRichText(am.result)}</div>` : ''}
+                          ${renderSimpleExplainBlock(am.simple, `simple-${topic.id}-ex-${exIdx}-am-${amIdx}`, 'is-compact')}
+                        </article>
+                      `).join('')}
+                    </div>
+                  </details>
+                ` : ''}
               </div>
             </div>
           `;
@@ -2950,7 +3074,7 @@ window.MatInteractiva = window.MatInteractiva || {};
             <div class="didactic-step-badge"><span>7</span> Etapa 7 de 9 · Errores Frecuentes y Cómo Evitarlos</div>
             <h2>⚠️ Errores Frecuentes al Resolver este Tipo de Problemas</h2>
             <div class="mistakes-grid">
-              ${mistakes.map(m => `
+              ${mistakes.map((m, mIdx) => `
                 <div class="mistake-card">
                   ${m.title ? `<div class="mistake-card-title">${ns.MathRenderer.formatRichText(m.title)}</div>` : ''}
                   <div class="mistake-wrong">
@@ -2964,6 +3088,7 @@ window.MatInteractiva = window.MatInteractiva || {};
                   <div class="mistake-why">
                     💡 <strong>Explicación:</strong> ${ns.MathRenderer.formatRichText(m.why || m.advice)}
                   </div>
+                  ${renderSimpleExplainBlock(m.simple, `simple-${topic.id}-ex-err-${mIdx}`, 'is-compact')}
                 </div>
               `).join('')}
             </div>
@@ -2976,6 +3101,8 @@ window.MatInteractiva = window.MatInteractiva || {};
         </div>
       </div>
     `;
+
+    bindSimpleExplainEvents(box);
 
     box.querySelectorAll('[data-example-graph]').forEach(btn => {
       btn.addEventListener('click', (ev) => {

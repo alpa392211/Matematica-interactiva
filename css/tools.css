@@ -2294,11 +2294,11 @@ body.has-expanded-graph .content-card {
   align-items: center;
   padding: 0.18rem 0.6rem;
   border-radius: var(--radius-full);
-  background: rgba(251, 191, 36, 0.24);
-  border: 1px solid rgba(253, 224, 71, 0.62);
-  color: #fef08a;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  color: #f8fafc;
   font-size: 0.7rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -2334,7 +2334,7 @@ body.has-expanded-graph .content-card {
 }
 
 .prepmat-hero-desc strong {
-  color: #fef08a;
+  color: #ffffff;
 }
 
 .prepmat-hero-features {
