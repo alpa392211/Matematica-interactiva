@@ -427,3 +427,10 @@ Este archivo documenta de forma acumulativa cada fase ejecutada, sus archivos mo
   - **Código `23410908` ([js/engine/storage.js](../js/engine/storage.js), [js/app.js](../js/app.js))**: ahora también aumenta o disminuye aleatoriamente el Dominio Global (modificando temas estudiados, ejercicios resueltos y evaluaciones) y lo reporta en el mensaje.
   - **Aviso de actualización ([index.html](../index.html), [js/app.js](../js/app.js))**: eliminado el botón `Ver más en Ajustes` (`#btn-whats-new-more`).
 - **Verificación**: `node --test tests/*.test.js` aprobado.
+
+---
+## v1.5.2 — Botón flotante de calculadora en móvil y notas limpias
+- **Qué cambió**:
+  - **Botón flotante de calculadora en celular ([index.html](../index.html), [css/layout.css](../css/layout.css), [js/app.js](../js/app.js))**: agregado `#btn-floating-open-quick-calc` en el lado derecho, sincronizado con el desplazamiento en pantalla igual que `#btn-floating-open-sidebar`.
+  - **Notas de actualización ([js/version.js](../js/version.js))**: limpiadas las entradas de `RELEASE_NOTES` para no incluir detalles internos.
+- **Verificación**: `node --test tests/*.test.js` aprobado.

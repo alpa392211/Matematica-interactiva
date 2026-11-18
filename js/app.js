@@ -273,8 +273,9 @@ window.MatInteractiva = window.MatInteractiva || {};
 
   function syncFloatingMenuButton() {
     if (typeof document === 'undefined' || typeof window === 'undefined') return;
-    const btn = document.getElementById('btn-floating-open-sidebar');
-    if (!btn) return;
+    const menuBtn = document.getElementById('btn-floating-open-sidebar');
+    const calcBtn = document.getElementById('btn-floating-open-quick-calc');
+    if (!menuBtn && !calcBtn) return;
 
     const isMobile = window.innerWidth <= 900;
     const sidebarOpen = Boolean(document.getElementById('app-sidebar')?.classList.contains('open'));
@@ -296,9 +297,12 @@ window.MatInteractiva = window.MatInteractiva || {};
     }
 
     const shouldShow = isMobile && !hasOverlay && scrolledPastHeader;
-    btn.classList.toggle('is-visible', shouldShow);
-    btn.setAttribute('aria-hidden', shouldShow ? 'false' : 'true');
-    btn.tabIndex = shouldShow ? 0 : -1;
+    [menuBtn, calcBtn].forEach((el) => {
+      if (!el) return;
+      el.classList.toggle('is-visible', shouldShow);
+      el.setAttribute('aria-hidden', shouldShow ? 'false' : 'true');
+      el.tabIndex = shouldShow ? 0 : -1;
+    });
   }
 
   function getFocusableInside(container) {
@@ -1551,12 +1555,15 @@ window.MatInteractiva = window.MatInteractiva || {};
       });
     }
 
-    document.getElementById('btn-open-quick-calc')?.addEventListener('click', (ev) => {
+    function handleOpenQuickCalc(ev) {
       if (!modal || !modalBody) return;
       haptic('confirm');
       openAccessibleDialog(modal, { returnFocusEl: ev.currentTarget });
       ns.CalculatorTool.renderCalculatorView(modalBody);
-    });
+    }
+
+    document.getElementById('btn-open-quick-calc')?.addEventListener('click', handleOpenQuickCalc);
+    document.getElementById('btn-floating-open-quick-calc')?.addEventListener('click', handleOpenQuickCalc);
 
     document.getElementById('btn-close-quick-modal')?.addEventListener('click', () => {
       haptic('confirm');

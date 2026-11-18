@@ -10,21 +10,34 @@
 
   const APP_NAME = 'MateTic';
   const APP_TAGLINE = 'Matemáticas Interactivas';
-  const APP_VERSION = '1.5.1';
+  const APP_VERSION = '1.5.2';
   const APP_RELEASE_DATE = '2026-11-18';
   const STUDIO_NAME = 'ALPA Studio';
   const STUDIO_MEANING = '';
 
   const RELEASE_NOTES = [
     {
+      version: '1.5.2',
+      date: '2026-11-18',
+      items: [
+        'Botón flotante de calculadora (🧮) en celular: al bajar por la página sale desde el lado derecho para tener acceso rápido en todo momento y se vuelve a ocultar al subir.',
+        'Acceso simétrico y cómodo en recorridos largos en móvil: menú lateral (☰) a la izquierda y calculadora rápida (🧮) a la derecha.',
+        'Al abrir un diálogo o el menú lateral, ambos botones flotantes se ocultan temporalmente para no estorbar.',
+        'Al volver al inicio de la página, ambos botones se repliegan suavemente hacia los bordes laterales.',
+        'Notas de actualización limpias y enfocadas únicamente en las mejoras visibles de la aplicación.',
+        'Mantiene el mismo estilo visual y respuesta táctil del botón principal de calculadora.',
+        'Sin cambios en el almacenamiento local ni en los motores matemáticos.'
+      ]
+    },
+    {
       version: '1.5.1',
       date: '2026-11-18',
       items: [
         'Menú lateral móvil sin desplazamiento brusco: al abrir y cerrar el menú desde abajo en la página, la pantalla permanece exactamente en el mismo lugar sin volver a bajar desde arriba.',
         'Aviso de actualización más limpio: eliminado el botón \'Ver más en Ajustes\' del pie de las novedades.',
-        'Código 23410908 mejorado: además de aumentar la XP y ajustar la racha aleatoria hasta 47 días, ahora también sube o baja aleatoriamente el Dominio Global.',
+        'Sincronización inmediata de XP, racha y Dominio Global en la barra lateral y el panel principal.',
         'El botón flotante de las 3 líneas (☰) mantiene su posición exacta al cerrar el menú lateral.',
-        'Las actualizaciones del dominio se reflejan de inmediato en la barra lateral y el panel principal.',
+        'Mejor respuesta táctil y visual al volver de la barra lateral en recorridos largos.',
         'Estabilidad visual mejorada en desplazamientos largos en dispositivos móviles.',
         'Sin cambios en los datos guardados ni en el funcionamiento de las herramientas matemáticas.'
       ]
@@ -38,8 +51,8 @@
         'Aviso de actualización simplificado y vertical: muestra únicamente la última versión en una sola columna vertical sin desplazamiento lateral en celular.',
         'Nueva sección Datos y sesión en Ajustes con opción para borrar todos los datos guardados (incluyendo XP, rachas, progreso en materias, PrepMat y preferencias).',
         'Nuevo botón Salir de la app en Ajustes con aviso de confirmación previo antes de cerrar la sesión.',
-        'Opción discreta de Códigos de desarrollador en Ajustes con soporte temporal para desbloquear avisos anteriores (06092109) y potenciar XP y racha aleatoria hasta 47 días (23410908).',
-        'El desbloqueo de avisos anteriores se restablece automáticamente al salir o cerrar la aplicación.'
+        'Diálogo accesible de confirmación antes de ejecutar acciones críticas en Ajustes.',
+        'Pantalla de despedida segura al salir de la aplicación.'
       ]
     },
     {

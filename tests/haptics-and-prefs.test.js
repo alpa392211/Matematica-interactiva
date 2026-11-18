@@ -252,16 +252,19 @@ test('Datos, salida de app, códigos de desarrollador (06092109 / 23410908) y aj
 
   const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
   const appCode = fs.readFileSync(path.join(__dirname, '..', 'js', 'app.js'), 'utf8');
+  const versionCode = fs.readFileSync(path.join(__dirname, '..', 'js', 'version.js'), 'utf8');
   const toolsCss = fs.readFileSync(path.join(__dirname, '..', 'css', 'tools.css'), 'utf8');
   const componentsCss = fs.readFileSync(path.join(__dirname, '..', 'css', 'components.css'), 'utf8');
 
   assert.match(html, /id="btn-floating-open-sidebar"/);
+  assert.match(html, /id="btn-floating-open-quick-calc"/);
   assert.match(html, /id="btn-wipe-all-data"/);
   assert.match(html, /id="btn-exit-app"/);
   assert.match(html, /id="app-confirm-modal"/);
   assert.match(html, /id="settings-dev-details"/);
   assert.match(html, /Códigos de desarrollador/);
   assert.doesNotMatch(html, /id="btn-whats-new-more"/);
+  assert.doesNotMatch(versionCode, /06092109|23410908|c[óo]digos de desarrollador/i);
   assert.match(appCode, /06092109/);
   assert.match(appCode, /23410908/);
   assert.match(appCode, /devOldNoticesUnlocked/);
