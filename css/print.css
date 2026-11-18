@@ -1,5 +1,5 @@
 /* ==========================================================================
-   MATEMÁTICA INTERACTIVA - Estilos de Formularios Matemáticos y Motor @media print
+   MATETIC - Estilos de Formularios Matemáticos y Motor @media print
    Archivo: css/print.css
    Fase 5A: Diseño en pantalla de Formularios Matemáticos + Impresión Tamaño Carta
    ========================================================================== */
@@ -123,7 +123,7 @@
   padding: 0.5rem 0.65rem;
   border-radius: var(--radius-md);
   border: 1.5px solid var(--border-light);
-  background: #FFFFFF;
+  background: var(--bg-surface-solid);
   cursor: pointer;
   text-align: left;
   transition: all var(--transition-fast);
@@ -177,14 +177,31 @@
 }
 
 /* --------------------------------------------------------------------------
-   2. Hoja Académica Imprimible y Membrete (Pantalla)
+   2. Hoja Académica Imprimible y Membrete (Pantalla: sin vidrio, blur ni fondos oscuros)
    -------------------------------------------------------------------------- */
 .fs-printable-sheet {
+  --bg-surface: #FFFFFF;
+  --bg-surface-solid: #FFFFFF;
+  --bg-surface-alt: #F8FAFC;
+  --text-main: #0F172A;
+  --text-secondary: #334155;
+  --text-muted: #475569;
+  --primary-900: #1E3A8A;
+  --primary-800: #1E40AF;
+  --primary-700: #1D4ED8;
+  --primary-600: #2563EB;
+  --primary-200: #BFDBFE;
+  --primary-50: #EFF6FF;
+  --border-light: #E2E8F0;
+  --border-medium: #CBD5E1;
   background: #FFFFFF;
-  border: 1px solid var(--border-light);
+  color: #0F172A;
+  border: 1px solid #CBD5E1;
   border-radius: var(--radius-xl);
   padding: 2rem 2.25rem;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.08);
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
   display: flex;
   flex-direction: column;
   gap: 1.65rem;
@@ -616,13 +633,28 @@
 }
 
 @media print {
-  /* Ocultar absolutamente toda la interfaz de navegación, controles y barras */
+  /* Ocultar absolutamente toda la interfaz de navegación, controles y atmósfera ambiental */
+  body::before,
+  .ambient-math-canvas,
   .sidebar,
   .sidebar-overlay,
+  .sidebar-prefs-card,
+  .sidebar-settings-btn,
+  .kofi-support-btn,
+  .demo-anim-section,
   .top-header,
   .mobile-menu-btn,
   .header-back-btn,
   .quick-modal-backdrop,
+  .sheet-modal-backdrop,
+  #numerus-cas-modal,
+  #settings-install-row,
+  #btn-install-pwa,
+  .precision-notice,
+  .graph-gesture-hint,
+  .grapher-zoom-actions,
+  .lesson-graph-toolbar,
+  .chart-fullscreen-modal,
   .no-print,
   .fs-controls-panel,
   .fs-module-banner-right,
@@ -631,6 +663,11 @@
   .learning-tabs,
   .topics-bar {
     display: none !important;
+  }
+
+  * {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
   }
 
   /* Restablecer contenedores principales para flujo multipágina en papel */
