@@ -5223,6 +5223,10 @@ html[data-theme="dark"] .approach-more-summary {
   opacity: 1;
 }
 
+.wt-spotlight.is-tracking {
+  transition: none !important;
+}
+
 .wt-dialog-card {
   position: fixed;
   z-index: 4205;

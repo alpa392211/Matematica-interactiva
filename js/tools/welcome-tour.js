@@ -2,8 +2,8 @@
    MATETIC - Animación de Bienvenida y Recorrido Interactivo Menú por Menú
    Archivo: js/tools/welcome-tour.js
    Presenta de forma limpia y progresiva cada menú y herramienta de la app
-   con bloqueo estricto de scroll, foco Spotlight exacto y hoja inferior
-   amigable en dispositivos móviles.
+   con bloqueo estricto de scroll, encuadre instantáneo y alineación exacta
+   del foco Spotlight en celular, tableta y escritorio.
    ========================================================================== */
 
 window.MatInteractiva = window.MatInteractiva || {};
@@ -13,6 +13,7 @@ window.MatInteractiva = window.MatInteractiva || {};
 
   const AUTO_STEP_DURATION_MS = 5800;
   const DIALOGUE_BEAT_MS = 780;
+  const SETTLE_MONITOR_MS = 520;
 
   const TOUR_STEPS = [
     {
@@ -76,7 +77,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       menuBadge: 'Lecciones',
       icon: '📖',
       title: 'Teoría, Métodos y Palabras Sencillas',
-      targetSelector: '.learning-tabs',
+      targetSelector: '.hscroll-shell.is-learning-tabs, .learning-tabs',
       previewAction: 'lesson',
       dialogues: [
         'Cada tema se organiza en <strong>4 pestañas</strong>: Teoría, Ejemplos, Práctica y Evaluación.',
@@ -90,7 +91,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       menuBadge: 'Exámenes PRO',
       icon: '🎓',
       title: 'PrepMat · Simulador de Exámenes',
-      targetSelector: '.prepmat-hero-header, #main-view-container',
+      targetSelector: '.prepmat-hero-header',
       previewAction: 'prepmat',
       dialogues: [
         'Entrena con exámenes de <strong>Bachillerato</strong> y <strong>Licenciatura</strong> sin preguntas repetidas.',
@@ -104,7 +105,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       menuBadge: 'Graficador',
       icon: '📈',
       title: 'Graficador Interactivo de Funciones',
-      targetSelector: '.tool-workspace-header, .grapher-layout, #main-view-container',
+      targetSelector: '.subject-header-card',
       previewAction: 'graficador',
       dialogues: [
         'Grafica funciones en tiempo real, explora tangentes y detecta <strong>huecos removibles (0/0)</strong> automáticamente.',
@@ -118,7 +119,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       menuBadge: 'Formularios',
       icon: '📄',
       title: 'Formularios Listos para Consultar',
-      targetSelector: '.tool-workspace-header, .formula-sheets-nav, #main-view-container',
+      targetSelector: '.subject-header-card',
       previewAction: 'formularios',
       dialogues: [
         'Reúne identidades trigonométricas, reglas de derivación e integrales en fichas limpias.',
@@ -132,7 +133,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       menuBadge: 'Editor Visual',
       icon: '∑',
       title: 'Editor Visual y Teclados Matemáticos',
-      targetSelector: '.mathlive-field-wrapper, .editor-main-panel, .tool-workspace-header',
+      targetSelector: '.mathlive-field-wrapper, .subject-header-card',
       previewAction: 'editor',
       dialogues: [
         'Escribe fracciones, raíces, potencias, límites e integrales con botones visuales claros.',
@@ -146,7 +147,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       menuBadge: 'Cálculo y Guía',
       icon: '🧭',
       title: 'Resolución Guiada y Calculadora',
-      targetSelector: '.tool-workspace-header, #main-view-container',
+      targetSelector: '.subject-header-card',
       previewAction: 'solucionador',
       dialogues: [
         '<strong>Resolución Guiada</strong> desbloquea cada paso conforme avanzas para practicar sin ver la respuesta de golpe.',
@@ -191,6 +192,8 @@ window.MatInteractiva = window.MatInteractiva || {};
   let autoTimerId = null;
   let dialogueTimers = [];
   let layoutTimers = [];
+  let settleRafId = null;
+  let activeResizeObserver = null;
   let rootEl = null;
   let spotlightEl = null;
   let cardEl = null;
@@ -223,6 +226,29 @@ window.MatInteractiva = window.MatInteractiva || {};
     if (typeof document === 'undefined') return;
     document.documentElement.classList.toggle('has-welcome-tour', Boolean(locked));
     document.body.classList.toggle('has-welcome-tour', Boolean(locked));
+  }
+
+  /**
+   * Desplazamiento estrictamente síncrono e instantáneo, inmune a `scroll-behavior: smooth`.
+   */
+  function instantScrollTo(y) {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
+    const htmlEl = document.documentElement;
+    const prev = htmlEl.style.scrollBehavior;
+    htmlEl.style.scrollBehavior = 'auto';
+    const targetY = Math.max(0, Math.round(y));
+    try {
+      window.scrollTo({ top: targetY, left: 0, behavior: 'instant' });
+    } catch (_) {
+      window.scrollTo(0, targetY);
+    }
+    htmlEl.scrollTop = targetY;
+    if (document.body) document.body.scrollTop = targetY;
+    if (prev) {
+      htmlEl.style.scrollBehavior = prev;
+    } else {
+      htmlEl.style.removeProperty('scroll-behavior');
+    }
   }
 
   function isScrollableCardEvent(ev) {
@@ -271,9 +297,20 @@ window.MatInteractiva = window.MatInteractiva || {};
     dialogueTimers = [];
   }
 
-  function clearLayoutTimers() {
+  function clearLayoutMonitors() {
     layoutTimers.forEach((id) => clearTimeout(id));
     layoutTimers = [];
+    if (settleRafId !== null && typeof cancelAnimationFrame === 'function') {
+      cancelAnimationFrame(settleRafId);
+      settleRafId = null;
+    }
+    if (activeResizeObserver) {
+      try { activeResizeObserver.disconnect(); } catch (_) {}
+      activeResizeObserver = null;
+    }
+    if (spotlightEl) {
+      spotlightEl.classList.remove('is-tracking');
+    }
   }
 
   function stopAutoPlay() {
@@ -515,26 +552,67 @@ window.MatInteractiva = window.MatInteractiva || {};
   }
 
   /**
-   * Desplaza instantáneamente el objetivo al tercio superior visible antes de
-   * bloquear el scroll, evitando que el foco quede cortado abajo o desfasado.
+   * Encuadra el objetivo de forma estrictamente instantánea solo cuando está
+   * fuera del área visible segura (debajo de la barra superior y encima de la hoja).
    */
   function frameTargetInstantly(step) {
-    if (typeof window === 'undefined' || !step || !step.targetSelector || step.fixedTarget) return;
+    if (typeof window === 'undefined' || typeof document === 'undefined' || !step || !step.targetSelector) {
+      return;
+    }
+    if (step.fixedTarget) {
+      instantScrollTo(0);
+      return;
+    }
+
+    instantScrollTo(0);
     const target = findVisibleTarget(step.targetSelector);
     if (!target) return;
 
-    const isMobile = (window.innerWidth || 1024) <= 900;
-    const desiredTop = isMobile ? 64 : 84;
-    const rect = target.getBoundingClientRect();
-    const docY = (window.scrollY || window.pageYOffset || 0) + rect.top;
-    const nextScrollY = Math.max(0, Math.round(docY - desiredTop));
+    const vw = window.innerWidth || 1024;
+    const vh = window.innerHeight || 768;
+    const isMobile = vw <= 900;
 
-    if (typeof window.scrollTo === 'function') {
-      window.scrollTo({ top: nextScrollY, behavior: 'auto' });
+    const headerEl = document.querySelector('.top-header');
+    const headerRect = headerEl && typeof headerEl.getBoundingClientRect === 'function'
+      ? headerEl.getBoundingClientRect()
+      : null;
+    const safeTop = Math.max(isMobile ? 48 : 74, headerRect ? Math.round(headerRect.bottom + 10) : 74);
+
+    let safeBottom = vh - 24;
+    if (isMobile && cardEl) {
+      const cardRect = cardEl.getBoundingClientRect();
+      if (cardRect.height > 40) {
+        safeBottom = Math.max(safeTop + 80, vh - Math.round(cardRect.height) - 24);
+      } else {
+        safeBottom = Math.round(vh * 0.56);
+      }
+    }
+
+    const rect = target.getBoundingClientRect();
+    const alreadyVisible = rect.top >= (safeTop - 8) && rect.bottom <= safeBottom;
+    if (alreadyVisible) return;
+
+    const docY = (window.scrollY || window.pageYOffset || 0) + rect.top;
+    instantScrollTo(docY - safeTop);
+  }
+
+  function resolveSpotlightRadius(target, pad, spotLeft, spotTop) {
+    try {
+      const cs = typeof window !== 'undefined' && typeof window.getComputedStyle === 'function'
+        ? window.getComputedStyle(target)
+        : null;
+      const base = cs ? parseFloat(cs.borderTopLeftRadius) : 16;
+      const r = Number.isFinite(base) ? Math.min(28, Math.max(8, Math.round(base + (base > 0 ? Math.min(pad, 4) : 0)))) : 16;
+      if (spotLeft <= 2 && spotTop <= 2 && base < 4) {
+        return '4px';
+      }
+      return `${r}px`;
+    } catch (_) {
+      return '16px';
     }
   }
 
-  function positionSpotlightAndCard(step) {
+  function positionSpotlightAndCard(step, opts = {}) {
     if (!rootEl || !spotlightEl || !cardEl || typeof window === 'undefined') return;
 
     const vw = window.innerWidth || 1024;
@@ -546,7 +624,7 @@ window.MatInteractiva = window.MatInteractiva || {};
     rootEl.classList.toggle('is-mobile-sheet', isMobile && !isCentered);
 
     if (isCentered) {
-      spotlightEl.classList.remove('is-active');
+      spotlightEl.classList.remove('is-active', 'is-tracking');
       cardEl.style.removeProperty('top');
       cardEl.style.removeProperty('left');
       cardEl.style.removeProperty('bottom');
@@ -558,7 +636,7 @@ window.MatInteractiva = window.MatInteractiva || {};
     if (!target) {
       rootEl.classList.add('is-centered-step');
       rootEl.classList.remove('is-mobile-sheet');
-      spotlightEl.classList.remove('is-active');
+      spotlightEl.classList.remove('is-active', 'is-tracking');
       cardEl.style.removeProperty('top');
       cardEl.style.removeProperty('left');
       cardEl.style.removeProperty('bottom');
@@ -566,11 +644,18 @@ window.MatInteractiva = window.MatInteractiva || {};
       return;
     }
 
+    if (opts.instant) {
+      spotlightEl.classList.add('is-tracking');
+    } else {
+      spotlightEl.classList.remove('is-tracking');
+    }
+
     const rawRect = target.getBoundingClientRect();
-    const pad = isMobile ? 5 : 8;
+    const pad = isMobile ? 4 : 6;
+    const edge = 2;
 
     // -----------------------------------------------------------------------
-    // Modo móvil (<= 900px): hoja inferior fija, foco recortado arriba sin chocar
+    // Celular y Tableta vertical (<= 900px): hoja inferior fija, foco exacto arriba
     // -----------------------------------------------------------------------
     if (isMobile) {
       cardEl.style.removeProperty('top');
@@ -579,50 +664,45 @@ window.MatInteractiva = window.MatInteractiva || {};
       cardEl.style.removeProperty('bottom');
 
       const cardRect = cardEl.getBoundingClientRect();
-      const cardTop = cardRect.top > 0 ? cardRect.top : Math.round(vh * 0.56);
-      const maxSpotBottom = Math.max(88, cardTop - 12);
+      const cardTop = cardRect.top > 40 ? cardRect.top : Math.round(vh * 0.56);
+      const maxSpotBottom = Math.max(90, Math.round(cardTop - 10));
 
-      const spotLeft = Math.max(6, Math.min(vw - 24, rawRect.left - pad));
-      const spotTop = Math.max(6, Math.min(maxSpotBottom - 36, rawRect.top - pad));
-      const spotRight = Math.min(vw - 6, rawRect.right + pad);
-      const spotBottom = Math.min(maxSpotBottom, Math.max(spotTop + 36, rawRect.bottom + pad));
+      const spotLeft = Math.max(edge, Math.round(rawRect.left - pad));
+      const spotRight = Math.min(vw - edge, Math.round(rawRect.right + pad));
+      const spotTop = Math.max(edge, Math.min(maxSpotBottom - 34, Math.round(rawRect.top - pad)));
+      const spotBottom = Math.min(maxSpotBottom, Math.max(spotTop + 34, Math.round(rawRect.bottom + pad)));
 
-      spotlightEl.style.left = `${Math.round(spotLeft)}px`;
-      spotlightEl.style.top = `${Math.round(spotTop)}px`;
-      spotlightEl.style.width = `${Math.max(40, Math.round(spotRight - spotLeft))}px`;
-      spotlightEl.style.height = `${Math.max(36, Math.round(spotBottom - spotTop))}px`;
+      spotlightEl.style.left = `${spotLeft}px`;
+      spotlightEl.style.top = `${spotTop}px`;
+      spotlightEl.style.width = `${Math.max(40, spotRight - spotLeft)}px`;
+      spotlightEl.style.height = `${Math.max(34, spotBottom - spotTop)}px`;
+      spotlightEl.style.borderRadius = resolveSpotlightRadius(target, pad, spotLeft, spotTop);
       spotlightEl.classList.add('is-active');
       return;
     }
 
     // -----------------------------------------------------------------------
-    // Modo escritorio (> 900px): foco exacto y tarjeta SIEMPRE dentro del viewport
+    // Tableta horizontal y Escritorio (> 900px): foco exacto y tarjeta sin solaparse
     // -----------------------------------------------------------------------
     const margin = 14;
     const gap = 14;
     const cardRect = cardEl.getBoundingClientRect();
-    const cardW = Math.min(410, Math.max(320, Math.round(cardRect.width || 396)));
-    const cardH = Math.min(vh - margin * 2, Math.max(210, Math.round(cardRect.height || 260)));
+    const cardW = Math.min(404, Math.max(320, Math.round(cardRect.width || 396)));
+    const cardH = Math.min(vh - margin * 2, Math.max(200, Math.round(cardRect.height || 260)));
 
-    let spotLeft = Math.max(6, rawRect.left - pad);
-    let spotTop = Math.max(6, rawRect.top - pad);
-    let spotRight = Math.min(vw - 6, rawRect.right + pad);
-    let spotBottom = Math.min(vh - 6, rawRect.bottom + pad);
+    const spotLeft = Math.max(edge, Math.round(rawRect.left - pad));
+    const spotRight = Math.min(vw - edge, Math.round(rawRect.right + pad));
+    const spotTop = Math.max(edge, Math.round(rawRect.top - pad));
+    const spotBottom = Math.min(vh - edge, Math.round(rawRect.bottom + pad));
 
-    // Si el objetivo ocupa casi todo el alto (y no es la barra lateral), acotar su
-    // foco para dejar espacio limpio a la tarjeta sin recortarla
-    if (step.id !== 'sidebar' && step.id !== 'settings' && (spotBottom - spotTop) > (vh - cardH - margin * 2 - gap)) {
-      const maxVisibleHeight = Math.max(110, vh - cardH - margin * 2 - gap - Math.max(0, spotTop - margin));
-      spotBottom = Math.min(spotBottom, spotTop + maxVisibleHeight);
-    }
+    const spotW = Math.max(44, spotRight - spotLeft);
+    const spotH = Math.max(34, spotBottom - spotTop);
 
-    const spotW = Math.max(44, Math.round(spotRight - spotLeft));
-    const spotH = Math.max(36, Math.round(spotBottom - spotTop));
-
-    spotlightEl.style.left = `${Math.round(spotLeft)}px`;
-    spotlightEl.style.top = `${Math.round(spotTop)}px`;
+    spotlightEl.style.left = `${spotLeft}px`;
+    spotlightEl.style.top = `${spotTop}px`;
     spotlightEl.style.width = `${spotW}px`;
     spotlightEl.style.height = `${spotH}px`;
+    spotlightEl.style.borderRadius = resolveSpotlightRadius(target, pad, spotLeft, spotTop);
     spotlightEl.classList.add('is-active');
 
     const clampLeft = (x) => Math.max(margin, Math.min(vw - cardW - margin, Math.round(x)));
@@ -635,23 +715,18 @@ window.MatInteractiva = window.MatInteractiva || {};
       cardLeft = spotRight + gap;
       cardTop = clampTop(vh * 0.24);
     } else if ((spotBottom + gap + cardH + margin) <= vh) {
-      // 1. Debajo del foco
       cardLeft = clampLeft(spotLeft + spotW / 2 - cardW / 2);
       cardTop = spotBottom + gap;
     } else if ((spotTop - gap - cardH) >= margin) {
-      // 2. Encima del foco
       cardLeft = clampLeft(spotLeft + spotW / 2 - cardW / 2);
       cardTop = spotTop - gap - cardH;
     } else if ((spotRight + gap + cardW + margin) <= vw) {
-      // 3. A la derecha del foco
       cardLeft = spotRight + gap;
       cardTop = clampTop(spotTop);
     } else if ((spotLeft - gap - cardW) >= margin) {
-      // 4. A la izquierda del foco
       cardLeft = spotLeft - gap - cardW;
       cardTop = clampTop(spotTop);
     } else {
-      // 5. Esquina inferior derecha garantizada dentro del viewport
       cardLeft = vw - cardW - margin;
       cardTop = vh - cardH - margin;
     }
@@ -660,6 +735,49 @@ window.MatInteractiva = window.MatInteractiva || {};
     cardEl.style.right = 'auto';
     cardEl.style.left = `${clampLeft(cardLeft)}px`;
     cardEl.style.top = `${clampTop(cardTop)}px`;
+  }
+
+  function startAlignmentMonitor(step, stepIdx) {
+    clearLayoutMonitors();
+    if (!isActive || !step || !step.targetSelector) return;
+
+    const target = findVisibleTarget(step.targetSelector);
+    if (target && typeof ResizeObserver === 'function') {
+      try {
+        activeResizeObserver = new ResizeObserver(() => {
+          if (isActive && currentStepIdx === stepIdx) {
+            positionSpotlightAndCard(step, { instant: true });
+          }
+        });
+        activeResizeObserver.observe(target);
+      } catch (_) {}
+    }
+
+    // Seguimiento continuo breve durante transiciones del panel (sidebar, Ajustes, MathLive)
+    const startTs = typeof performance !== 'undefined' && typeof performance.now === 'function'
+      ? performance.now()
+      : Date.now();
+
+    const tick = () => {
+      if (!isActive || currentStepIdx !== stepIdx) {
+        settleRafId = null;
+        return;
+      }
+      positionSpotlightAndCard(step, { instant: true });
+      const now = typeof performance !== 'undefined' && typeof performance.now === 'function'
+        ? performance.now()
+        : Date.now();
+      if ((now - startTs) < SETTLE_MONITOR_MS && typeof requestAnimationFrame === 'function') {
+        settleRafId = requestAnimationFrame(tick);
+      } else {
+        settleRafId = null;
+        if (spotlightEl) spotlightEl.classList.remove('is-tracking');
+      }
+    };
+
+    if (typeof requestAnimationFrame === 'function') {
+      settleRafId = requestAnimationFrame(tick);
+    }
   }
 
   function renderStepContent(step, idx) {
@@ -754,55 +872,15 @@ window.MatInteractiva = window.MatInteractiva || {};
     currentStepIdx = bounded;
     const step = TOUR_STEPS[bounded];
 
-    clearLayoutTimers();
-    // 1. Liberar brevemente para navegar y encuadrar el objetivo al instante
-    setTourScrollLock(false);
+    clearLayoutMonitors();
+    setTourScrollLock(true);
     executeStepNavigation(step);
     renderStepContent(step, bounded);
 
-    const finalizeLayout = () => {
-      if (!isActive || currentStepIdx !== bounded) return;
-      frameTargetInstantly(step);
-      setTourScrollLock(true);
-      positionSpotlightAndCard(step);
-    };
-
-    if (typeof requestAnimationFrame === 'function') {
-      requestAnimationFrame(() => {
-        finalizeLayout();
-        requestAnimationFrame(() => {
-          if (isActive && currentStepIdx === bounded) {
-            positionSpotlightAndCard(step);
-          }
-        });
-      });
-    } else {
-      finalizeLayout();
-    }
-
-    // Si el paso abre un panel animado (menú lateral móvil o Ajustes),
-    // re-medir al terminar la transición para encuadrar el panel completo.
-    if (step.openSidebarMobile || step.previewAction === 'settings') {
-      const targetEl = findVisibleTarget(step.targetSelector);
-      if (targetEl && typeof targetEl.addEventListener === 'function') {
-        const onEnd = () => {
-          if (isActive && currentStepIdx === bounded) {
-            positionSpotlightAndCard(step);
-          }
-        };
-        targetEl.addEventListener('transitionend', onEnd, { once: true });
-      }
-      layoutTimers.push(setTimeout(() => {
-        if (isActive && currentStepIdx === bounded) {
-          positionSpotlightAndCard(step);
-        }
-      }, 220));
-      layoutTimers.push(setTimeout(() => {
-        if (isActive && currentStepIdx === bounded) {
-          positionSpotlightAndCard(step);
-        }
-      }, 420));
-    }
+    // Encuadre instantáneo (sincrónico, sin smooth scroll) y medición inmediata
+    frameTargetInstantly(step);
+    positionSpotlightAndCard(step, { instant: true });
+    startAlignmentMonitor(step, bounded);
 
     if (isAutoPlaying) {
       scheduleAutoAdvance();
@@ -814,7 +892,7 @@ window.MatInteractiva = window.MatInteractiva || {};
     isActive = false;
     stopAutoPlay();
     clearDialogueTimers();
-    clearLayoutTimers();
+    clearLayoutMonitors();
     closeTemporaryPanels();
     detachInputScrollBlockers();
     setTourScrollLock(false);
@@ -914,10 +992,8 @@ window.MatInteractiva = window.MatInteractiva || {};
     repositionHandler = () => {
       if (isActive) {
         const step = TOUR_STEPS[currentStepIdx];
-        setTourScrollLock(false);
         frameTargetInstantly(step);
-        setTourScrollLock(true);
-        positionSpotlightAndCard(step);
+        positionSpotlightAndCard(step, { instant: true });
       }
     };
     if (typeof window !== 'undefined') {

@@ -853,15 +853,20 @@ html[data-theme="dark"] .nav-item-prepmat.active .nav-badge-prepmat {
 }
 
 /* Overlay para móvil y bloqueo estricto de scroll del documento base */
-html.has-open-overlay,
-html.has-welcome-tour {
+html.has-open-overlay {
   overflow: hidden !important;
   height: 100% !important;
   overscroll-behavior: none !important;
 }
 
 html.has-welcome-tour {
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
   scroll-behavior: auto !important;
+}
+
+html.has-welcome-tour .main-content > * {
+  animation: none !important;
 }
 
 body.has-open-overlay {

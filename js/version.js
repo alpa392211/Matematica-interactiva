@@ -10,12 +10,25 @@
 
   const APP_NAME = 'MateTic';
   const APP_TAGLINE = 'Matemáticas Interactivas';
-  const APP_VERSION = '1.9.1';
+  const APP_VERSION = '1.9.2';
   const APP_RELEASE_DATE = '2026-11-20';
   const STUDIO_NAME = 'ALPA Studio';
   const STUDIO_MEANING = '';
 
   const RELEASE_NOTES = [
+    {
+      version: '1.9.2',
+      date: '2026-11-20',
+      items: [
+        'Alineación milimétrica de los cuadros luminosos (Spotlight) en todos los 12 pasos del recorrido en celular, tableta (vertical y horizontal) y escritorio.',
+        'Corregido el desplazamiento desfasado en Lecciones, PrepMat, Graficador, Formularios, Editor Visual y Resolución Guiada mediante encuadre estrictamente instantáneo (sin retraso de scroll suave).',
+        'Desactivada la animación de entrada vertical de vistas durante el recorrido para eliminar el corrimiento de 10 px al medir cada tarjeta.',
+        'Selectores corregidos para iluminar exclusivamente la cabecera de cada herramienta y el campo matemático visual, evitando marcos gigantes o recortados.',
+        'Radios de esquina adaptados automáticamente a cada elemento y margen seguro en bordes para no cortar el título del menú lateral en tableta.',
+        'Monitor continuo de ajuste con ResizeObserver para mantener la alineación exacta durante transiciones de menús laterales, Ajustes y carga de MathLive.',
+        'Verificación visual con capturas en los 12 pasos en celular (390×844) y tableta (768×1024 y 1024×768) con bloqueo de scroll comprobado.'
+      ]
+    },
     {
       version: '1.9.1',
       date: '2026-11-20',

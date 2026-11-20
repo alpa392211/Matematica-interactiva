@@ -304,7 +304,23 @@ window.MatInteractiva = window.MatInteractiva || {};
 
   function scrollPageToTop() {
     if (typeof window === 'undefined' || typeof window.scrollTo !== 'function') return;
-    window.scrollTo({ top: 0, behavior: isWelcomeTourActive() ? 'auto' : 'smooth' });
+    if (isWelcomeTourActive()) {
+      const htmlEl = typeof document !== 'undefined' ? document.documentElement : null;
+      const prev = htmlEl ? htmlEl.style.scrollBehavior : '';
+      if (htmlEl) htmlEl.style.scrollBehavior = 'auto';
+      try {
+        window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      } catch (_) {
+        window.scrollTo(0, 0);
+      }
+      if (htmlEl) {
+        htmlEl.scrollTop = 0;
+        if (prev) htmlEl.style.scrollBehavior = prev;
+        else htmlEl.style.removeProperty('scroll-behavior');
+      }
+      return;
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   function syncFloatingMenuButton() {

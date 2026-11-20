@@ -185,11 +185,16 @@ test('WelcomeTour cubre menú por menú con diálogos progresivos, bloqueo de sc
   assert.match(appCode, /previewOnly/);
   assert.match(appCode, /function scrollPageToTop\(\)/);
   assert.match(layoutCss, /html\.has-welcome-tour/);
+  assert.match(layoutCss, /html\.has-welcome-tour \.main-content > \*/);
   assert.match(layoutCss, /body\.has-welcome-tour/);
   assert.match(tourCode, /addEventListener\('wheel'/);
   assert.match(tourCode, /addEventListener\('touchmove'/);
+  assert.match(tourCode, /function instantScrollTo\(/);
   assert.match(tourCode, /function frameTargetInstantly\(/);
+  assert.match(tourCode, /function startAlignmentMonitor\(/);
+  assert.doesNotMatch(tourCode, /\.tool-workspace-header/);
   assert.match(compCss, /\.wt-spotlight/);
+  assert.match(compCss, /\.wt-spotlight\.is-tracking/);
   assert.match(compCss, /\.wt-dialogue-line/);
   assert.match(compCss, /\.wt-overlay\.is-mobile-sheet \.wt-dialog-card/);
   assert.match(compCss, /\.wt-nav-btn\[hidden\]/);

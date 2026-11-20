@@ -517,4 +517,13 @@ Este archivo documenta de forma acumulativa cada fase ejecutada, sus archivos mo
   - **Mejor contraste en modo claro con tonos grises ([css/variables.css](../css/variables.css), [css/components.css](../css/components.css))**: refinados fondo base (`#e5e7eb`), superficies secundarias, bordes (`rgba(71, 85, 105, 0.24)`), píldoras, tarjetas en celular y paleta neutra del recorrido de bienvenida en modo claro y oscuro.
 - **Verificación**: Inspección visual en Chromium headless en escritorio (`1280×720`) y móvil (`390×844`) en modo claro y oscuro, comprobación real de bloqueo `mouseWheel`, auditoría sintáctica y suite `node --test tests/*.test.js` aprobada (`65/65`).
 
+---
+## v1.9.2 — Alineación exacta de cuadros luminosos (Spotlight) en los 12 pasos para celular y tableta
+- **Qué cambió**:
+  - **Scroll estrictamente instantáneo durante el recorrido ([js/tools/welcome-tour.js](../js/tools/welcome-tour.js), [js/app.js](../js/app.js), [css/layout.css](../css/layout.css))**: reemplazado `behavior: 'auto'` (que seguía `scroll-behavior: smooth` del documento y provocaba desfases de hasta +448 px y +1481 px al medir antes de terminar el desplazamiento) por `instantScrollTo()` con `behavior: 'instant'` y `html.scrollTop` síncrono.
+  - **Cero corrimiento por animación de vistas ([css/layout.css](../css/layout.css))**: añadida la regla `html.has-welcome-tour .main-content > * { animation: none !important; }` para eliminar el desplazamiento inicial de `10 px` de `lgViewTransitionIn` mientras el recorrido está activo.
+  - **Selectores exactos en las 12 etapas y radios sincronizados ([js/tools/welcome-tour.js](../js/tools/welcome-tour.js), [css/components.css](../css/components.css))**: corregidos los objetivos de Graficador, Formularios y Resolución Guiada a `.subject-header-card`, Lecciones a `.hscroll-shell.is-learning-tabs, .learning-tabs` y PrepMat a `.prepmat-hero-header`; añadido `resolveSpotlightRadius()`, margen de borde `edge = 2px` para no cortar el título del menú lateral en tableta y monitor continuo (`startAlignmentMonitor` con `ResizeObserver` + seguimiento por cuadro + `.wt-spotlight.is-tracking`).
+- **Verificación**: Auditoría automatizada de los 12 pasos (36 capturas completas) en Chromium headless sobre celular (`390×844`) y tableta (`768×1024` y `1024×768`) confirmando deltas simétricos exactos (`±4px` móvil/tableta vertical, `±6px` tableta horizontal), `lock=true` en los 36 estados y `65/65` pruebas aprobadas en `node --test tests/*.test.js`.
+
+
 
