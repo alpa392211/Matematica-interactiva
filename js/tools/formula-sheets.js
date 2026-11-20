@@ -1151,21 +1151,19 @@ window.MatInteractiva = window.MatInteractiva || {};
         <div class="fs-formula-card-header">
           <span class="fs-formula-code">${f.code}</span>
           <h4 class="fs-formula-name">${f.name}</h4>
-          <div class="fs-card-actions no-print" style="margin-left:auto; display:flex; gap:0.4rem; align-items:center;">
+          <div class="fs-card-actions no-print">
             <button
               type="button"
-              class="btn btn-outline btn-sm fs-btn-copy"
+              class="btn btn-outline btn-sm fs-btn-copy fs-card-action-btn"
               data-fs-copy-latex="${encodedLatex}"
-              title="Copiar fórmula matemática en formato LaTeX"
-              style="font-size:0.75rem; padding:0.25rem 0.55rem;">
+              title="Copiar fórmula matemática en formato LaTeX">
               📋 Copiar
             </button>
             <button
               type="button"
-              class="btn btn-outline btn-sm fs-btn-editor"
+              class="btn btn-outline btn-sm fs-btn-editor fs-card-action-btn"
               data-fs-open-editor="${encodedLatex}"
-              title="Abrir y experimentar esta fórmula en el Editor de Expresiones"
-              style="font-size:0.75rem; padding:0.25rem 0.55rem;">
+              title="Abrir y experimentar esta fórmula en el Editor de Expresiones">
               ∑ Editor
             </button>
           </div>
@@ -1334,6 +1332,8 @@ window.MatInteractiva = window.MatInteractiva || {};
     }
 
     const totalAll = countAllFormulas();
+    const isCompactPhone = typeof window !== 'undefined' && window.innerWidth < 768;
+    const activeModObj = FORMULA_SHEETS_DATA.find(m => m.id === sheetState.selectedSubjectId) || FORMULA_SHEETS_DATA[0];
 
     container.innerHTML = `
       <!-- Cabecera de Herramienta (No imprimible) -->
@@ -1396,12 +1396,16 @@ window.MatInteractiva = window.MatInteractiva || {};
         </div>
 
         <!-- Selector Visual de los 9 Módulos (Activo en Modalidad A o como salto rápido en Modalidad B) -->
-        <div class="fs-subject-selector-wrap">
-          <div class="fs-subject-selector-header">
-            <span>${sheetState.modality === 'single'
+        <details class="fs-subject-selector-wrap fs-subject-details" ${isCompactPhone ? '' : 'open'}>
+          <summary class="fs-subject-selector-header">
+            <span class="fs-selector-label-desktop">${sheetState.modality === 'single'
               ? 'Selecciona el módulo académico cuyo formulario deseas consultar o imprimir:'
               : 'Vista de Compendio General activa (toca cualquier módulo para filtrar solo ese tema):'}</span>
-          </div>
+            <span class="fs-selector-label-mobile">${sheetState.modality === 'single'
+              ? `📚 Módulo: ${activeModObj.moduleNumber}. ${activeModObj.shortName} (cambiar módulo)`
+              : '📚 Compendio general (filtrar por módulo)'}</span>
+            <span class="fs-subject-details-chevron" aria-hidden="true">▾</span>
+          </summary>
           <div class="fs-subject-pills-grid" id="fs-subject-pills">
             ${FORMULA_SHEETS_DATA.map(mod => {
               const isSelected = sheetState.modality === 'single' && sheetState.selectedSubjectId === mod.id;
@@ -1421,7 +1425,7 @@ window.MatInteractiva = window.MatInteractiva || {};
               `;
             }).join('')}
           </div>
-        </div>
+        </details>
       </section>
 
       <!-- Contenedor Dinámico del Documento de Fórmulas -->

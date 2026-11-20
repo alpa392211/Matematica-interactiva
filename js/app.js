@@ -332,7 +332,22 @@ window.MatInteractiva = window.MatInteractiva || {};
     const isMobile = window.innerWidth <= 900;
     const sidebarOpen = Boolean(document.getElementById('app-sidebar')?.classList.contains('open'));
     const expandedGraph = Boolean(document.body.classList.contains('has-expanded-graph'));
-    const hasOverlay = activeDialogStack.length > 0 || sidebarOpen || expandedGraph || isWelcomeTourActive() || document.documentElement.classList.contains('has-open-overlay');
+    let hasBlockingVkb = false;
+    if (window.innerWidth <= 767) {
+      hasBlockingVkb = Boolean(document.querySelector('.exercise-card.has-vkb-open, .exercise-vkb-drawer.is-open'));
+      if (!hasBlockingVkb) {
+        const vh = window.innerHeight || 0;
+        const panels = document.querySelectorAll('.mvk-panel');
+        for (const panel of panels) {
+          const r = panel.getBoundingClientRect();
+          if (r.width > 0 && r.height > 0 && r.top < vh && r.bottom > vh - 84) {
+            hasBlockingVkb = true;
+            break;
+          }
+        }
+      }
+    }
+    const hasOverlay = activeDialogStack.length > 0 || sidebarOpen || expandedGraph || hasBlockingVkb || isWelcomeTourActive() || document.documentElement.classList.contains('has-open-overlay');
 
     let scrolledPastHeader = false;
     if (isMobile && !hasOverlay) {
@@ -1866,8 +1881,31 @@ window.MatInteractiva = window.MatInteractiva || {};
     });
     window.addEventListener('scroll', syncFloatingMenuButton, { passive: true });
     document.querySelector('.main-content')?.addEventListener('scroll', syncFloatingMenuButton, { passive: true });
+    const MOBILE_ONLY_DETAILS_SEL = '.topic-actions-collapsible, .lesson-toc-details, .grapher-mobile-details, .fs-subject-details';
+    document.addEventListener('click', (ev) => {
+      if (window.innerWidth < 768) return;
+      const summary = ev.target && typeof ev.target.closest === 'function' ? ev.target.closest('summary') : null;
+      if (summary && summary.parentElement && summary.parentElement.matches(MOBILE_ONLY_DETAILS_SEL)) {
+        ev.preventDefault();
+        summary.parentElement.open = true;
+      }
+    });
+    document.addEventListener('keydown', (ev) => {
+      if (window.innerWidth < 768) return;
+      if (ev.key !== 'Enter' && ev.key !== ' ') return;
+      const summary = ev.target && typeof ev.target.closest === 'function' ? ev.target.closest('summary') : null;
+      if (summary && summary.parentElement && summary.parentElement.matches(MOBILE_ONLY_DETAILS_SEL)) {
+        ev.preventDefault();
+        summary.parentElement.open = true;
+      }
+    });
     window.addEventListener('resize', () => {
       if (window.innerWidth > 900) closeMobileSidebar();
+      if (window.innerWidth >= 768) {
+        document.querySelectorAll(MOBILE_ONLY_DETAILS_SEL).forEach((el) => {
+          el.open = true;
+        });
+      }
       syncFloatingMenuButton();
       enhanceHorizontalScrollStrips(document);
     });
@@ -2623,6 +2661,7 @@ window.MatInteractiva = window.MatInteractiva || {};
   function renderSubjectWorkspace(subj, topic) {
     const main = document.getElementById('main-view-container');
     if (!main) return;
+    const isCompactPhone = typeof window !== 'undefined' && window.innerWidth < 768;
 
     main.innerHTML = `
       <!-- Cabecera de la Materia y Selector de Temas -->
@@ -2635,19 +2674,25 @@ window.MatInteractiva = window.MatInteractiva || {};
               <p>${ns.MathRenderer.formatRichText(topic.summary)}</p>
             </div>
           </div>
-          <div class="topic-actions-row">
-            <button class="btn btn-outline btn-sm" id="btn-topic-formula-sheet">
-              📄 Abrir Formulario Imprimible de ${subj.name}
-            </button>
-            ${topic.graphPreset ? `
-              <button class="btn btn-outline btn-sm" id="btn-topic-graph">
-                ${ns.MathRenderer.formatRichText(`📈 Abrir en Graficador: $f(x) = ${ns.MathRenderer.algebraicToLatex(topic.graphPreset)}$`)}
+          <details class="topic-actions-collapsible" ${isCompactPhone ? '' : 'open'}>
+            <summary class="topic-actions-summary">
+              <span>🛠️ Herramientas del tema (Formulario, Graficador, Editor)</span>
+              <span class="topic-actions-chevron" aria-hidden="true">▾</span>
+            </summary>
+            <div class="topic-actions-row">
+              <button class="btn btn-outline btn-sm" id="btn-topic-formula-sheet">
+                📄 Abrir Formulario Imprimible de ${subj.name}
               </button>
-            ` : ''}
-            <button class="btn btn-outline btn-sm" id="btn-topic-editor">
-              ∑ Editor Matemático
-            </button>
-          </div>
+              ${topic.graphPreset ? `
+                <button class="btn btn-outline btn-sm" id="btn-topic-graph">
+                  ${ns.MathRenderer.formatRichText(`📈 Abrir en Graficador: $f(x) = ${ns.MathRenderer.algebraicToLatex(topic.graphPreset)}$`)}
+                </button>
+              ` : ''}
+              <button class="btn btn-outline btn-sm" id="btn-topic-editor">
+                ∑ Editor Matemático
+              </button>
+            </div>
+          </details>
         </div>
 
         <div class="topics-bar">
@@ -2801,6 +2846,7 @@ window.MatInteractiva = window.MatInteractiva || {};
     const approaches = topic.solvingApproaches || [];
     const mistakes = topic.commonMistakes || [];
     const isDesktopLayout = typeof window !== 'undefined' && window.innerWidth >= 1024;
+    const isCompactPhone = typeof window !== 'undefined' && window.innerWidth < 768;
     const theoryGraphPayloads = {};
 
     concepts.forEach((c, idx) => {
@@ -2815,9 +2861,12 @@ window.MatInteractiva = window.MatInteractiva || {};
 
     box.innerHTML = `
       <!-- Índice interno de secciones de la lección -->
-      <nav class="lesson-toc-card" aria-label="Índice de secciones de la lección">
-        <div class="lesson-toc-title">📑 Índice de esta lección (${subj.name})</div>
-        <div class="lesson-toc-links">
+      <details class="lesson-toc-card lesson-toc-details" ${isCompactPhone ? '' : 'open'}>
+        <summary class="lesson-toc-title">
+          <span>📑 Índice de esta lección (${subj.name})</span>
+          <span class="lesson-toc-chevron" aria-hidden="true">▾</span>
+        </summary>
+        <nav class="lesson-toc-links" aria-label="Índice de secciones de la lección">
           <button type="button" class="lesson-toc-btn" data-jump-sec="sec-etapa-1">1. Introducción</button>
           ${prereqs.length ? `<button type="button" class="lesson-toc-btn" data-jump-sec="sec-etapa-2">2. Conocimientos Previos</button>` : ''}
           <button type="button" class="lesson-toc-btn" data-jump-sec="sec-etapa-3">3. Teoría y Conceptos</button>
@@ -2826,8 +2875,8 @@ window.MatInteractiva = window.MatInteractiva || {};
           ${approaches.length ? `<button type="button" class="lesson-toc-btn" data-jump-sec="sec-metodos">🧭 Formas de resolver (${approaches.length})</button>` : ''}
           <button type="button" class="lesson-toc-btn" data-jump-sec="sec-etapa-5">5. Visualización Gráfica</button>
           ${mistakes.length ? `<button type="button" class="lesson-toc-btn" data-jump-sec="sec-etapa-7">7. Errores Frecuentes</button>` : ''}
-        </div>
-      </nav>
+        </nav>
+      </details>
 
       <!-- ETAPA 1: INTRODUCCIÓN -->
       <div class="content-card" id="sec-etapa-1">
@@ -3131,12 +3180,17 @@ window.MatInteractiva = window.MatInteractiva || {};
       );
     });
 
+    box.querySelector('.lesson-toc-details')?.addEventListener('toggle', () => {
+      enhanceHorizontalScrollStrips(box);
+    });
+
     enhanceHorizontalScrollStrips(box);
   }
 
   /* --- Pestaña 2: Etapa 6 (Ejemplos Resueltos Paso a Paso) y Etapa 7 (Errores Frecuentes) --- */
   function renderExamplesTab(box, subj, topic) {
     const mistakes = topic.commonMistakes || [];
+    const isCompactPhone = typeof window !== 'undefined' && window.innerWidth < 768;
     const exampleGraphPayloads = {};
     (topic.examples || []).forEach((ex, exIdx) => {
       if (ex && ex.graphPayload) exampleGraphPayloads[exIdx] = ex.graphPayload;
@@ -3210,7 +3264,7 @@ window.MatInteractiva = window.MatInteractiva || {};
                 ${renderSimpleExplainBlock(ex.simple, `simple-${topic.id}-ex-${exIdx}`, 'is-compact')}
 
                 ${Array.isArray(ex.alternativeMethods) && ex.alternativeMethods.length ? `
-                  <details class="alt-methods-details" ${exIdx === 0 ? 'open' : ''}>
+                  <details class="alt-methods-details" ${(exIdx === 0 && !isCompactPhone) ? 'open' : ''}>
                     <summary class="alt-methods-summary">
                       <span>🔄 Otras ${ex.alternativeMethods.length} ${ex.alternativeMethods.length === 1 ? 'forma' : 'formas'} de resolver este mismo problema</span>
                       <span class="alt-methods-chevron" aria-hidden="true">▾</span>
@@ -3403,7 +3457,7 @@ window.MatInteractiva = window.MatInteractiva || {};
         const showExKeyboard = Boolean(appState.exerciseShowKeyboard[ex.id]);
 
         return `
-          <div class="exercise-card ${isSolved ? 'solved' : ''}" id="card-${ex.id}">
+          <div class="exercise-card ${isSolved ? 'solved' : ''} ${showExKeyboard ? 'has-vkb-open' : ''}" id="card-${ex.id}">
             <div class="exercise-header">
               <div class="ex-header-meta">
                 <span class="badge-level ${ex.level}">${levelLabels[ex.level] || ex.level}</span>
@@ -3419,12 +3473,14 @@ window.MatInteractiva = window.MatInteractiva || {};
             </div>
 
             <!-- Barra rápida + Botón para abrir el Teclado Matemático Visual de 6 Categorías -->
-            <div class="math-quick-keypad">
-              ${quickSymbols.map((sym, sIdx) => `
-                <button type="button" class="keypad-chip" data-keypad-ex="${ex.id}" data-keypad-idx="${sIdx}" data-keypad-target="inp-${ex.id}" data-keypad-val="${sym.val}" title="${sym.title}">
-                  ${sym.label}
-                </button>
-              `).join('')}
+            <div class="math-quick-keypad-wrap">
+              <div class="math-quick-keypad">
+                ${quickSymbols.map((sym, sIdx) => `
+                  <button type="button" class="keypad-chip" data-keypad-ex="${ex.id}" data-keypad-idx="${sIdx}" data-keypad-target="inp-${ex.id}" data-keypad-val="${sym.val}" title="${sym.title}">
+                    ${sym.label}
+                  </button>
+                `).join('')}
+              </div>
               <button
                 type="button"
                 class="btn btn-outline btn-sm exercise-vkb-toggle-btn ${showExKeyboard ? 'active' : ''}"
@@ -3593,12 +3649,14 @@ window.MatInteractiva = window.MatInteractiva || {};
               appState.exerciseShowKeyboard[ex.id] = false;
               vkbDrawer.classList.remove('is-open');
               vkbDrawer.classList.add('is-collapsed');
+              box.querySelector(`#card-${ex.id}`)?.classList.remove('has-vkb-open');
               const toggleBtn = box.querySelector(`[data-toggle-vkb="${ex.id}"]`);
               if (toggleBtn) {
                 toggleBtn.classList.remove('active');
                 toggleBtn.setAttribute('aria-expanded', 'false');
                 toggleBtn.innerHTML = '⌨️ Teclado Matemático (6 Categorías)';
               }
+              syncFloatingMenuButton();
             }
           });
         }
@@ -3623,12 +3681,14 @@ window.MatInteractiva = window.MatInteractiva || {};
         appState.exerciseShowKeyboard[exId] = nextOpen;
         vkbDrawer.classList.toggle('is-open', nextOpen);
         vkbDrawer.classList.toggle('is-collapsed', !nextOpen);
+        box.querySelector(`#card-${exId}`)?.classList.toggle('has-vkb-open', nextOpen);
         btn.classList.toggle('active', nextOpen);
         btn.setAttribute('aria-expanded', nextOpen ? 'true' : 'false');
         btn.innerHTML = `⌨️ ${nextOpen ? 'Ocultar Teclado (6 Categorías)' : 'Teclado Matemático (6 Categorías)'}`;
         if (nextOpen && exerciseControllers[exId]) {
           exerciseControllers[exId].focus();
         }
+        syncFloatingMenuButton();
       });
     });
 

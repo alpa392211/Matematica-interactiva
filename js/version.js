@@ -10,12 +10,25 @@
 
   const APP_NAME = 'MateTic';
   const APP_TAGLINE = 'Matemáticas Interactivas';
-  const APP_VERSION = '1.9.2';
+  const APP_VERSION = '1.9.3';
   const APP_RELEASE_DATE = '2026-11-20';
   const STUDIO_NAME = 'ALPA Studio';
   const STUDIO_MEANING = '';
 
   const RELEASE_NOTES = [
+    {
+      version: '1.9.3',
+      date: '2026-11-20',
+      items: [
+        'Experiencia de estudio en celular más limpia y cómoda: reorganizado el CSS adaptable eliminando reglas contradictorias y mejorando la jerarquía visual sin alterar tableta ni computadora.',
+        'Pestañas de lección 2×2 en teléfonos: las 4 etapas (Teoría, Ejemplos, Ejercicios y Evaluación) permanecen siempre visibles para cambiar con un toque sin deslizamientos a ciegas.',
+        'Paneles secundarios contraíbles en celular: las herramientas del tema, el índice de la lección, las opciones avanzadas del graficador y el selector de módulos en formularios se contraen para priorizar el estudio y se despliegan en un toque.',
+        'Ejercicios y teclado matemático más cómodos: evita mostrar dos teclados simbólicos al mismo tiempo, agrupa acciones secundarias en dos columnas y presenta las categorías del teclado en una sola fila deslizable.',
+        'Graficador y Calculadora optimizados para pantallas pequeñas: los ejemplos rápidos del graficador van en una fila horizontal y la calculadora completa (incluido el botón =) cabe sin desplazarse, tanto en página como en el modal rápido.',
+        'Panel principal y Formularios más ordenados en celular: estadísticas en cuadrícula 2×2, botones de acceso lado a lado y selector de módulos contraíble mostrando la materia activa.',
+        'Botones flotantes de menú y calculadora reubicados en la parte inferior en celular para no tapar títulos ni insignias al desplazarse.'
+      ]
+    },
     {
       version: '1.9.2',
       date: '2026-11-20',

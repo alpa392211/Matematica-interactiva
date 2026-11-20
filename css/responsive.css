@@ -24,6 +24,70 @@
   touch-action: none; /* pantalla completa: control táctil total de 1 y 2 dedos sobre el plano */
 }
 
+/* Auxiliares colapsables (transparentes en tablet/escritorio >= 768px; activos en móvil) */
+.topic-actions-collapsible {
+  display: block;
+}
+
+.topic-actions-summary {
+  display: none;
+  list-style: none;
+  cursor: pointer;
+}
+
+.topic-actions-summary::-webkit-details-marker,
+.lesson-toc-details > summary.lesson-toc-title::-webkit-details-marker,
+.fs-subject-details > summary.fs-subject-selector-header::-webkit-details-marker {
+  display: none;
+}
+
+.lesson-toc-details > summary.lesson-toc-title,
+.fs-subject-details > summary.fs-subject-selector-header {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  cursor: default;
+  pointer-events: none;
+  user-select: text;
+}
+
+.lesson-toc-chevron,
+.fs-subject-details-chevron {
+  display: none;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition: transform var(--transition-fast);
+}
+
+.lesson-toc-details[open] .lesson-toc-chevron,
+.fs-subject-details[open] .fs-subject-details-chevron {
+  transform: rotate(180deg);
+}
+
+.fs-subject-details[open] .fs-subject-pills-grid {
+  margin-top: 0.55rem;
+}
+
+.fs-selector-label-mobile {
+  display: none;
+}
+
+.math-quick-keypad-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 0.75rem;
+}
+
+.math-quick-keypad-wrap .math-quick-keypad {
+  display: contents;
+  margin-bottom: 0;
+}
+
 /* Botón para alternar el teclado nativo del teléfono (solo se muestra en pantallas táctiles) */
 .mat-native-kb-toggle {
   display: none;
@@ -287,8 +351,12 @@
 }
 
 /* --------------------------------------------------------------------------
-   2. Header móvil minimalista (< 768px): barra ligera de 1 fila; al hacer scroll quedan los botones laterales
+   2. Móvil (<= 767px): barra superior ligera, botones flotantes sin solape y colapsables
    -------------------------------------------------------------------------- */
+.header-back-btn {
+  display: none;
+}
+
 @media (max-width: 767px) {
   .top-header {
     position: static;
@@ -320,12 +388,12 @@
   }
   .mobile-menu-btn {
     order: 1;
-    flex: 0 0 36px;
-    width: 36px;
-    min-width: 36px;
-    height: 36px;
-    min-height: 36px;
-    font-size: 1rem;
+    flex: 0 0 40px;
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+    min-height: 40px;
+    font-size: 1.05rem;
     border: 1px solid var(--lg-border-outer);
     background: var(--bg-surface);
     box-shadow: var(--shadow-xs);
@@ -336,15 +404,15 @@
     display: inline-flex;
     align-items: center;
     gap: 0.18rem;
-    height: 36px;
-    min-height: 36px;
-    padding: 0 0.52rem;
+    height: 40px;
+    min-height: 40px;
+    padding: 0 0.56rem;
     border: 1px solid var(--lg-border-outer);
     border-radius: var(--radius-full);
     background: var(--bg-surface);
     box-shadow: var(--shadow-xs);
     color: var(--primary-700);
-    font-size: 0.72rem;
+    font-size: 0.74rem;
     font-weight: 700;
     cursor: pointer;
     white-space: nowrap;
@@ -357,17 +425,17 @@
     min-width: 0;
   }
   .header-search-input {
-    height: 36px;
-    min-height: 36px;
+    height: 40px;
+    min-height: 40px;
     padding: 0.2rem 0.65rem 0.2rem 1.85rem;
     background: var(--bg-surface);
     border: 1px solid var(--lg-border-outer);
     box-shadow: var(--shadow-xs);
-    font-size: 16px;
+    font-size: 16px; /* evita el zoom automático de iOS */
   }
   .header-search-icon {
     left: 0.62rem;
-    font-size: 0.8rem;
+    font-size: 0.82rem;
   }
   #header-streak-pill,
   #header-xp-pill {
@@ -375,26 +443,26 @@
   }
   .theme-toggle-btn {
     order: 4;
-    flex: 0 0 36px;
-    width: 36px;
-    min-width: 36px;
-    height: 36px;
-    min-height: 36px;
+    flex: 0 0 40px;
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+    min-height: 40px;
     padding: 0;
     justify-content: center;
     border-radius: var(--radius-full);
     background: var(--bg-surface);
     border: 1px solid var(--lg-border-outer);
     box-shadow: var(--shadow-xs);
-    font-size: 0.88rem;
+    font-size: 0.92rem;
   }
   .quick-tool-btn {
     order: 5;
-    flex: 0 0 36px;
-    width: 36px;
-    min-width: 36px;
-    height: 36px;
-    min-height: 36px;
+    flex: 0 0 40px;
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+    min-height: 40px;
     justify-content: center;
     padding: 0;
     box-shadow: var(--shadow-xs);
@@ -402,18 +470,37 @@
   .quick-tool-btn span.btn-text {
     display: none;
   }
+
+  /* Botones flotantes al hacer scroll: zona inferior para no tapar títulos ni badges */
+  .floating-mobile-menu-btn,
+  .floating-mobile-calc-btn {
+    top: auto;
+    bottom: max(0.9rem, env(safe-area-inset-bottom, 0px));
+  }
+  /* Ocultar botones flotantes mientras el teclado matemático visual está abierto para no tapar ninguna tecla */
+  body:has(.exercise-card.has-vkb-open, .exercise-vkb-drawer.is-open) .floating-mobile-menu-btn,
+  body:has(.exercise-card.has-vkb-open, .exercise-vkb-drawer.is-open) .floating-mobile-calc-btn {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Evitar duplicar el aviso de gestos encima del plano en todo el rango móvil (< 768px) */
+  .grapher-help-text {
+    display: none;
+  }
+
   /* Oculta visualmente el breadcrumb manteniendo disponibilidad para lectores de pantalla */
   .header-breadcrumb {
-    position: absolute !important;
-    width: 1px !important;
-    height: 1px !important;
-    padding: 0 !important;
-    margin: -1px !important;
-    overflow: hidden !important;
-    clip: rect(0, 0, 0, 0) !important;
-    clip-path: inset(50%) !important;
-    white-space: nowrap !important;
-    border: 0 !important;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
   }
   .search-results-dropdown {
     position: fixed;
@@ -423,10 +510,111 @@
     margin-top: 6px;
     max-height: 60vh;
   }
+
+  /* Tiras horizontales y áreas táctiles cómodas en móvil */
+  .lesson-toc-links,
+  .map-filter-blocks {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    gap: 0.45rem;
+  }
+  .lesson-toc-links::-webkit-scrollbar,
+  .map-filter-blocks::-webkit-scrollbar {
+    display: none;
+  }
+  .lesson-toc-btn,
+  .map-filter-blocks .diff-pill {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .map-topic-name {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  /* Paneles secundarios contraíbles en móvil (< 768px): herramientas del tema, TOC, graficador y formularios */
+  .topic-actions-collapsible {
+    width: 100%;
+  }
+  .topic-actions-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    width: 100%;
+    min-height: 44px;
+    padding: 0.48rem 0.85rem;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--border-light);
+    background: var(--bg-surface-alt);
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+    font-weight: 700;
+    transition: background var(--transition-fast), border-color var(--transition-fast);
+  }
+  .topic-actions-collapsible[open] .topic-actions-summary {
+    border-color: var(--primary-300);
+    color: var(--primary-700);
+    margin-bottom: 0.55rem;
+  }
+  .topic-actions-chevron {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    transition: transform var(--transition-fast);
+  }
+  .topic-actions-collapsible[open] .topic-actions-chevron {
+    transform: rotate(180deg);
+  }
+  .lesson-toc-details {
+    padding: 0.5rem 0.85rem;
+    gap: 0;
+  }
+  .lesson-toc-details > summary.lesson-toc-title {
+    min-height: 44px;
+    pointer-events: auto;
+    cursor: pointer;
+  }
+  .lesson-toc-details[open] {
+    gap: 0.55rem;
+  }
+  .lesson-toc-chevron,
+  .grapher-details-chevron,
+  .fs-subject-details-chevron {
+    display: inline-block;
+  }
+  .grapher-mobile-details > summary.grapher-section-title {
+    min-height: 44px;
+    padding: 0.15rem 0;
+    pointer-events: auto;
+    cursor: pointer;
+  }
+  .fs-subject-details {
+    padding-top: 0.65rem;
+    gap: 0;
+  }
+  .fs-subject-details > summary.fs-subject-selector-header {
+    padding: 0.5rem 0.75rem;
+    min-height: 44px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-light);
+    background: var(--bg-surface-alt);
+    font-size: 0.82rem;
+    pointer-events: auto;
+    cursor: pointer;
+  }
+  .fs-selector-label-desktop {
+    display: none;
+  }
+  .fs-selector-label-mobile {
+    display: inline;
+  }
 }
 
 /* --------------------------------------------------------------------------
-   3. Tarjetas y contenido compacto (<= 640px)
+   3. Teléfonos (<= 640px): jerarquía limpia, lectura cómoda y herramientas sin saturación
    -------------------------------------------------------------------------- */
 @media (max-width: 640px) {
   .sidebar {
@@ -439,187 +627,11 @@
   }
 
   .main-content {
-    padding: 0.9rem 0.75rem 1.5rem;
+    padding: 0.85rem 0.78rem 4.75rem;
   }
 
-  .stats-grid,
-  .modules-grid {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0.85rem;
-  }
+  /* Contención segura de tarjetas */
   .content-card,
-  .exercise-card,
-  .quiz-question-card,
-  .subject-header-card {
-    padding: 1rem;
-    border-radius: var(--radius-md);
-  }
-  .subject-header-top {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.85rem;
-  }
-  .subject-header-top > div[style*="display:flex"],
-  .subject-header-top > .topic-actions-row,
-  .subject-header-top > .grapher-presets-row,
-  .subject-header-top > .calc-mode-switch {
-    width: 100%;
-  }
-
-  /* Cuadrículas inline de herramientas -> una columna */
-  .main-content div[style*="grid-template-columns"]:not([style*="repeat(5"]) {
-    grid-template-columns: minmax(0, 1fr) !important;
-  }
-  .grapher-sidebar div[style*="grid-template-columns"],
-  .grapher-sidebar .grapher-int-bounds-grid {
-    grid-template-columns: 1fr 1fr !important; /* límites a y b lado a lado */
-  }
-  .quiz-options-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .graph-analysis-bar {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .graph-live-bar {
-    font-size: 0.78rem;
-    padding: 0.45rem 0.65rem;
-  }
-  .canvas-wrapper {
-    height: clamp(275px, 50dvh, 410px);
-  }
-  .lesson-canvas-box {
-    height: clamp(250px, 44dvh, 340px);
-  }
-
-  .mvk-header-hint {
-    display: none;
-  }
-  .mvk-panel {
-    padding: 0.6rem;
-  }
-
-  .exercise-input-row {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .exercise-input,
-  .exercise-math-field-mount {
-    min-width: 0;
-    width: 100%;
-    flex: 1 1 auto;
-  }
-  .exercise-input-row .btn {
-    width: 100%;
-  }
-  .learning-tab-btn {
-    min-width: 128px;
-    padding: 0.6rem 0.75rem;
-    font-size: 0.82rem;
-  }
-
-  /* Calculadora a pantalla completa en teléfonos (sin afectar bottom sheets) */
-  .quick-modal-backdrop:not(.sheet-modal-backdrop) {
-    padding: 0;
-    align-items: stretch;
-  }
-  .quick-modal-window:not(.sheet-modal-window) {
-    max-width: 100%;
-    max-height: 100vh;
-    max-height: 100dvh;
-    height: 100%;
-    border-radius: 0;
-  }
-  .sheet-modal-backdrop.open .sheet-modal-window {
-    animation: lgSheetSpringUp 380ms cubic-bezier(0.22, 1, 0.36, 1) both;
-    transform-origin: bottom center;
-    will-change: transform, opacity;
-  }
-  .quick-modal-header {
-    padding: 0.75rem 1rem;
-    gap: 0.5rem;
-  }
-  .quick-modal-header strong {
-    font-size: 0.9rem !important;
-  }
-  .quick-modal-body {
-    padding: 0.75rem;
-    -webkit-overflow-scrolling: touch;
-  }
-  .calc-layout {
-    gap: 0.85rem;
-  }
-  .calc-keypad-grid {
-    gap: 0.4rem;
-  }
-  .calc-key {
-    min-height: 48px;
-    padding: 0.4rem 0.2rem;
-    font-size: 0.95rem;
-  }
-}
-
-/* --------------------------------------------------------------------------
-   3. Teléfonos pequeños (<= 430px)
-   -------------------------------------------------------------------------- */
-@media (max-width: 430px) {
-  .main-content {
-    padding: 0.75rem 0.6rem 1.25rem;
-  }
-  .editor-action-controls-bar,
-  .editor-action-left,
-  .editor-action-right {
-    flex-wrap: wrap;
-    width: 100%;
-  }
-  .editor-action-left .btn,
-  .editor-action-right .btn {
-    flex: 1 1 calc(50% - 0.5rem);
-  }
-  .editor-eval-controls-grid {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  }
-  .subject-title-text h1 {
-    font-size: 1.25rem;
-  }
-}
-
-@media (max-width: 360px) {
-  .mvk-key-math {
-    font-size: 0.92rem;
-  }
-  .stat-pill {
-    padding: 0.22rem 0.5rem;
-    font-size: 0.7rem;
-  }
-  .brand-title {
-    font-size: 0.95rem;
-  }
-}
-
-/* ==========================================================================
-   4. Compactación fuerte para teléfonos (<= 480px)  -  iPhone / 360px - 430px
-   Estas reglas van al final para sobrescribir las de las secciones anteriores.
-   ========================================================================== */
-.header-back-btn {
-  display: none;
-}
-
-@media (max-width: 480px) {
-  /* --- 6. Contención general ------------------------------------------- */
-  html,
-  body {
-    overflow-x: hidden;
-    overflow-x: clip;
-    max-width: 100vw;
-  }
-  .app-layout,
-  .main-wrapper,
-  .main-content,
-  .card,
-  .content-card,
-  .module-container,
-  .dashboard,
-  .wrapper,
   .exercise-card,
   .quiz-question-card,
   .subject-header-card,
@@ -631,13 +643,10 @@
   .calc-history-card,
   .module-card,
   .stat-card {
-    box-sizing: border-box !important;
     max-width: 100%;
     min-width: 0;
   }
-  .main-content {
-    padding: 0.85rem 0.78rem 4.25rem;
-  }
+
   .content-card,
   .exercise-card,
   .quiz-question-card,
@@ -645,131 +654,57 @@
   .grapher-sidebar,
   .grapher-canvas-card,
   .calc-history-card {
-    padding: 1.05rem;
-    margin-left: 0;
-    margin-right: 0;
-  }
-  .solver-fields-grid.solver-cols-3 {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .solver-fraction-builder {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .solver-op-selector {
-    grid-template-columns: repeat(4, minmax(44px, 1fr));
+    padding: 1rem;
+    border-radius: var(--radius-lg);
   }
 
-  /* Fórmulas y tablas: scroll horizontal propio, sin empujar al padre */
-  .katex-display,
-  .formula-expression,
-  .math-block,
-  .editor-preview-stage,
-  .exercise-live-preview-math,
-  .step-math-work,
-  .editor-case-math,
-  .calc-result-line,
-  #graph-table-box,
-  .main-content table {
-    overflow-x: auto;
-    max-width: 100%;
-  }
-  .formula-expression,
-  .math-block {
-    font-size: 0.95rem;
-  }
-
-  /* --- 1. Barra superior minimalista en <= 480px ---------------------------- */
-  .top-header {
-    position: static;
-    top: auto;
-    margin: 0.3rem 0.55rem 0;
-    max-width: calc(100% - 1.1rem);
-    padding: 0;
-    gap: 0.28rem;
-  }
-  .header-back-btn:not([hidden]) {
-    height: 36px;
-    min-height: 36px;
-    padding: 0 0.46rem;
-    font-size: 0.7rem;
-  }
-  .header-search {
-    width: auto;
-  }
-  .header-search-input {
-    height: 36px;
-    min-height: 36px;
-    padding: 0.2rem 0.58rem 0.2rem 1.75rem;
-    font-size: 16px; /* 16px evita el zoom automático de iOS */
-  }
-  .header-search-icon {
-    left: 0.58rem;
-    font-size: 0.78rem;
-  }
-  .stat-pill,
-  .stat-badge {
-    min-height: 26px;
-    font-size: 0.7rem;
-    padding: 0.12rem 0.42rem;
-    gap: 0.22rem;
-  }
-  .mobile-menu-btn,
-  .theme-toggle-btn,
-  .quick-tool-btn {
-    width: 36px;
-    min-width: 36px;
-    height: 36px;
-    min-height: 36px;
-    padding: 0;
-  }
-
-  /* --- 2. Banner de bienvenida ------------------------------------------ */
+  /* --- Inicio (Dashboard) ----------------------------------------------- */
   .hero-banner {
     flex-direction: column;
     align-items: stretch;
     gap: 0.75rem;
-    padding: 1rem 12px;
+    padding: 1.15rem 1rem;
     border-radius: var(--radius-lg);
     margin-bottom: 1rem;
   }
   .hero-banner::after {
-    font-size: 2.4rem;
-    right: 0.5rem;
+    font-size: 2.5rem;
+    right: 0.6rem;
   }
   .hero-content {
     max-width: 100%;
   }
   .hero-badge {
-    font-size: 0.7rem;
+    font-size: 0.74rem;
     margin-bottom: 0.5rem;
   }
   .hero-title {
-    font-size: clamp(1.2rem, 5.5vw, 1.4rem);
-    line-height: 1.25;
+    font-size: clamp(1.28rem, 5.4vw, 1.48rem);
+    line-height: 1.24;
   }
   .hero-description {
-    font-size: 0.85rem;
-    line-height: 1.45;
+    font-size: 0.88rem;
+    line-height: 1.48;
     margin-bottom: 0.85rem;
     padding: 0;
   }
   .hero-actions {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 0.5rem;
   }
   .hero-actions .btn {
     width: 100%;
-    min-height: 42px;
-    font-size: 0.85rem;
-    padding: 0.45rem 0.75rem;
+    min-height: 44px;
+    font-size: 0.86rem;
+    padding: 0.5rem 0.85rem;
     white-space: normal;
     text-align: center;
     justify-content: center;
   }
   .hero-more-panel {
     gap: 8px;
-    padding: 0.6rem;
+    padding: 0.65rem;
   }
   .hero-more-links-grid {
     display: grid;
@@ -778,6 +713,59 @@
   }
   .hero-more-links-grid .btn:first-child {
     grid-column: 1 / -1;
+  }
+
+  .continue-learning-bar {
+    padding: 1rem;
+    gap: 0.85rem;
+    margin-bottom: 1rem;
+  }
+  .continue-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+    width: 100%;
+  }
+  .continue-actions .btn {
+    width: 100%;
+    padding: 0.5rem 0.65rem;
+    font-size: 0.82rem;
+    justify-content: center;
+    text-align: center;
+  }
+
+  /* Estadísticas en cuadrícula 2x2 equilibrada en lugar de 4 bloques altos apilados */
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem;
+    margin-bottom: 1.25rem;
+  }
+  .stat-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.45rem;
+    padding: 0.85rem;
+  }
+  .stat-icon-box {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    font-size: 1rem;
+  }
+  .stat-value {
+    font-size: 1.15rem;
+  }
+  .stat-label {
+    font-size: 0.78rem;
+  }
+  .stat-subtext {
+    font-size: 0.72rem;
+    line-height: 1.35;
+  }
+
+  .modules-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.85rem;
   }
   .dash-prepmat-spotlight {
     flex-direction: column;
@@ -792,119 +780,408 @@
     white-space: normal;
   }
 
-  /* --- 3. Módulos, títulos y pestañas ------------------------------------ */
-  .subject-title-text h1 {
-    font-size: 1.15rem;
-    line-height: 1.25;
-    overflow-wrap: anywhere;
+  /* --- Cabecera de materia, temas y pestañas pedagógicas ---------------- */
+  .subject-header-card {
+    margin-bottom: 0.9rem;
   }
-  .subject-title-text p {
-    font-size: 0.82rem;
-    line-height: 1.4;
+  .subject-header-top {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
   }
   .subject-title-group {
-    gap: 0.6rem;
+    gap: 0.65rem;
     min-width: 0;
   }
   .subject-big-icon {
-    width: 40px;
-    height: 40px;
-    min-width: 40px;
-    font-size: 1.1rem;
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    font-size: 1.15rem;
+  }
+  .subject-title-text h1 {
+    font-size: 1.18rem;
+    line-height: 1.28;
+    overflow-wrap: anywhere;
+  }
+  .subject-title-text p {
+    font-size: 0.84rem;
+    line-height: 1.45;
   }
   .main-content h2,
   .main-content h3 {
-    font-size: 1.05rem;
-    line-height: 1.3;
+    font-size: 1.06rem;
+    line-height: 1.32;
   }
-  .subject-header-top > div[style*="display:flex"],
-  .subject-header-top > .topic-actions-row,
-  .subject-header-top > .grapher-presets-row,
-  .subject-header-top > .calc-mode-switch {
+  .topic-actions-row {
     display: flex;
     flex-direction: column;
-    gap: 6px !important;
+    gap: 0.45rem;
     width: 100%;
   }
-  #btn-topic-graph,
-  #btn-topic-editor,
-  .subject-header-top .btn {
+  .topic-actions-row .btn {
     width: 100%;
     justify-content: center;
     text-align: center;
     white-space: normal;
-    padding: 0.4rem 0.6rem;
-    font-size: 0.8rem;
+    padding: 0.48rem 0.75rem;
+    font-size: 0.82rem;
     line-height: 1.3;
   }
   .topic-selector-btn {
-    font-size: 0.8rem;
-    padding: 0.4rem 0.72rem;
-    min-height: 38px;
-    max-width: 245px;
+    font-size: 0.82rem;
+    padding: 0.45rem 0.8rem;
+    min-height: 44px;
+    max-width: 260px;
   }
   .topic-selector-btn > span:last-child {
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
-  .learning-tabs,
-  .tabs,
-  .tab-buttons {
+  /* Pestañas pedagógicas 2x2: las 4 etapas siempre visibles y accesibles en 1 toque */
+  .hscroll-shell.is-learning-tabs {
+    border-radius: var(--radius-lg);
+    margin-bottom: 1rem;
+  }
+  .hscroll-shell.is-learning-tabs .hscroll-arrow {
+    display: none;
+  }
+  .hscroll-shell.is-learning-tabs > .learning-tabs,
+  .learning-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.4rem;
+    padding: 0.4rem;
+    overflow: visible;
+    border-radius: var(--radius-lg);
+    margin-bottom: 0;
+  }
+  .learning-tab-btn {
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    padding: 0.5rem 0.6rem;
+    font-size: 0.78rem;
+    line-height: 1.25;
+    white-space: normal;
+    text-align: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+  }
+
+  /* Cuadrículas inline de herramientas -> una columna */
+  .main-content div[style*="grid-template-columns"]:not([style*="repeat(5"]) {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  .grapher-sidebar div[style*="grid-template-columns"],
+  .grapher-sidebar .grapher-int-bounds-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .quiz-options-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* --- Ejercicios y Teclado Matemático ---------------------------------- */
+  .difficulty-filter-bar {
+    gap: 0.75rem;
+    padding: 0.9rem 1rem;
+    margin-bottom: 1rem;
+  }
+  .difficulty-subtitle {
+    font-size: 0.84rem;
+    line-height: 1.45;
+  }
+  .difficulty-pills {
     display: flex;
     flex-wrap: nowrap;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    gap: 0.3rem;
-    padding: 0.3rem;
+    scrollbar-width: none;
+    gap: 0.4rem;
     max-width: 100%;
+    padding-bottom: 0.1rem;
   }
-  .learning-tab-btn,
-  .tabs > *,
-  .tab-buttons > * {
+  .difficulty-pills::-webkit-scrollbar {
+    display: none;
+  }
+  .difficulty-pills .diff-pill {
     flex: 0 0 auto;
-    min-width: 0;
-    width: auto;
-    padding: 0.45rem 0.75rem;
-    font-size: 0.8rem;
-    min-height: 38px;
     white-space: nowrap;
   }
 
-  /* --- 4. Teclado Matemático Visual -------------------------------------- */
+  /* Barra rápida de símbolos: 1 fila horizontal limpia + botón del teclado siempre visible */
+  .math-quick-keypad-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+  .math-quick-keypad-wrap .math-quick-keypad {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 0.35rem;
+    padding-bottom: 0.15rem;
+    margin-bottom: 0;
+  }
+  .math-quick-keypad-wrap .math-quick-keypad::-webkit-scrollbar {
+    display: none;
+  }
+  .keypad-chip {
+    flex: 0 0 auto;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0.35rem 0.65rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .exercise-vkb-toggle-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  /* Evitar dos teclados simbólicos simultáneos cuando el teclado de 6 categorías está abierto */
+  .exercise-card.has-vkb-open .math-quick-keypad-wrap .math-quick-keypad {
+    display: none;
+  }
+
+  /* Campo de respuesta + botón principal destacado + acciones secundarias en 2 columnas */
+  .exercise-input-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+    align-items: stretch;
+  }
+  .exercise-input,
+  .exercise-math-field-mount,
+  .exercise-input-row > .btn-primary,
+  .exercise-input-row > .btn:not(.btn-primary):last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    min-width: 0;
+    width: 100%;
+  }
+  .exercise-input-row > .btn {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+    font-size: 0.82rem;
+    padding: 0.5rem 0.6rem;
+    white-space: normal;
+    line-height: 1.25;
+  }
+
+  /* Teclado Matemático Visual (6 Categorías): pestañas en 1 fila horizontal y teclas cómodas */
+  .mvk-header-bar {
+    flex-wrap: nowrap;
+    gap: 0.45rem;
+    margin-bottom: 0.45rem;
+  }
+  .mvk-header-left {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+  .mvk-close-btn {
+    flex-shrink: 0;
+    min-height: 44px;
+    padding: 0.35rem 0.7rem;
+    font-size: 0.78rem;
+  }
+  .mvk-header-hint {
+    display: none;
+  }
   .mvk-panel {
-    padding: 0.5rem;
+    padding: 0.6rem;
   }
   .mvk-header-title {
-    font-size: 0.75rem;
+    font-size: 0.78rem;
   }
   .mvk-cat-desc {
-    font-size: 0.75rem;
+    font-size: 0.76rem;
     padding: 0.15rem 0.3rem;
     margin-bottom: 0.35rem;
   }
+  .mvk-tabs-bar {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 0.38rem;
+    padding-bottom: 0.15rem;
+  }
+  .mvk-tab-btn {
+    flex: 0 0 auto;
+    min-width: 84px;
+    min-height: 44px;
+    padding: 0.35rem 0.7rem;
+  }
+  .mvk-tab-label {
+    font-size: 0.78rem;
+    white-space: nowrap;
+  }
+  .mvk-key-btn {
+    min-height: 46px;
+    font-size: 1.04rem;
+    padding: 0.3rem 0.2rem;
+  }
+  .mvk-key-math {
+    font-size: 1.02rem;
+    line-height: 1.2;
+  }
+  .mvk-key-math .katex {
+    font-size: 1em;
+  }
+  .mvk-keys-grid[data-cat-id="cat-basicas"],
+  .mvk-keys-grid[data-cat-id="1"] {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 5px;
+  }
+  .mvk-keys-grid[data-cat-id="cat-basicas"] .mvk-key-backspace,
+  .mvk-key-btn.mvk-key-backspace {
+    grid-column: span 2;
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+  .mvk-keys-grid:not([data-cat-id="cat-basicas"]):not([data-cat-id="1"]) {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
   .mat-native-kb-toggle {
-    min-width: 40px;
-    min-height: 40px;
+    min-width: 44px;
+    min-height: 44px;
   }
 
-  /* --- 5. Calculadora científica y bottom sheets ------------------------- */
-  .quick-modal-backdrop:not(.sheet-modal-backdrop) {
-    padding: 0.5rem;
-    align-items: center;
+  /* Teclado oscuro nativo de MathLive (.ML__keyboard) */
+  :root,
+  body,
+  .ML__keyboard {
+    --keyboard-row-height: 48px !important;
   }
-  .quick-modal-backdrop.sheet-modal-backdrop {
+  .ML__keyboard {
+    font-size: 1.15rem !important;
+  }
+  .ML__keyboard--plate {
+    padding: 4px 2px !important;
+    width: 100% !important;
+  }
+  .ML__keyboard .keycap,
+  .ML__keyboard .action,
+  .ML__keyboard .fnbutton,
+  .ML__keyboard [role="button"] {
+    min-height: 46px !important;
+    height: 46px !important;
+    font-size: 1.15rem !important;
+    padding: 0 4px !important;
+  }
+  .ML__keyboard .segmented-control,
+  .ML__keyboard .track,
+  .ML__keyboard .segmented-control button,
+  .ML__keyboard [role="tablist"] [role="tab"] {
+    font-size: 0.95rem !important;
+    padding: 8px 10px !important;
+    min-height: 40px !important;
+  }
+
+  /* --- Graficador ------------------------------------------------------- */
+  /* Presets en fila horizontal deslizable en lugar de 5 botones apilados */
+  .grapher-presets-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 0.45rem;
+    width: 100%;
+    padding-bottom: 0.15rem;
+  }
+  .grapher-presets-row::-webkit-scrollbar {
+    display: none;
+  }
+  .grapher-presets-row .btn {
+    flex: 0 0 auto;
+    width: auto;
+    white-space: nowrap;
+    min-height: 44px;
+    padding: 0.45rem 0.85rem;
+    font-size: 0.82rem;
+  }
+  .grapher-zoom-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.45rem;
+    width: 100%;
+  }
+  .grapher-zoom-actions .btn {
+    width: 100%;
+    min-height: 44px;
+    padding: 0.42rem 0.6rem;
+    font-size: 0.82rem;
+    justify-content: center;
+  }
+  .graph-analysis-bar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .graph-live-bar {
+    font-size: 0.78rem;
+    padding: 0.45rem 0.65rem;
+  }
+  .canvas-wrapper {
+    height: clamp(260px, 46dvh, 390px);
+  }
+  .lesson-canvas-box {
+    height: clamp(235px, 42dvh, 320px);
+  }
+
+  /* --- Calculadora científica y modales --------------------------------- */
+  /* Conmutador DEG / RAD lado a lado (2 columnas) */
+  .calc-mode-switch {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.45rem;
+    width: 100%;
+  }
+  .calc-mode-switch .btn {
+    width: 100%;
+    min-height: 44px;
+    padding: 0.45rem 0.55rem;
+    font-size: 0.82rem;
+    justify-content: center;
+    text-align: center;
+  }
+  .calc-tools-bar {
+    justify-content: flex-end;
+    margin-bottom: 0.45rem;
+  }
+  .calc-cursor-hint {
+    display: none;
+  }
+
+  /* Modal de calculadora rápida a pantalla completa limpia (sin afectar bottom sheets) */
+  .quick-modal-backdrop:not(.sheet-modal-backdrop) {
     padding: 0;
-    align-items: flex-end;
+    align-items: stretch;
   }
   .quick-modal-window:not(.sheet-modal-window) {
     display: flex;
     flex-direction: column;
-    height: auto;
-    max-height: 90vh;
-    max-height: 90dvh;
-    overflow-y: auto;
-    border-radius: var(--radius-lg);
+    max-width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100vh;
+    max-height: 100dvh;
+    border-radius: 0;
+  }
+  .quick-modal-backdrop.sheet-modal-backdrop {
+    padding: 0;
+    align-items: flex-end;
   }
   .quick-modal-window.sheet-modal-window {
     max-width: 100%;
@@ -913,51 +1190,62 @@
     max-height: 88dvh;
     border-radius: 1.5rem 1.5rem 0 0;
   }
+  .sheet-modal-backdrop.open .sheet-modal-window {
+    animation: lgSheetSpringUp 380ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    transform-origin: bottom center;
+    will-change: transform, opacity;
+  }
   .quick-modal-header {
-    padding: 0.5rem 0.75rem;
+    padding: 0.6rem 0.85rem;
+    gap: 0.5rem;
     flex-shrink: 0;
   }
+  .quick-modal-title {
+    font-size: 0.9rem;
+  }
   .quick-modal-body {
-    padding: 0.5rem;
+    padding: 0.65rem;
     min-height: 0;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
+  /* En el modal rápido el título ya está en la barra superior: evitar duplicarlo */
   .quick-modal-body .subject-header-card {
-    padding: 0.5rem 0.6rem;
-    margin-bottom: 0.5rem;
+    padding: 0.55rem 0.65rem;
+    margin-bottom: 0.55rem;
   }
-  .quick-modal-body .subject-title-text p,
-  .quick-modal-body .subject-big-icon {
+  .quick-modal-body .subject-title-group {
     display: none;
   }
+
   .calc-layout {
-    gap: 0.5rem;
+    gap: 0.7rem;
   }
   .calculator-body {
-    padding: 0.5rem;
+    padding: 0.6rem;
     border-radius: var(--radius-md);
   }
   .calc-screen {
-    padding: 0.5rem 0.65rem;
-    min-height: 74px;
-    margin-bottom: 0.5rem;
+    padding: 0.55rem 0.7rem;
+    min-height: 76px;
+    margin-bottom: 0.55rem;
   }
   .calc-screen-top {
-    font-size: 0.65rem;
+    font-size: 0.68rem;
   }
   .calc-expression-line {
-    font-size: 0.8rem;
+    font-size: 0.84rem;
   }
   .calc-result-line {
-    font-size: 1.3rem;
-  }
-  .calc-keypad-grid {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: 5px;
+    font-size: 1.35rem;
   }
   .calc-memory-row {
     gap: 5px;
     margin-bottom: 5px;
+  }
+  .calc-keypad-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 5px;
   }
   .calc-key,
   .calc-key.fn-key,
@@ -967,11 +1255,11 @@
     min-height: 44px;
     height: auto;
     padding: 0.35rem 0.15rem;
-    font-size: 0.84rem;
+    font-size: 0.86rem;
     border-radius: var(--radius-sm);
   }
   .calc-key.equal-key {
-    font-size: 1rem;
+    font-size: 1.02rem;
   }
   .calc-hist-btn {
     min-height: 44px;
@@ -982,35 +1270,10 @@
     min-height: 44px;
   }
   .calc-history-card {
-    padding: 0.5rem;
+    padding: 0.75rem;
   }
 
-  /* Graficador */
-  .canvas-wrapper {
-    height: clamp(245px, 44dvh, 360px);
-  }
-  .lesson-canvas-box {
-    height: clamp(220px, 40dvh, 300px);
-  }
-  .lesson-graph-card.is-graph-expanded .lesson-canvas-box,
-  .grapher-canvas-card.is-graph-expanded .canvas-wrapper {
-    flex: 0 0 auto;
-    min-height: 195px;
-    height: clamp(195px, 34dvh, 275px);
-  }
-  .lesson-graph-card.is-graph-expanded .lesson-graph-controls {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0.55rem;
-    padding: 0.65rem 0.78rem;
-  }
-  .grapher-help-text,
-  .grapher-toolbar > div:first-child {
-    font-size: 0.8rem;
-    line-height: 1.38;
-  }
-  .grapher-zoom-actions {
-    width: 100%;
-  }
+  /* --- PrepMat ---------------------------------------------------------- */
   .prepmat-hero-header {
     padding: 1.1rem 1rem;
     gap: 0.65rem;
@@ -1036,119 +1299,108 @@
   }
 }
 
-/* ==========================================================================
-   5. Agrandar Teclado Oscuro Nativo MathLive y Teclado Blanco de 6 Categorías (<= 640px)
-   ========================================================================== */
-@media (max-width: 640px) {
-  /* --------------------------------------------------------------------------
-     1. Teclado Oscuro Nativo de MathLive (.ML__keyboard)
-     -------------------------------------------------------------------------- */
-  :root,
-  body,
-  .ML__keyboard {
-    --keyboard-row-height: 54px !important;
+/* --------------------------------------------------------------------------
+   4. Teléfonos compactos (<= 480px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 480px) {
+  .top-header {
+    margin: 0.3rem 0.55rem 0;
+    max-width: calc(100% - 1.1rem);
+    gap: 0.28rem;
+  }
+  .header-back-btn:not([hidden]) {
+    padding: 0 0.46rem;
+    font-size: 0.72rem;
+  }
+  .header-search-input {
+    padding: 0.2rem 0.55rem 0.2rem 1.72rem;
+  }
+  .header-search-icon {
+    left: 0.56rem;
+    font-size: 0.78rem;
   }
 
-  .ML__keyboard {
-    font-size: 1.25rem !important;
+  .main-content {
+    padding: 0.8rem 0.7rem 4.75rem;
+  }
+  .content-card,
+  .exercise-card,
+  .quiz-question-card,
+  .subject-header-card,
+  .grapher-sidebar,
+  .grapher-canvas-card,
+  .calc-history-card {
+    padding: 0.95rem;
+  }
+  .formula-expression,
+  .math-block {
+    font-size: 0.96rem;
   }
 
-  .ML__keyboard--plate {
-    padding: 4px 2px !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
+  /* Solucionador guiado y editor de expresiones */
+  .solver-fields-grid.solver-cols-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .solver-fraction-builder {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .solver-op-selector {
+    grid-template-columns: repeat(4, minmax(44px, 1fr));
+  }
+  .editor-action-controls-bar,
+  .editor-action-left,
+  .editor-action-right {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+  .editor-action-left .btn,
+  .editor-action-right .btn {
+    flex: 1 1 calc(50% - 0.5rem);
+  }
+  .editor-eval-controls-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
 
-  .ML__keyboard .keycap,
-  .ML__keyboard .action,
-  .ML__keyboard .fnbutton,
-  .ML__keyboard [role="button"] {
-    min-height: 52px !important;
-    height: 52px !important;
-    font-size: 1.25rem !important;
-    padding: 0 4px !important;
-    box-sizing: border-box !important;
+  /* Gráficas expandidas en teléfonos estrechos */
+  .lesson-graph-card.is-graph-expanded .lesson-canvas-box,
+  .grapher-canvas-card.is-graph-expanded .canvas-wrapper {
+    flex: 0 0 auto;
+    min-height: 205px;
+    height: clamp(205px, 36dvh, 285px);
   }
-
-  /* Barra superior de pestañas del teclado nativo (123, ∞≠∈, abc, αβγ, etc.) */
-  .ML__keyboard .segmented-control,
-  .ML__keyboard .track,
-  .ML__keyboard .segmented-control button,
-  .ML__keyboard [role="tablist"] [role="tab"] {
-    font-size: 1rem !important;
-    padding: 10px 12px !important;
-    min-height: 42px !important;
+  .lesson-graph-card.is-graph-expanded .lesson-graph-controls {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.55rem;
+    padding: 0.65rem 0.78rem;
   }
+}
 
-  /* --------------------------------------------------------------------------
-     2. Teclado Blanco de 6 Categorías (.mvk-panel)
-     -------------------------------------------------------------------------- */
-  /* Pestañas: cuadrícula de 2 columnas x 3 filas visible y sin cortarse */
-  .mvk-tabs-bar {
-    display: grid !important;
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 6px !important;
-    overflow: visible !important;
-    white-space: normal !important;
-    padding-bottom: 0 !important;
+/* --------------------------------------------------------------------------
+   5. Teléfonos muy estrechos (<= 360px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 360px) {
+  .mobile-menu-btn,
+  .theme-toggle-btn,
+  .quick-tool-btn {
+    flex: 0 0 38px;
+    width: 38px;
+    min-width: 38px;
+    height: 38px;
+    min-height: 38px;
   }
-
-  .mvk-tab-btn {
-    min-width: 0 !important;
-    width: 100% !important;
-    min-height: 44px !important;
-    padding: 0.35rem 0.5rem !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    text-align: center !important;
+  .header-back-btn:not([hidden]),
+  .header-search-input {
+    height: 38px;
+    min-height: 38px;
   }
-
-  .mvk-tab-label {
-    font-size: 0.82rem !important;
-    line-height: 1.2 !important;
-    white-space: normal !important;
-    word-break: normal !important;
+  .main-content {
+    padding: 0.75rem 0.6rem 4.75rem;
   }
-
-  /* Dimensiones generales para todas las teclas de las 6 categorías */
-  .mvk-key-btn {
-    min-height: 52px !important;
-    font-size: 1.15rem !important;
-    padding: 0.3rem 0.2rem !important;
-    box-sizing: border-box !important;
-  }
-
   .mvk-key-math {
-    font-size: 1.15rem !important;
-    line-height: 1.2 !important;
+    font-size: 0.94rem;
   }
-
-  .mvk-key-math .katex {
-    font-size: 1.05em !important;
-  }
-
-  /* Categoría 1 (Operaciones básicas): exactamente 4 columnas */
-  .mvk-keys-grid[data-cat-id="cat-basicas"],
-  .mvk-keys-grid[data-cat-id="1"] {
-    display: grid !important;
-    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-    gap: 5px !important;
-  }
-
-  /* Botón ⌫ Borrar ocupa 2 columnas completas */
-  .mvk-keys-grid[data-cat-id="cat-basicas"] .mvk-key-backspace,
-  .mvk-key-btn.mvk-key-backspace {
-    grid-column: span 2 !important;
-    font-size: 0.95rem !important;
-    font-weight: 700 !important;
-  }
-
-  /* Categorías 2 a 6: exactamente 3 columnas anchas */
-  .mvk-keys-grid:not([data-cat-id="cat-basicas"]):not([data-cat-id="1"]) {
-    display: grid !important;
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    gap: 6px !important;
+  .brand-title {
+    font-size: 0.95rem;
   }
 }
 
@@ -1243,25 +1495,5 @@
   .lesson-graph-card.is-graph-expanded .lesson-canvas-box,
   .grapher-canvas-card.is-graph-expanded .canvas-wrapper {
     height: clamp(270px, 48dvh, 460px);
-  }
-}
-
-@media (max-width: 767px) {
-  .lesson-toc-links,
-  .map-filter-blocks {
-    display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    scrollbar-width: none;
-    gap: 0.45rem;
-  }
-  .lesson-toc-links::-webkit-scrollbar,
-  .map-filter-blocks::-webkit-scrollbar {
-    display: none;
-  }
-  .lesson-toc-btn,
-  .map-filter-blocks .diff-pill {
-    flex-shrink: 0;
-    white-space: nowrap;
   }
 }

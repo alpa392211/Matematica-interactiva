@@ -169,6 +169,8 @@ window.MatInteractiva = window.MatInteractiva || {};
       applyPayloadToGrapherState(initialExpr);
     }
 
+    const isCompactPhone = typeof window !== 'undefined' && window.innerWidth < 768;
+
     container.innerHTML = `
       <div class="subject-header-card">
         <div class="subject-header-top">
@@ -206,8 +208,11 @@ window.MatInteractiva = window.MatInteractiva || {};
             </div>
           </div>
 
-          <div class="grapher-section-block">
-            <h3 class="grapher-section-title">Análisis de Cálculo sobre f(x)</h3>
+          <details class="grapher-section-block grapher-mobile-details" ${isCompactPhone ? '' : 'open'}>
+            <summary class="grapher-section-title">
+              <span>Análisis de Cálculo sobre f(x)</span>
+              <span class="grapher-details-chevron" aria-hidden="true">▾</span>
+            </summary>
             <label class="grapher-check-row">
               <input type="checkbox" id="chk-show-deriv" ${state.showDerivative ? 'checked' : ''} />
               <span>${ns.MathRenderer.formatRichText('Trazar Recta Tangente en $x_0$:')}</span>
@@ -231,12 +236,15 @@ window.MatInteractiva = window.MatInteractiva || {};
                 <input type="number" step="0.5" id="inp-int-b" class="fn-input" value="${state.integralB}" />
               </div>
             </div>
-          </div>
+          </details>
 
-          <div class="grapher-section-block">
-            <h3 class="grapher-section-title">Tabla de Valores de f(x)</h3>
+          <details class="grapher-section-block grapher-mobile-details" ${isCompactPhone ? '' : 'open'}>
+            <summary class="grapher-section-title">
+              <span>Tabla de Valores de f(x)</span>
+              <span class="grapher-details-chevron" aria-hidden="true">▾</span>
+            </summary>
             <div id="graph-table-box" class="grapher-table-box"></div>
-          </div>
+          </details>
         </div>
 
         <!-- Lienzo Cartesiano y Resultados -->
