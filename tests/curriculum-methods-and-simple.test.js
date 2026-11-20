@@ -41,7 +41,8 @@ function loadEnrichedCurriculumAndRenderer() {
     'js/data/curriculum-part3.js',
     'js/data/curriculum-enrichment-1.js',
     'js/data/curriculum-enrichment-2.js',
-    'js/data/curriculum-enrichment-3.js'
+    'js/data/curriculum-enrichment-3.js',
+    'js/data/curriculum-approach-examples.js'
   ];
 
   const ctx = vm.createContext(sandbox);
@@ -233,6 +234,18 @@ test('Todos los textos enriquecidos y fórmulas LaTeX renderizan en KaTeX sin er
         if (ap.miniExample) {
           assertValidRichLatex(ap.miniExample, `${p}.miniExample`, katex, mathRenderer);
         }
+        assert.ok(
+          Array.isArray(ap.moreExamples) && ap.moreExamples.length >= 2,
+          `${p}: debe tener >= 2 ejemplos adicionales (moreExamples)`
+        );
+        ap.moreExamples.forEach((mEx, mIdx) => {
+          const mp = `${p}.moreExamples[${mIdx}]`;
+          assertValidRichLatex(mEx.title, `${mp}.title`, katex, mathRenderer);
+          assertValidRichLatex(mEx.problem, `${mp}.problem`, katex, mathRenderer);
+          assert.ok(Array.isArray(mEx.steps) && mEx.steps.length >= 2, `${mp}: faltan steps (>=2)`);
+          mEx.steps.forEach((st, sIdx) => assertValidRichLatex(st, `${mp}.steps[${sIdx}]`, katex, mathRenderer));
+          assertValidRichLatex(mEx.result, `${mp}.result`, katex, mathRenderer);
+        });
       });
 
       (topic.examples || []).forEach((ex, i) => {
@@ -259,9 +272,11 @@ test('index.html y js/app.js integran la sección de Múltiples Métodos y boton
   assert.match(html, /js\/data\/curriculum-enrichment-1\.js/);
   assert.match(html, /js\/data\/curriculum-enrichment-2\.js/);
   assert.match(html, /js\/data\/curriculum-enrichment-3\.js/);
+  assert.match(html, /js\/data\/curriculum-approach-examples\.js/);
 
   assert.match(appCode, /id="sec-metodos"/);
   assert.match(appCode, /simple-explain-btn/);
   assert.match(appCode, /alt-methods-details/);
+  assert.match(appCode, /approach-more-examples/);
   assert.match(appCode, /solvingApproaches/);
 });

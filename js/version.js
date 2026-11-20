@@ -10,12 +10,25 @@
 
   const APP_NAME = 'MateTic';
   const APP_TAGLINE = 'Matemáticas Interactivas';
-  const APP_VERSION = '1.8.0';
-  const APP_RELEASE_DATE = '2026-11-18';
+  const APP_VERSION = '1.9.0';
+  const APP_RELEASE_DATE = '2026-11-20';
   const STUDIO_NAME = 'ALPA Studio';
   const STUDIO_MEANING = '';
 
   const RELEASE_NOTES = [
+    {
+      version: '1.9.0',
+      date: '2026-11-20',
+      items: [
+        'Animación de bienvenida y recorrido guiado menú por menú: presenta de forma dinámica con foco luminoso y diálogos progresivos la barra superior, el panel principal, el menú lateral, las lecciones, PrepMat, Graficador, Formularios, Editor, Resolución Guiada, Calculadora y Ajustes.',
+        'Modo automático e interactivo en el recorrido: avanza paso a paso o activa ▶ Auto para ver la explicación automática de cada menú, y repítelo en cualquier momento desde Ajustes o el menú rápido de inicio.',
+        'Botón ✕ Ocultar en el teclado matemático virtual oscuro: añadido un control visible y táctil en la barra superior de todas las pestañas (123, ∞≠∈, abc, αβγ) para cerrar el teclado de MathLive cuando quieras.',
+        'Tres tipos de letra adicionales en Ajustes: elige entre Moderna (predeterminada), Académica (Serif), Técnica (Monoespaciada) y Lectura Clara (abierta) con vista previa instantánea y guardado local.',
+        'Más ejemplos por cada forma de resolver: cada uno de los 96 métodos alternativos distribuidos en los 24 temas suma 2 nuevos ejemplos resueltos paso a paso (192 ejemplos adicionales en total, 3 por método).',
+        'Integración limpia sin alterar tu progreso: la vista previa de lecciones durante el recorrido de bienvenida no modifica tus XP ni marca temas como estudiados.',
+        'Pruebas matemáticas con compilación estricta KaTeX y caché sin conexión (PWA) actualizados.'
+      ]
+    },
     {
       version: '1.8.0',
       date: '2026-11-18',

@@ -3135,3 +3135,75 @@ body.has-expanded-graph .content-card {
     padding: 0.6rem 0.65rem;
   }
 }
+
+/* ==========================================================================
+   Botón de Cierre / Ocultar en Teclado Virtual Matemático de MathLive
+   ========================================================================== */
+.ML__keyboard .MLK__toolbar {
+  align-items: center;
+  gap: 0.35rem;
+  padding-right: 0.35rem;
+}
+
+.ML__keyboard .MLK__toolbar > .right {
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.ML__keyboard .mat-mlk-close-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  margin-left: auto;
+  margin-right: 0.25rem;
+  margin-bottom: 4px;
+  padding: 0.34rem 0.78rem;
+  min-height: 32px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.14);
+  color: #f8fafc;
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.28);
+  transition: background-color 150ms ease, transform 140ms ease, border-color 150ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ML__keyboard .mat-mlk-close-btn:hover {
+  background: rgba(239, 68, 68, 0.28);
+  border-color: rgba(248, 113, 113, 0.55);
+  color: #ffffff;
+}
+
+.ML__keyboard .mat-mlk-close-btn:active {
+  transform: scale(0.95);
+  background: rgba(239, 68, 68, 0.38);
+}
+
+.ML__keyboard .mat-mlk-close-icon {
+  font-size: 0.85rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.ML__keyboard .mat-mlk-close-btn.is-floating-fallback {
+  align-self: flex-end;
+  margin: 0.35rem 0.45rem 0.15rem auto;
+}
+
+@media (prefers-color-scheme: light) {
+  .ML__keyboard[data-theme="light"] .mat-mlk-close-btn {
+    background: rgba(15, 23, 42, 0.08);
+    border-color: rgba(15, 23, 42, 0.18);
+    color: #0f172a;
+    box-shadow: none;
+  }
+}
+

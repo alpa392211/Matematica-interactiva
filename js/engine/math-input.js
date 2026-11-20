@@ -714,7 +714,174 @@ window.MatInteractiva = window.MatInteractiva || {};
    * desactivación de sonidos/motores externos) antes de instanciar <math-field>.
    */
   let mathLiveGlobalsConfigured = false;
+  let keyboardDomObserver = null;
+  let mathVirtualKeyboardEventsBound = false;
+
+  /**
+   * Oculta el teclado virtual de MathLive de forma segura en móvil y escritorio.
+   */
+  function hideVirtualKeyboard() {
+    try {
+      if (ns.Haptics && typeof ns.Haptics.light === 'function') {
+        ns.Haptics.light();
+      }
+    } catch (_) {}
+
+    try {
+      if (typeof window !== 'undefined' && window.mathVirtualKeyboard) {
+        if (typeof window.mathVirtualKeyboard.hide === 'function') {
+          window.mathVirtualKeyboard.hide({ animate: true });
+        } else {
+          window.mathVirtualKeyboard.visible = false;
+        }
+      }
+    } catch (_) {
+      try {
+        if (typeof window !== 'undefined' && window.mathVirtualKeyboard) {
+          window.mathVirtualKeyboard.visible = false;
+        }
+      } catch (_) {}
+    }
+
+    try {
+      const activeEl = typeof document !== 'undefined' ? document.activeElement : null;
+      if (activeEl && String(activeEl.tagName || '').toLowerCase() === 'math-field' && typeof activeEl.blur === 'function') {
+        activeEl.blur();
+      }
+    } catch (_) {}
+  }
+
+  function createVirtualKeyboardCloseButton(doc) {
+    const btn = doc.createElement('button');
+    btn.type = 'button';
+    btn.className = 'mat-mlk-close-btn';
+    btn.setAttribute('data-mat-mlk-close', 'true');
+    btn.setAttribute('aria-label', 'Ocultar teclado matemático');
+    btn.setAttribute('title', 'Ocultar teclado matemático');
+    btn.innerHTML = '<span class="mat-mlk-close-icon" aria-hidden="true">✕</span><span class="mat-mlk-close-label">Ocultar</span>';
+
+    let handledByPointer = false;
+    btn.addEventListener('pointerdown', (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      handledByPointer = true;
+      hideVirtualKeyboard();
+      setTimeout(() => { handledByPointer = false; }, 250);
+    });
+    btn.addEventListener('mousedown', (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+    });
+    btn.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      if (!handledByPointer) {
+        hideVirtualKeyboard();
+      }
+    });
+    return btn;
+  }
+
+  /**
+   * Inyecta el botón de cierre/ocultamiento en cada barra superior (.MLK__toolbar)
+   * del teclado virtual oscuro de MathLive (.ML__keyboard).
+   */
+  function ensureVirtualKeyboardCloseButton(rootEl) {
+    if (typeof document === 'undefined') return 0;
+    const scope = rootEl && typeof rootEl.querySelectorAll === 'function' ? rootEl : document;
+    const keyboards = scope.classList && scope.classList.contains('ML__keyboard')
+      ? [scope]
+      : [...scope.querySelectorAll('.ML__keyboard')];
+
+    let injectedCount = 0;
+    keyboards.forEach((kb) => {
+      const toolbars = [...kb.querySelectorAll('.MLK__toolbar')];
+      if (toolbars.length > 0) {
+        toolbars.forEach((toolbar) => {
+          if (toolbar.querySelector('[data-mat-mlk-close="true"]')) return;
+          const rightBar = toolbar.querySelector('.right');
+          const closeBtn = createVirtualKeyboardCloseButton(document);
+          if (rightBar) {
+            rightBar.appendChild(closeBtn);
+          } else {
+            toolbar.appendChild(closeBtn);
+          }
+          injectedCount++;
+        });
+      } else {
+        const plate = kb.querySelector('.MLK__plate') || kb;
+        if (!plate.querySelector('[data-mat-mlk-close="true"]')) {
+          const closeBtn = createVirtualKeyboardCloseButton(document);
+          closeBtn.classList.add('is-floating-fallback');
+          plate.insertBefore(closeBtn, plate.firstChild);
+          injectedCount++;
+        }
+      }
+    });
+    return injectedCount;
+  }
+
+  function installMathVirtualKeyboardCloseButton() {
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
+      return;
+    }
+
+    const syncNow = () => {
+      ensureVirtualKeyboardCloseButton(document);
+    };
+
+    if (!mathVirtualKeyboardEventsBound) {
+      try {
+        if (window.mathVirtualKeyboard && typeof window.mathVirtualKeyboard.addEventListener === 'function') {
+          window.mathVirtualKeyboard.addEventListener('virtual-keyboard-toggle', syncNow);
+          window.mathVirtualKeyboard.addEventListener('geometrychange', syncNow);
+          mathVirtualKeyboardEventsBound = true;
+        }
+      } catch (_) {}
+    }
+
+    if (!keyboardDomObserver && typeof MutationObserver === 'function' && document.body) {
+      let scheduled = false;
+      keyboardDomObserver = new MutationObserver((mutations) => {
+        let relevant = false;
+        for (const m of mutations) {
+          for (const node of m.addedNodes) {
+            if (node && node.nodeType === 1) {
+              const cls = String(node.className || '');
+              if (
+                cls.includes('ML__keyboard') ||
+                cls.includes('MLK__toolbar') ||
+                cls.includes('MLK__plate') ||
+                (typeof node.querySelector === 'function' && node.querySelector('.ML__keyboard, .MLK__toolbar'))
+              ) {
+                relevant = true;
+                break;
+              }
+            }
+          }
+          if (relevant) break;
+        }
+        if (relevant && !scheduled) {
+          scheduled = true;
+          const run = () => {
+            scheduled = false;
+            syncNow();
+          };
+          if (typeof requestAnimationFrame === 'function') {
+            requestAnimationFrame(run);
+          } else {
+            setTimeout(run, 0);
+          }
+        }
+      });
+      keyboardDomObserver.observe(document.body, { childList: true, subtree: true });
+    }
+
+    syncNow();
+  }
+
   function configureMathLiveGlobals() {
+    installMathVirtualKeyboardCloseButton();
     if (typeof window === 'undefined' || !window.MathfieldElement || mathLiveGlobalsConfigured) {
       return;
     }
@@ -739,9 +906,17 @@ window.MatInteractiva = window.MatInteractiva || {};
   }
 
   configureMathLiveGlobals();
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => installMathVirtualKeyboardCloseButton());
+    } else {
+      installMathVirtualKeyboardCloseButton();
+    }
+  }
   if (typeof window !== 'undefined' && window.customElements && typeof window.customElements.whenDefined === 'function') {
     window.customElements.whenDefined('math-field').then(() => {
       configureMathLiveGlobals();
+      ensureVirtualKeyboardCloseButton(document);
     }).catch(() => {});
   }
 
@@ -1356,6 +1531,8 @@ window.MatInteractiva = window.MatInteractiva || {};
     isMathLiveAvailable,
     createMathFieldController,
     renderVisualKeyboard,
-    executeKeyOnController
+    executeKeyOnController,
+    hideVirtualKeyboard,
+    ensureVirtualKeyboardCloseButton
   };
 })(window.MatInteractiva);

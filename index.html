@@ -260,6 +260,35 @@
                 </button>
               </div>
             </div>
+
+            <div class="settings-control-row settings-wrappable-row" id="settings-row-font-family">
+              <div class="settings-control-text">
+                <span class="settings-control-label">Tipo de letra</span>
+                <span class="settings-control-note">Elige entre la tipografía predeterminada y 3 estilos adicionales</span>
+              </div>
+              <div class="settings-font-grid" role="group" aria-label="Selector de tipo de letra">
+                <button type="button" class="settings-font-btn" data-font-choice="moderna" aria-pressed="true">
+                  <span class="font-preview-sample font-sample-moderna" aria-hidden="true">Aa</span>
+                  <span class="font-option-name">Moderna</span>
+                  <span class="font-option-tag">Sans</span>
+                </button>
+                <button type="button" class="settings-font-btn" data-font-choice="academica" aria-pressed="false">
+                  <span class="font-preview-sample font-sample-academica" aria-hidden="true">Aa</span>
+                  <span class="font-option-name">Académica</span>
+                  <span class="font-option-tag">Serif</span>
+                </button>
+                <button type="button" class="settings-font-btn" data-font-choice="tecnica" aria-pressed="false">
+                  <span class="font-preview-sample font-sample-tecnica" aria-hidden="true">Aa</span>
+                  <span class="font-option-name">Técnica</span>
+                  <span class="font-option-tag">Mono</span>
+                </button>
+                <button type="button" class="settings-font-btn" data-font-choice="lectura" aria-pressed="false">
+                  <span class="font-preview-sample font-sample-lectura" aria-hidden="true">Aa</span>
+                  <span class="font-option-name">Lectura Clara</span>
+                  <span class="font-option-tag">Abierta</span>
+                </button>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -309,6 +338,14 @@
                 <span class="settings-control-note" id="settings-app-studio"></span>
               </div>
               <button type="button" class="btn btn-outline btn-sm" id="btn-open-whats-new">✨ Novedades de esta versión</button>
+            </div>
+
+            <div class="settings-control-row settings-wrappable-row">
+              <div class="settings-control-text">
+                <span class="settings-control-label">Recorrido de bienvenida</span>
+                <span class="settings-control-note">Animación interactiva menú por menú explicando cada función</span>
+              </div>
+              <button type="button" class="btn btn-outline btn-sm" id="btn-start-welcome-tour">🎬 Ver recorrido guiado</button>
             </div>
           </div>
         </section>
@@ -616,6 +653,7 @@
   <script src="js/data/curriculum-enrichment-1.js"></script>
   <script src="js/data/curriculum-enrichment-2.js"></script>
   <script src="js/data/curriculum-enrichment-3.js"></script>
+  <script src="js/data/curriculum-approach-examples.js"></script>
 
   <!-- Herramientas Interactivas y Gráficas de Lección -->
   <script src="js/tools/lesson-graphs.js"></script>
@@ -626,6 +664,7 @@
   <script src="js/tools/guided-solver.js"></script>
   <script src="js/tools/formula-sheets.js"></script>
   <script src="js/tools/prepmat.js"></script>
+  <script src="js/tools/welcome-tour.js"></script>
 
   <!-- Controlador Principal de la Aplicación -->
   <script src="js/app.js"></script>

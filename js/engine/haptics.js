@@ -20,11 +20,14 @@ window.MatInteractiva = window.MatInteractiva || {};
     lastSeenVersion: '',
     graphGestureHintSeen: false,
     lightBgPreset: 'cristal',
-    darkBgPreset: 'cosmos'
+    darkBgPreset: 'cosmos',
+    fontFamily: 'moderna',
+    welcomeTourCompleted: false
   };
 
   const VALID_LIGHT_BGS = new Set(['cristal', 'esmeralda', 'aurora']);
   const VALID_DARK_BGS = new Set(['cosmos', 'abismo', 'nebulosa']);
+  const VALID_FONTS = new Set(['moderna', 'academica', 'tecnica', 'lectura']);
 
   /**
    * Patrones hápticos diferenciados (en milisegundos).
@@ -53,7 +56,9 @@ window.MatInteractiva = window.MatInteractiva || {};
       lastSeenVersion: typeof raw.lastSeenVersion === 'string' ? raw.lastSeenVersion.trim() : '',
       graphGestureHintSeen: Boolean(raw.graphGestureHintSeen),
       lightBgPreset: VALID_LIGHT_BGS.has(raw.lightBgPreset) ? raw.lightBgPreset : 'cristal',
-      darkBgPreset: VALID_DARK_BGS.has(raw.darkBgPreset) ? raw.darkBgPreset : 'cosmos'
+      darkBgPreset: VALID_DARK_BGS.has(raw.darkBgPreset) ? raw.darkBgPreset : 'cosmos',
+      fontFamily: VALID_FONTS.has(raw.fontFamily) ? raw.fontFamily : 'moderna',
+      welcomeTourCompleted: Boolean(raw.welcomeTourCompleted)
     };
   }
 
@@ -86,7 +91,13 @@ window.MatInteractiva = window.MatInteractiva || {};
 
   function setPreference(key, value) {
     const current = loadPreferences();
-    if (key === 'hapticsEnabled' || key === 'ambientBgEnabled' || key === 'showThemeButton' || key === 'graphGestureHintSeen') {
+    if (
+      key === 'hapticsEnabled' ||
+      key === 'ambientBgEnabled' ||
+      key === 'showThemeButton' ||
+      key === 'graphGestureHintSeen' ||
+      key === 'welcomeTourCompleted'
+    ) {
       current[key] = Boolean(value);
     } else if (key === 'lastSeenVersion') {
       current.lastSeenVersion = typeof value === 'string' ? value.trim() : '';
@@ -94,6 +105,8 @@ window.MatInteractiva = window.MatInteractiva || {};
       current.lightBgPreset = VALID_LIGHT_BGS.has(value) ? value : 'cristal';
     } else if (key === 'darkBgPreset') {
       current.darkBgPreset = VALID_DARK_BGS.has(value) ? value : 'cosmos';
+    } else if (key === 'fontFamily') {
+      current.fontFamily = VALID_FONTS.has(value) ? value : 'moderna';
     }
     return savePreferences(current);
   }
@@ -101,7 +114,8 @@ window.MatInteractiva = window.MatInteractiva || {};
   function resetPreferences(opts = {}) {
     const current = loadPreferences();
     const next = Object.assign({}, DEFAULT_PREFS, {
-      lastSeenVersion: opts.includeUpdateNotice ? '' : current.lastSeenVersion
+      lastSeenVersion: opts.includeUpdateNotice ? '' : current.lastSeenVersion,
+      welcomeTourCompleted: opts.includeWelcomeTour ? false : current.welcomeTourCompleted
     });
     return savePreferences(next);
   }

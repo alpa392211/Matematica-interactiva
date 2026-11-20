@@ -181,6 +181,23 @@ window.MatInteractiva = window.MatInteractiva || {};
     }
   }
 
+  function applySavedFont() {
+    const prefs = (ns.Preferences && typeof ns.Preferences.getPreferences === 'function')
+      ? ns.Preferences.getPreferences()
+      : { fontFamily: 'moderna' };
+    const fontId = prefs.fontFamily || 'moderna';
+    if (typeof document !== 'undefined') {
+      if (fontId === 'moderna') {
+        document.documentElement.removeAttribute('data-font');
+      } else {
+        document.documentElement.setAttribute('data-font', fontId);
+      }
+      document.querySelectorAll('[data-font-choice]').forEach((btn) => {
+        btn.setAttribute('aria-pressed', btn.getAttribute('data-font-choice') === fontId ? 'true' : 'false');
+      });
+    }
+  }
+
   function applySavedTheme() {
     const mode = getSavedThemeMode();
     if (mode === 'dark' || mode === 'light') {
@@ -191,6 +208,7 @@ window.MatInteractiva = window.MatInteractiva || {};
     syncThemeButton();
     syncThemeSegmentedControl();
     applySavedBgPresets();
+    applySavedFont();
   }
 
   function haptic(kind) {
@@ -222,7 +240,7 @@ window.MatInteractiva = window.MatInteractiva || {};
   function syncPreferenceSwitches() {
     const prefs = (ns.Preferences && typeof ns.Preferences.getPreferences === 'function')
       ? ns.Preferences.getPreferences()
-      : { hapticsEnabled: true, ambientBgEnabled: true, showThemeButton: true };
+      : { hapticsEnabled: true, ambientBgEnabled: true, showThemeButton: true, fontFamily: 'moderna' };
 
     const hapticsSupported = ns.Haptics && typeof ns.Haptics.isSupported === 'function'
       ? ns.Haptics.isSupported()
@@ -263,6 +281,7 @@ window.MatInteractiva = window.MatInteractiva || {};
 
     syncThemeSegmentedControl();
     applySavedBgPresets();
+    applySavedFont();
     syncSettingsMetadata();
   }
 
@@ -792,6 +811,10 @@ window.MatInteractiva = window.MatInteractiva || {};
 
   function guardNavigation(target, onProceed, returnFocusEl = null) {
     if (typeof onProceed !== 'function') return;
+    if (ns.WelcomeTour && typeof ns.WelcomeTour.isActive === 'function' && ns.WelcomeTour.isActive()) {
+      onProceed();
+      return;
+    }
     if (!willTargetChangeContext(target) || isSameStudySection(target)) {
       onProceed();
       return;
@@ -946,6 +969,17 @@ window.MatInteractiva = window.MatInteractiva || {};
       });
     });
 
+    document.querySelectorAll('[data-font-choice]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        haptic('light');
+        const fontId = btn.getAttribute('data-font-choice') || 'moderna';
+        if (ns.Preferences && typeof ns.Preferences.setPreference === 'function') {
+          ns.Preferences.setPreference('fontFamily', fontId);
+        }
+        applySavedFont();
+      });
+    });
+
     const numerusModal = document.getElementById('numerus-cas-modal');
     const closeNumerusModal = () => {
       haptic('light');
@@ -1007,7 +1041,7 @@ window.MatInteractiva = window.MatInteractiva || {};
     document.getElementById('btn-reset-preferences')?.addEventListener('click', (ev) => {
       openAppConfirmDialog({
         title: 'Restablecer preferencias',
-        message: '¿Restablecer preferencias de interfaz (vibración, fondo animado, tema automático y visibilidad del botón de tema)? Tu progreso y XP permanecerán intactos.',
+        message: '¿Restablecer preferencias de interfaz (vibración, fondo animado, tema automático, tipografía moderna y botón de tema)? Tu progreso y XP permanecerán intactos.',
         confirmText: 'Sí, restablecer',
         cancelText: 'Cancelar',
         danger: false,
@@ -1033,6 +1067,12 @@ window.MatInteractiva = window.MatInteractiva || {};
         manual: true,
         returnFocusEl: document.getElementById('btn-open-settings')
       });
+    });
+
+    document.getElementById('btn-start-welcome-tour')?.addEventListener('click', () => {
+      haptic('confirm');
+      closeAccessibleDialog(settingsModal);
+      startWelcomeTour({ manual: true });
     });
 
     const whatsNewModal = document.getElementById('whats-new-modal');
@@ -1478,6 +1518,46 @@ window.MatInteractiva = window.MatInteractiva || {};
     syncSettingsMetadata();
   }
 
+  function openSettingsForTour() {
+    const settingsModal = document.getElementById('settings-modal');
+    if (!settingsModal) return;
+    closeMobileSidebar();
+    syncPreferenceSwitches();
+    syncPwaAndOfflineUI();
+    openAccessibleDialog(settingsModal);
+  }
+
+  function closeSettingsForTour() {
+    const settingsModal = document.getElementById('settings-modal');
+    if (!settingsModal || settingsModal.hidden) return;
+    closeAccessibleDialog(settingsModal);
+  }
+
+  function startWelcomeTour(options = {}) {
+    if (!ns.WelcomeTour || typeof ns.WelcomeTour.start !== 'function') return false;
+    closeMobileSidebar();
+    return ns.WelcomeTour.start({
+      autoPlay: Boolean(options.autoPlay),
+      onComplete: (meta) => {
+        if (options.isFirstVisit) {
+          const v = ns.Version;
+          const prefs = (ns.Preferences && typeof ns.Preferences.getPreferences === 'function')
+            ? ns.Preferences.getPreferences()
+            : { lastSeenVersion: '' };
+          if (v && v.APP_VERSION && !prefs.lastSeenVersion && ns.Preferences && typeof ns.Preferences.setPreference === 'function') {
+            try {
+              ns.Preferences.setPreference('lastSeenVersion', v.APP_VERSION);
+              whatsNewShownThisSession = true;
+            } catch (_) {}
+          }
+        }
+        if (typeof options.onComplete === 'function') {
+          options.onComplete(meta);
+        }
+      }
+    });
+  }
+
   function init() {
     syncAppBrand();
     applySavedTheme();
@@ -1492,7 +1572,16 @@ window.MatInteractiva = window.MatInteractiva || {};
     updateHeaderStats();
     bindGlobalHeaderEvents();
     navigateToDashboard();
-    maybeAutoShowWhatsNew();
+
+    const prefs = (ns.Preferences && typeof ns.Preferences.getPreferences === 'function')
+      ? ns.Preferences.getPreferences()
+      : { welcomeTourCompleted: true };
+
+    if (!prefs.welcomeTourCompleted && ns.WelcomeTour && typeof ns.WelcomeTour.start === 'function') {
+      startWelcomeTour({ isFirstVisit: true });
+    } else {
+      maybeAutoShowWhatsNew();
+    }
   }
 
   /* ------------------------------------------------------------------------
@@ -1665,6 +1754,15 @@ window.MatInteractiva = window.MatInteractiva || {};
     });
   }
 
+  function openMobileSidebar() {
+    haptic('confirm');
+    document.getElementById('app-sidebar')?.classList.add('open');
+    document.getElementById('sidebar-overlay')?.classList.add('active');
+    document.getElementById('btn-open-sidebar')?.setAttribute('aria-expanded', 'true');
+    document.getElementById('btn-floating-open-sidebar')?.setAttribute('aria-expanded', 'true');
+    syncModalScrollLock();
+  }
+
   function closeMobileSidebar() {
     document.getElementById('app-sidebar')?.classList.remove('open');
     document.getElementById('sidebar-overlay')?.classList.remove('active');
@@ -1690,15 +1788,6 @@ window.MatInteractiva = window.MatInteractiva || {};
 
     function closeQuickModal() {
       closeAccessibleDialog(modal);
-    }
-
-    function openMobileSidebar() {
-      haptic('confirm');
-      sidebar?.classList.add('open');
-      overlay?.classList.add('active');
-      btnOpenSidebar?.setAttribute('aria-expanded', 'true');
-      btnFloatingSidebar?.setAttribute('aria-expanded', 'true');
-      syncModalScrollLock();
     }
 
     btnOpenSidebar?.addEventListener('click', openMobileSidebar);
@@ -1985,6 +2074,9 @@ window.MatInteractiva = window.MatInteractiva || {};
                   </button>
                   <button type="button" class="btn btn-glass" id="btn-hero-formulas">
                     📄 Formularios
+                  </button>
+                  <button type="button" class="btn btn-glass" id="btn-hero-tour">
+                    🎬 Recorrido de bienvenida
                   </button>
                 </div>
               </div>
@@ -2357,6 +2449,9 @@ window.MatInteractiva = window.MatInteractiva || {};
     main.querySelector('#btn-hero-formulas')?.addEventListener('click', () => {
       openTool('formularios');
     });
+    main.querySelector('#btn-hero-tour')?.addEventListener('click', () => {
+      startWelcomeTour({ manual: true });
+    });
     main.querySelector('#btn-continue-theory')?.addEventListener('click', () => {
       openSubject(lastSubj.id, lastTopic.id, 'teoria');
     });
@@ -2448,7 +2543,7 @@ window.MatInteractiva = window.MatInteractiva || {};
   /* ------------------------------------------------------------------------
      3. Vista de Materia y Estructura Didáctica de 9 Etapas por Tema
      ------------------------------------------------------------------------ */
-  function openSubject(subjectId, topicId = null, tab = 'teoria') {
+  function openSubject(subjectId, topicId = null, tab = 'teoria', options = {}) {
     clearExpandedGraphState();
     syncModalScrollLock();
     const curriculum = ns.Curriculum || [];
@@ -2460,7 +2555,9 @@ window.MatInteractiva = window.MatInteractiva || {};
     appState.activeTopicId = topic.id;
     appState.activeTab = tab;
 
-    ns.Storage.markTopicStudied(subj.id, topic.id, topic.title);
+    if (!options || !options.previewOnly) {
+      ns.Storage.markTopicStudied(subj.id, topic.id, topic.title);
+    }
     renderSidebar();
     updateHeaderStats();
     setBreadcrumb(`
@@ -2822,9 +2919,38 @@ window.MatInteractiva = window.MatInteractiva || {};
                 ` : ''}
                 ${ap.miniExample ? `
                   <div class="approach-mini-example">
-                    <span class="approach-mini-tag">⚡ Ejemplo rápido con este método</span>
+                    <span class="approach-mini-tag">⚡ Ejemplo 1 · Rápido con este método</span>
                     <div>${ns.MathRenderer.formatRichText(ap.miniExample)}</div>
                   </div>
+                ` : ''}
+                ${Array.isArray(ap.moreExamples) && ap.moreExamples.length ? `
+                  <details class="approach-more-examples">
+                    <summary class="approach-more-summary">
+                      <span>📚 Más ejemplos resueltos con este método (+${ap.moreExamples.length})</span>
+                      <span class="approach-more-chevron" aria-hidden="true">▾</span>
+                    </summary>
+                    <div class="approach-more-list">
+                      ${ap.moreExamples.map((mEx, mIdx) => `
+                        <div class="approach-extra-example-card">
+                          <div class="approach-extra-head">
+                            <span class="approach-extra-num">Ejemplo ${mIdx + 2}</span>
+                            ${mEx.title ? `<strong class="approach-extra-title">${ns.MathRenderer.formatRichText(mEx.title)}</strong>` : ''}
+                          </div>
+                          ${mEx.problem ? `<div class="approach-extra-problem">${ns.MathRenderer.formatRichText(mEx.problem)}</div>` : ''}
+                          ${Array.isArray(mEx.steps) && mEx.steps.length ? `
+                            <ol class="approach-extra-steps">
+                              ${mEx.steps.map(st => `<li>${ns.MathRenderer.formatRichText(st)}</li>`).join('')}
+                            </ol>
+                          ` : ''}
+                          ${mEx.result ? `
+                            <div class="approach-extra-result">
+                              <strong>Resultado:</strong> ${ns.MathRenderer.formatRichText(mEx.result)}
+                            </div>
+                          ` : ''}
+                        </div>
+                      `).join('')}
+                    </div>
+                  </details>
                 ` : ''}
                 ${renderSimpleExplainBlock(ap.simple, `simple-${topic.id}-ap-${aIdx}`, 'is-compact')}
               </article>
@@ -3853,6 +3979,12 @@ window.MatInteractiva = window.MatInteractiva || {};
     openSubject,
     openTool,
     openQuickCalculator,
+    openMobileSidebar,
+    closeMobileSidebar,
+    openSettingsForTour,
+    closeSettingsForTour,
+    startWelcomeTour,
+    applySavedFont,
     syncModalScrollLock,
     confirmAction: openAppConfirmDialog,
     refreshScrollStrips: enhanceHorizontalScrollStrips,
