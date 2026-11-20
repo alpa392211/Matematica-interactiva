@@ -1,8 +1,9 @@
 /* ==========================================================================
    MATETIC - Animación de Bienvenida y Recorrido Interactivo Menú por Menú
    Archivo: js/tools/welcome-tour.js
-   Presenta de forma dinámica cada menú y herramienta de la aplicación con
-   foco Spotlight móvil, diálogos progresivos y modo de reproducción automática.
+   Presenta de forma limpia y progresiva cada menú y herramienta de la app
+   con bloqueo estricto de scroll, foco Spotlight exacto y hoja inferior
+   amigable en dispositivos móviles.
    ========================================================================== */
 
 window.MatInteractiva = window.MatInteractiva || {};
@@ -10,8 +11,8 @@ window.MatInteractiva = window.MatInteractiva || {};
 (function (ns) {
   'use strict';
 
-  const AUTO_STEP_DURATION_MS = 6200;
-  const DIALOGUE_BEAT_MS = 950;
+  const AUTO_STEP_DURATION_MS = 5800;
+  const DIALOGUE_BEAT_MS = 780;
 
   const TOUR_STEPS = [
     {
@@ -19,67 +20,69 @@ window.MatInteractiva = window.MatInteractiva || {};
       kind: 'intro',
       menuBadge: 'Bienvenida',
       icon: '∫π',
-      title: '¡Te damos la bienvenida a MateTic!',
+      title: '¡Hola! Bienvenido a MateTic',
       targetSelector: null,
       dialogues: [
-        'Tu laboratorio interactivo de matemáticas: <strong>9 materias</strong>, <strong>24 temas</strong> y herramientas profesionales funcionando <strong>100% sin conexión</strong>.',
-        'Hagamos un recorrido dinámico <strong>menú por menú</strong> para descubrir cómo aprovechar cada función desde hoy.'
+        'Aquí tienes <strong>9 materias</strong>, <strong>24 temas</strong> y herramientas matemáticas listas para usar incluso <strong>sin internet</strong>.',
+        'Te mostraremos cada menú paso a paso en menos de un minuto.'
       ],
-      highlights: ['📚 9 Materias completas', '🎓 Simulador PrepMat', '📈 Gráficas y animaciones', '📡 Sin internet (PWA)']
+      highlights: ['9 Materias', 'PrepMat PRO', '100% Sin conexión']
     },
     {
       id: 'header',
       kind: 'spotlight',
       menuBadge: 'Barra superior',
       icon: '🔍',
-      title: 'Buscador, Racha, XP y Accesos Rápidos',
+      title: 'Buscador, Racha y Accesos Rápidos',
       targetSelector: '.top-header',
+      fixedTarget: true,
       dialogues: [
-        'En la cabecera siempre verás tu <strong>racha diaria 🔥</strong> y tus puntos <strong>XP 🌱</strong>, que crecen al estudiar temas y resolver ejercicios.',
-        'Usa el <strong>buscador instantáneo 🔍</strong> para saltar a cualquier tema o fórmula, alterna el tema visual 🌙 o abre la <strong>calculadora flotante 🧮</strong> en cualquier momento.'
+        'Arriba ves tu <strong>racha diaria 🔥</strong>, tus puntos <strong>XP</strong> y el <strong>buscador 🔍</strong> para abrir cualquier tema al instante.',
+        'También tienes el botón de tema <strong>claro/oscuro</strong> y la <strong>calculadora rápida 🧮</strong> siempre a mano.'
       ],
-      highlights: ['🔍 Búsqueda instantánea', '🔥 Racha y XP', '🧮 Calculadora rápida']
+      highlights: ['Buscador rápido', 'Racha y XP', 'Calculadora 🧮']
     },
     {
       id: 'dashboard',
       kind: 'spotlight',
       menuBadge: 'Panel Principal',
       icon: '📊',
-      title: 'Panel Principal y Mapa Curricular',
+      title: 'Retoma donde lo dejaste',
       targetSelector: '.hero-banner',
       dialogues: [
-        'El <strong>Panel Principal</strong> recuerda exactamente tu último tema para retomar con un solo toque en <strong>Continuar</strong>.',
-        'Más abajo encontrarás rutas sugeridas, acceso destacado a <strong>PrepMat</strong> y el <strong>Mapa Curricular</strong> filtrable por bloque.'
+        'El botón <strong>Continuar</strong> abre directo tu último tema sin tener que buscarlo.',
+        'Debajo tienes accesos rápidos, rutas sugeridas y el <strong>Mapa Curricular</strong> completo.'
       ],
-      highlights: ['▶ Retomar estudio', '🧭 Rutas guiadas', '🗺️ Mapa de 24 temas']
+      highlights: ['Continuar estudio', 'Mapa de 24 temas']
     },
     {
       id: 'sidebar',
       kind: 'spotlight',
       menuBadge: 'Menú lateral',
       icon: '☰',
-      title: 'Menú de Materias, Herramientas y Dominio',
+      title: 'Todas las Materias y Herramientas',
       targetSelector: '#app-sidebar',
+      fixedTarget: true,
       openSidebarMobile: true,
       dialogues: [
-        'Desde el <strong>Menú Lateral</strong> accedes a las <strong>9 materias</strong> (de Aritmética a Cálculo), cada una con su porcentaje de avance.',
-        'Debajo están todas las herramientas interactivas, tu barra de <strong>Dominio Global</strong>, <strong>Ajustes ⚙️</strong> y el enlace de apoyo en Ko-fi.'
+        'En el <strong>menú lateral</strong> encuentras las <strong>9 materias</strong> con tu porcentaje de avance en cada una.',
+        'Abajo se agrupan las herramientas interactivas, tu <strong>Dominio Global</strong> y el acceso a <strong>Ajustes ⚙️</strong>.'
       ],
-      highlights: ['9 Módulos curriculares', '📊 Dominio Global', '⚙️ Ajustes siempre a mano']
+      highlights: ['9 Materias', 'Dominio Global', 'Ajustes ⚙️']
     },
     {
       id: 'lesson',
       kind: 'spotlight',
       menuBadge: 'Lecciones',
       icon: '📖',
-      title: 'Estudio en 9 Etapas, Métodos y Palabras Sencillas',
+      title: 'Teoría, Métodos y Palabras Sencillas',
       targetSelector: '.learning-tabs',
       previewAction: 'lesson',
       dialogues: [
-        'Cada tema se divide en <strong>4 pestañas</strong>: <strong>Teoría</strong>, <strong>Ejemplos</strong>, <strong>Práctica</strong> y <strong>Evaluación</strong>.',
-        'En Teoría hallarás <strong>múltiples formas de resolver</strong> con varios ejemplos resueltos por método, gráficas interactivas y el botón <strong>💡 Explicar en palabras más sencillas</strong>.'
+        'Cada tema se organiza en <strong>4 pestañas</strong>: Teoría, Ejemplos, Práctica y Evaluación.',
+        'Incluye <strong>múltiples métodos</strong> con 3 ejemplos por forma y el botón <strong>💡 Explicar en palabras más sencillas</strong>.'
       ],
-      highlights: ['🧭 Múltiples métodos', '📚 3 ejemplos por método', '💡 Palabras sencillas']
+      highlights: ['4 Pestañas', '3 Ejemplos por método', 'Palabras sencillas']
     },
     {
       id: 'prepmat',
@@ -90,10 +93,10 @@ window.MatInteractiva = window.MatInteractiva || {};
       targetSelector: '.prepmat-hero-header, #main-view-container',
       previewAction: 'prepmat',
       dialogues: [
-        '<strong>PrepMat</strong> genera exámenes paramétricos sin repetición para <strong>Bachillerato</strong> y <strong>Licenciatura</strong> en las 9 ramas.',
-        'Alterna entre <strong>Entrenamiento Guiado</strong> y <strong>Simulacro Oficial</strong> con cronómetro y diagnóstico analítico paso a paso.'
+        'Entrena con exámenes de <strong>Bachillerato</strong> y <strong>Licenciatura</strong> sin preguntas repetidas.',
+        'Elige <strong>Entrenamiento Guiado</strong> o <strong>Simulacro Oficial</strong> con diagnóstico paso a paso.'
       ],
-      highlights: ['⏱️ Cronómetro dual', '📝 Enunciados y directos', '📊 Diagnóstico completo']
+      highlights: ['9 Ramas', 'Cronómetro', 'Diagnóstico']
     },
     {
       id: 'grapher',
@@ -104,24 +107,24 @@ window.MatInteractiva = window.MatInteractiva || {};
       targetSelector: '.tool-workspace-header, .grapher-layout, #main-view-container',
       previewAction: 'graficador',
       dialogues: [
-        'Traza curvas en vivo, analiza <strong>raíces</strong>, <strong>derivadas</strong>, áreas bajo la curva y detecta automáticamente <strong>huecos removibles (0/0)</strong>.',
-        'En celular puedes hacer zoom con dos dedos y ampliar la gráfica a <strong>pantalla completa</strong>.'
+        'Grafica funciones en tiempo real, explora tangentes y detecta <strong>huecos removibles (0/0)</strong> automáticamente.',
+        'En celular soporta pellizco para zoom y vista a <strong>pantalla completa</strong>.'
       ],
-      highlights: ['🔎 Zoom y paneo suave', '⭕ Huecos removibles', '⛶ Vista expandida']
+      highlights: ['Zoom táctil', 'Huecos 0/0', 'Pantalla completa']
     },
     {
       id: 'formulas',
       kind: 'spotlight',
       menuBadge: 'Formularios',
       icon: '📄',
-      title: 'Formularios Matemáticos de Referencia',
+      title: 'Formularios Listos para Consultar',
       targetSelector: '.tool-workspace-header, .formula-sheets-nav, #main-view-container',
       previewAction: 'formularios',
       dialogues: [
-        'Consulta al instante leyes algebraicas, identidades trigonométricas, reglas de derivación y tablas de integrales.',
-        'Todas las hojas están organizadas por tema y listas para <strong>estudiar o imprimir</strong> con tipografía matemática nítida.'
+        'Reúne identidades trigonométricas, reglas de derivación e integrales en fichas limpias.',
+        'Úsalas para repasar rápido o <strong>imprimir</strong> tu propio formulario.'
       ],
-      highlights: ['📐 Identidades y reglas', '🖨️ Listos para imprimir', '⚡ Consulta rápida']
+      highlights: ['Por materia', 'Imprimibles']
     },
     {
       id: 'editor',
@@ -129,55 +132,56 @@ window.MatInteractiva = window.MatInteractiva || {};
       menuBadge: 'Editor Visual',
       icon: '∑',
       title: 'Editor Visual y Teclados Matemáticos',
-      targetSelector: '.mathlive-field-wrapper, .tool-workspace-header, #main-view-container',
+      targetSelector: '.mathlive-field-wrapper, .editor-main-panel, .tool-workspace-header',
       previewAction: 'editor',
       dialogues: [
-        'Construye fracciones, raíces, potencias, límites e integrales de forma visual sin memorizar comandos.',
-        'Incluye un <strong>teclado de 6 categorías</strong> y teclado virtual matemático desplegable con botón <strong>✕ Ocultar</strong> integrado en su barra superior.'
+        'Escribe fracciones, raíces, potencias, límites e integrales con botones visuales claros.',
+        'El teclado virtual oscuro incluye el botón <strong>✕ Ocultar</strong> en su barra superior para cerrarlo cuando quieras.'
       ],
-      highlights: ['⌨️ 6 Categorías visuales', '✕ Cierre rápido del teclado', '📋 Copiar expresión']
+      highlights: ['6 Categorías', 'Botón ✕ Ocultar']
     },
     {
       id: 'solver-calc',
       kind: 'spotlight',
-      menuBadge: 'Resolución y Cálculo',
+      menuBadge: 'Cálculo y Guía',
       icon: '🧭',
-      title: 'Resolución Guiada y Calculadora Científica',
+      title: 'Resolución Guiada y Calculadora',
       targetSelector: '.tool-workspace-header, #main-view-container',
       previewAction: 'solucionador',
       dialogues: [
-        'La <strong>Resolución Guiada</strong> te entrena paso a paso manteniendo bloqueados los pasos siguientes hasta que avanzas por tu cuenta.',
-        'Y cuando necesites evaluar rápido en <strong>DEG o RAD</strong>, abre la <strong>Calculadora Científica 🧮</strong> desde el menú o el botón flotante.'
+        '<strong>Resolución Guiada</strong> desbloquea cada paso conforme avanzas para practicar sin ver la respuesta de golpe.',
+        'Y la <strong>Calculadora Científica 🧮</strong> trabaja en <strong>DEG / RAD</strong> con historial.'
       ],
-      highlights: ['🔒 Pasos progresivos', '🧮 Modo DEG / RAD', '🕘 Historial guardado']
+      highlights: ['Paso a paso', 'DEG / RAD']
     },
     {
       id: 'settings',
       kind: 'spotlight',
       menuBadge: 'Ajustes',
       icon: '⚙️',
-      title: 'Personalización: Temas, Fondos y 4 Tipografías',
+      title: 'Personaliza Tema, Fondos y Letras',
       targetSelector: '#settings-modal .sheet-modal-window',
+      fixedTarget: true,
       previewAction: 'settings',
       dialogues: [
-        'En <strong>Ajustes ⚙️</strong> adaptas MateTic a tu estilo: modo <strong>Claro, Oscuro o Automático</strong>, <strong>6 fondos ambientales</strong> y <strong>4 tipos de letra</strong> (Moderna, Académica, Técnica y Lectura Clara).',
-        'También puedes configurar la vibración háptica, el fondo animado y <strong>repetir este recorrido</strong> siempre que lo necesites.'
+        'Cambia entre modo <strong>Claro, Oscuro o Automático</strong>, <strong>6 fondos</strong> y <strong>4 tipos de letra</strong> distintos.',
+        'Desde aquí también puedes <strong>repetir este recorrido</strong> en cualquier momento.'
       ],
-      highlights: ['🎨 6 Fondos claros/oscuros', '🔤 4 Tipos de letra', '🎬 Repetible cuando quieras']
+      highlights: ['6 Fondos', '4 Tipos de letra', 'Repetible']
     },
     {
       id: 'finish',
       kind: 'outro',
       menuBadge: '¡Listo!',
-      icon: '🚀',
-      title: '¡Todo listo para dominar las matemáticas!',
+      icon: '✓',
+      title: '¡Todo listo para empezar!',
       targetSelector: null,
       previewAction: 'dashboard',
       dialogues: [
-        'Has recorrido todos los menús y herramientas de <strong>MateTic</strong>. Tu progreso y preferencias se guardan automáticamente en este dispositivo.',
-        'Elige una materia en el panel principal o reta tus conocimientos en <strong>PrepMat</strong>. ¡Mucho éxito!'
+        'Ya conoces todos los menús de <strong>MateTic</strong>. Tu progreso se guarda de forma segura en tu dispositivo.',
+        'Elige una materia o abre <strong>PrepMat</strong> para comenzar.'
       ],
-      highlights: ['✅ Recorrido completado', '💾 Progreso local seguro', '🚀 A practicar']
+      highlights: ['Recorrido completado', 'Progreso guardado']
     }
   ];
 
@@ -186,11 +190,14 @@ window.MatInteractiva = window.MatInteractiva || {};
   let isAutoPlaying = false;
   let autoTimerId = null;
   let dialogueTimers = [];
+  let layoutTimers = [];
   let rootEl = null;
   let spotlightEl = null;
   let cardEl = null;
   let keydownHandler = null;
   let repositionHandler = null;
+  let wheelBlockHandler = null;
+  let touchMoveBlockHandler = null;
   let onCompleteCallback = null;
   let openedSettingsForStep = false;
 
@@ -212,9 +219,61 @@ window.MatInteractiva = window.MatInteractiva || {};
     } catch (_) {}
   }
 
+  function setTourScrollLock(locked) {
+    if (typeof document === 'undefined') return;
+    document.documentElement.classList.toggle('has-welcome-tour', Boolean(locked));
+    document.body.classList.toggle('has-welcome-tour', Boolean(locked));
+  }
+
+  function isScrollableCardEvent(ev) {
+    if (!cardEl || !ev || !ev.target || typeof ev.target.closest !== 'function') return false;
+    const insideCard = ev.target.closest('#wt-dialog-card');
+    if (!insideCard) return false;
+    return cardEl.scrollHeight > cardEl.clientHeight + 2;
+  }
+
+  function attachInputScrollBlockers() {
+    if (typeof window === 'undefined') return;
+    if (!wheelBlockHandler) {
+      wheelBlockHandler = (ev) => {
+        if (!isActive) return;
+        if (!isScrollableCardEvent(ev)) {
+          ev.preventDefault();
+        }
+      };
+      window.addEventListener('wheel', wheelBlockHandler, { passive: false, capture: true });
+    }
+    if (!touchMoveBlockHandler) {
+      touchMoveBlockHandler = (ev) => {
+        if (!isActive) return;
+        if (!isScrollableCardEvent(ev)) {
+          ev.preventDefault();
+        }
+      };
+      window.addEventListener('touchmove', touchMoveBlockHandler, { passive: false, capture: true });
+    }
+  }
+
+  function detachInputScrollBlockers() {
+    if (typeof window === 'undefined') return;
+    if (wheelBlockHandler) {
+      window.removeEventListener('wheel', wheelBlockHandler, { capture: true });
+      wheelBlockHandler = null;
+    }
+    if (touchMoveBlockHandler) {
+      window.removeEventListener('touchmove', touchMoveBlockHandler, { capture: true });
+      touchMoveBlockHandler = null;
+    }
+  }
+
   function clearDialogueTimers() {
     dialogueTimers.forEach((id) => clearTimeout(id));
     dialogueTimers = [];
+  }
+
+  function clearLayoutTimers() {
+    layoutTimers.forEach((id) => clearTimeout(id));
+    layoutTimers = [];
   }
 
   function stopAutoPlay() {
@@ -242,8 +301,7 @@ window.MatInteractiva = window.MatInteractiva || {};
     if (!isAutoPlaying || !isActive) return;
     if (autoTimerId) clearTimeout(autoTimerId);
 
-    const isLast = currentStepIdx >= TOUR_STEPS.length - 1;
-    if (isLast) {
+    if (currentStepIdx >= TOUR_STEPS.length - 1) {
       stopAutoPlay();
       return;
     }
@@ -290,7 +348,7 @@ window.MatInteractiva = window.MatInteractiva || {};
 
   function ensureTourDOM() {
     if (typeof document === 'undefined') return null;
-    let existing = document.getElementById('welcome-tour-root');
+    const existing = document.getElementById('welcome-tour-root');
     if (existing) {
       rootEl = existing;
       spotlightEl = existing.querySelector('.wt-spotlight');
@@ -308,10 +366,10 @@ window.MatInteractiva = window.MatInteractiva || {};
 
     wrapper.innerHTML = `
       <div class="wt-backdrop-dim" aria-hidden="true"></div>
-      <div class="wt-spotlight" aria-hidden="true">
-        <div class="wt-spotlight-pulse"></div>
-      </div>
+      <div class="wt-spotlight" aria-hidden="true"></div>
       <div class="wt-dialog-card" id="wt-dialog-card">
+        <div class="wt-sheet-handle" aria-hidden="true"></div>
+
         <div class="wt-auto-progress" aria-hidden="true">
           <div class="wt-auto-progress-fill" id="wt-auto-fill"></div>
         </div>
@@ -322,45 +380,34 @@ window.MatInteractiva = window.MatInteractiva || {};
             <span class="wt-step-counter" id="wt-step-counter">1 / ${TOUR_STEPS.length}</span>
           </div>
           <div class="wt-top-actions">
-            <button type="button" class="wt-mini-btn" id="wt-btn-auto" aria-pressed="false" title="Avanzar automáticamente menú por menú">▶ Auto</button>
-            <button type="button" class="wt-mini-btn wt-skip-btn" id="wt-btn-skip" aria-label="Omitir recorrido de bienvenida">✕ Omitir</button>
+            <button type="button" class="wt-mini-btn" id="wt-btn-auto" aria-pressed="false" title="Avanzar automáticamente">▶ Auto</button>
+            <button type="button" class="wt-mini-btn wt-skip-btn" id="wt-btn-skip" aria-label="Omitir recorrido de bienvenida">Saltar</button>
           </div>
         </div>
 
+        <div class="wt-linear-track" aria-hidden="true">
+          <div class="wt-linear-fill" id="wt-linear-fill"></div>
+        </div>
+
         <div class="wt-hero-stage" id="wt-hero-stage" hidden>
-          <div class="wt-orbit-ring" aria-hidden="true">
-            <span class="wt-orbit-sym s1">∫</span>
-            <span class="wt-orbit-sym s2">π</span>
-            <span class="wt-orbit-sym s3">∑</span>
-            <span class="wt-orbit-sym s4">∞</span>
-            <span class="wt-orbit-sym s5">√</span>
-            <span class="wt-orbit-sym s6">∂</span>
-          </div>
           <div class="wt-hero-emblem" id="wt-hero-emblem" aria-hidden="true">∫π</div>
         </div>
 
         <div class="wt-header-row">
           <div class="wt-guide-avatar" id="wt-guide-avatar" aria-hidden="true">
             <span id="wt-avatar-glyph">∫π</span>
-            <span class="wt-speaking-dot"></span>
           </div>
           <div class="wt-title-wrap">
             <h2 class="wt-title" id="wt-title"></h2>
           </div>
         </div>
 
-        <div class="wt-dialogues" id="wt-dialogues" aria-live="polite" title="Toca para mostrar todo el diálogo"></div>
+        <div class="wt-dialogues" id="wt-dialogues" aria-live="polite" title="Toca para mostrar todo el mensaje"></div>
 
         <div class="wt-highlights" id="wt-highlights"></div>
 
-        <div class="wt-dots-bar" id="wt-dots-bar" role="tablist" aria-label="Pasos del recorrido">
-          ${TOUR_STEPS.map((st, idx) => `
-            <button type="button" class="wt-dot" data-wt-step="${idx}" aria-label="Ir al paso ${idx + 1}: ${st.menuBadge}"></button>
-          `).join('')}
-        </div>
-
         <div class="wt-footer-actions">
-          <button type="button" class="btn btn-outline btn-sm wt-nav-btn" id="wt-btn-prev">← Anterior</button>
+          <button type="button" class="btn btn-outline btn-sm wt-nav-btn wt-prev-btn" id="wt-btn-prev">← Anterior</button>
           <button type="button" class="btn btn-primary btn-sm wt-nav-btn wt-next-btn" id="wt-btn-next">Siguiente →</button>
         </div>
       </div>
@@ -389,16 +436,6 @@ window.MatInteractiva = window.MatInteractiva || {};
     wrapper.querySelector('#wt-dialogues')?.addEventListener('click', () => {
       revealAllCurrentDialogues();
     });
-    wrapper.querySelectorAll('[data-wt-step]').forEach((dotBtn) => {
-      dotBtn.addEventListener('click', () => {
-        stopAutoPlay();
-        haptic('light');
-        const idx = Number(dotBtn.getAttribute('data-wt-step'));
-        if (Number.isInteger(idx) && idx >= 0 && idx < TOUR_STEPS.length) {
-          goToStep(idx);
-        }
-      });
-    });
 
     return wrapper;
   }
@@ -406,13 +443,12 @@ window.MatInteractiva = window.MatInteractiva || {};
   function revealAllCurrentDialogues() {
     clearDialogueTimers();
     if (!rootEl) return;
-    rootEl.querySelectorAll('.wt-dialogue-bubble').forEach((el) => {
+    rootEl.querySelectorAll('.wt-dialogue-line').forEach((el) => {
       el.classList.add('is-visible');
     });
     rootEl.querySelectorAll('.wt-highlight-pill').forEach((el) => {
       el.classList.add('is-visible');
     });
-    rootEl.querySelector('.wt-guide-avatar')?.classList.remove('is-speaking');
   }
 
   function findVisibleTarget(selector) {
@@ -444,7 +480,6 @@ window.MatInteractiva = window.MatInteractiva || {};
 
   function executeStepNavigation(step) {
     closeTemporaryPanels();
-
     if (!ns.App) return;
 
     if (step.kind === 'intro' || step.previewAction === 'dashboard' || step.id === 'dashboard' || step.id === 'header') {
@@ -479,11 +514,36 @@ window.MatInteractiva = window.MatInteractiva || {};
     }
   }
 
+  /**
+   * Desplaza instantáneamente el objetivo al tercio superior visible antes de
+   * bloquear el scroll, evitando que el foco quede cortado abajo o desfasado.
+   */
+  function frameTargetInstantly(step) {
+    if (typeof window === 'undefined' || !step || !step.targetSelector || step.fixedTarget) return;
+    const target = findVisibleTarget(step.targetSelector);
+    if (!target) return;
+
+    const isMobile = (window.innerWidth || 1024) <= 900;
+    const desiredTop = isMobile ? 64 : 84;
+    const rect = target.getBoundingClientRect();
+    const docY = (window.scrollY || window.pageYOffset || 0) + rect.top;
+    const nextScrollY = Math.max(0, Math.round(docY - desiredTop));
+
+    if (typeof window.scrollTo === 'function') {
+      window.scrollTo({ top: nextScrollY, behavior: 'auto' });
+    }
+  }
+
   function positionSpotlightAndCard(step) {
     if (!rootEl || !spotlightEl || !cardEl || typeof window === 'undefined') return;
 
+    const vw = window.innerWidth || 1024;
+    const vh = window.innerHeight || 768;
+    const isMobile = vw <= 900;
     const isCentered = step.kind === 'intro' || step.kind === 'outro' || !step.targetSelector;
+
     rootEl.classList.toggle('is-centered-step', isCentered);
+    rootEl.classList.toggle('is-mobile-sheet', isMobile && !isCentered);
 
     if (isCentered) {
       spotlightEl.classList.remove('is-active');
@@ -497,66 +557,109 @@ window.MatInteractiva = window.MatInteractiva || {};
     const target = findVisibleTarget(step.targetSelector);
     if (!target) {
       rootEl.classList.add('is-centered-step');
+      rootEl.classList.remove('is-mobile-sheet');
       spotlightEl.classList.remove('is-active');
+      cardEl.style.removeProperty('top');
+      cardEl.style.removeProperty('left');
+      cardEl.style.removeProperty('bottom');
+      cardEl.style.removeProperty('right');
       return;
     }
 
-    const vw = window.innerWidth || 1024;
-    const vh = window.innerHeight || 768;
     const rawRect = target.getBoundingClientRect();
-    const pad = 8;
+    const pad = isMobile ? 5 : 8;
 
-    const left = Math.max(6, Math.min(vw - 24, rawRect.left - pad));
-    const top = Math.max(6, Math.min(vh - 24, rawRect.top - pad));
-    const width = Math.max(40, Math.min(vw - left - 6, rawRect.width + pad * 2));
-    const height = Math.max(36, Math.min(vh - top - 6, rawRect.height + pad * 2));
-
-    spotlightEl.style.left = `${left}px`;
-    spotlightEl.style.top = `${top}px`;
-    spotlightEl.style.width = `${width}px`;
-    spotlightEl.style.height = `${height}px`;
-    spotlightEl.classList.add('is-active');
-
-    // En móvil fijamos la tarjeta en la zona inferior (o superior si el foco está abajo)
-    if (vw <= 900) {
+    // -----------------------------------------------------------------------
+    // Modo móvil (<= 900px): hoja inferior fija, foco recortado arriba sin chocar
+    // -----------------------------------------------------------------------
+    if (isMobile) {
+      cardEl.style.removeProperty('top');
       cardEl.style.removeProperty('left');
       cardEl.style.removeProperty('right');
-      const targetMidY = top + height / 2;
-      if (targetMidY > vh * 0.56 && height < vh * 0.6) {
-        cardEl.style.top = '12px';
-        cardEl.style.bottom = 'auto';
-      } else {
-        cardEl.style.top = 'auto';
-        cardEl.style.bottom = '12px';
-      }
+      cardEl.style.removeProperty('bottom');
+
+      const cardRect = cardEl.getBoundingClientRect();
+      const cardTop = cardRect.top > 0 ? cardRect.top : Math.round(vh * 0.56);
+      const maxSpotBottom = Math.max(88, cardTop - 12);
+
+      const spotLeft = Math.max(6, Math.min(vw - 24, rawRect.left - pad));
+      const spotTop = Math.max(6, Math.min(maxSpotBottom - 36, rawRect.top - pad));
+      const spotRight = Math.min(vw - 6, rawRect.right + pad);
+      const spotBottom = Math.min(maxSpotBottom, Math.max(spotTop + 36, rawRect.bottom + pad));
+
+      spotlightEl.style.left = `${Math.round(spotLeft)}px`;
+      spotlightEl.style.top = `${Math.round(spotTop)}px`;
+      spotlightEl.style.width = `${Math.max(40, Math.round(spotRight - spotLeft))}px`;
+      spotlightEl.style.height = `${Math.max(36, Math.round(spotBottom - spotTop))}px`;
+      spotlightEl.classList.add('is-active');
       return;
     }
 
-    // Escritorio: ubicar la tarjeta sin tapar el objetivo resaltado
-    const cardW = Math.min(440, vw - 32);
-    const cardH = Math.min(cardEl.offsetHeight || 310, vh - 32);
-    let cardLeft = Math.max(16, Math.min(vw - cardW - 16, left + width / 2 - cardW / 2));
-    let cardTop = top + height + 16;
+    // -----------------------------------------------------------------------
+    // Modo escritorio (> 900px): foco exacto y tarjeta SIEMPRE dentro del viewport
+    // -----------------------------------------------------------------------
+    const margin = 14;
+    const gap = 14;
+    const cardRect = cardEl.getBoundingClientRect();
+    const cardW = Math.min(410, Math.max(320, Math.round(cardRect.width || 396)));
+    const cardH = Math.min(vh - margin * 2, Math.max(210, Math.round(cardRect.height || 260)));
 
-    if (step.id === 'sidebar') {
-      cardLeft = Math.min(vw - cardW - 18, left + width + 20);
-      cardTop = Math.max(20, Math.min(vh - cardH - 20, vh * 0.25));
-    } else if (step.id === 'settings') {
-      cardLeft = Math.max(18, vw - cardW - 22);
-      cardTop = Math.max(18, vh - cardH - 22);
-    } else if (cardTop + cardH > vh - 16) {
-      if (top - cardH - 16 >= 16) {
-        cardTop = top - cardH - 16;
-      } else {
-        cardTop = Math.max(16, vh - cardH - 18);
-        cardLeft = Math.max(16, vw - cardW - 20);
-      }
+    let spotLeft = Math.max(6, rawRect.left - pad);
+    let spotTop = Math.max(6, rawRect.top - pad);
+    let spotRight = Math.min(vw - 6, rawRect.right + pad);
+    let spotBottom = Math.min(vh - 6, rawRect.bottom + pad);
+
+    // Si el objetivo ocupa casi todo el alto (y no es la barra lateral), acotar su
+    // foco para dejar espacio limpio a la tarjeta sin recortarla
+    if (step.id !== 'sidebar' && step.id !== 'settings' && (spotBottom - spotTop) > (vh - cardH - margin * 2 - gap)) {
+      const maxVisibleHeight = Math.max(110, vh - cardH - margin * 2 - gap - Math.max(0, spotTop - margin));
+      spotBottom = Math.min(spotBottom, spotTop + maxVisibleHeight);
+    }
+
+    const spotW = Math.max(44, Math.round(spotRight - spotLeft));
+    const spotH = Math.max(36, Math.round(spotBottom - spotTop));
+
+    spotlightEl.style.left = `${Math.round(spotLeft)}px`;
+    spotlightEl.style.top = `${Math.round(spotTop)}px`;
+    spotlightEl.style.width = `${spotW}px`;
+    spotlightEl.style.height = `${spotH}px`;
+    spotlightEl.classList.add('is-active');
+
+    const clampLeft = (x) => Math.max(margin, Math.min(vw - cardW - margin, Math.round(x)));
+    const clampTop = (y) => Math.max(margin, Math.min(vh - cardH - margin, Math.round(y)));
+
+    let cardLeft;
+    let cardTop;
+
+    if (step.id === 'sidebar' && (spotRight + gap + cardW + margin) <= vw) {
+      cardLeft = spotRight + gap;
+      cardTop = clampTop(vh * 0.24);
+    } else if ((spotBottom + gap + cardH + margin) <= vh) {
+      // 1. Debajo del foco
+      cardLeft = clampLeft(spotLeft + spotW / 2 - cardW / 2);
+      cardTop = spotBottom + gap;
+    } else if ((spotTop - gap - cardH) >= margin) {
+      // 2. Encima del foco
+      cardLeft = clampLeft(spotLeft + spotW / 2 - cardW / 2);
+      cardTop = spotTop - gap - cardH;
+    } else if ((spotRight + gap + cardW + margin) <= vw) {
+      // 3. A la derecha del foco
+      cardLeft = spotRight + gap;
+      cardTop = clampTop(spotTop);
+    } else if ((spotLeft - gap - cardW) >= margin) {
+      // 4. A la izquierda del foco
+      cardLeft = spotLeft - gap - cardW;
+      cardTop = clampTop(spotTop);
+    } else {
+      // 5. Esquina inferior derecha garantizada dentro del viewport
+      cardLeft = vw - cardW - margin;
+      cardTop = vh - cardH - margin;
     }
 
     cardEl.style.bottom = 'auto';
     cardEl.style.right = 'auto';
-    cardEl.style.left = `${Math.round(cardLeft)}px`;
-    cardEl.style.top = `${Math.round(cardTop)}px`;
+    cardEl.style.left = `${clampLeft(cardLeft)}px`;
+    cardEl.style.top = `${clampTop(cardTop)}px`;
   }
 
   function renderStepContent(step, idx) {
@@ -565,9 +668,9 @@ window.MatInteractiva = window.MatInteractiva || {};
 
     const badgeEl = rootEl.querySelector('#wt-menu-badge');
     const counterEl = rootEl.querySelector('#wt-step-counter');
+    const linearFill = rootEl.querySelector('#wt-linear-fill');
     const titleEl = rootEl.querySelector('#wt-title');
     const avatarGlyph = rootEl.querySelector('#wt-avatar-glyph');
-    const avatarEl = rootEl.querySelector('#wt-guide-avatar');
     const heroStage = rootEl.querySelector('#wt-hero-stage');
     const heroEmblem = rootEl.querySelector('#wt-hero-emblem');
     const dialoguesEl = rootEl.querySelector('#wt-dialogues');
@@ -577,6 +680,10 @@ window.MatInteractiva = window.MatInteractiva || {};
 
     if (badgeEl) badgeEl.textContent = step.menuBadge;
     if (counterEl) counterEl.textContent = `${idx + 1} / ${TOUR_STEPS.length}`;
+    if (linearFill) {
+      const pct = Math.round(((idx + 1) / TOUR_STEPS.length) * 100);
+      linearFill.style.width = `${pct}%`;
+    }
     if (titleEl) titleEl.textContent = step.title;
     if (avatarGlyph) avatarGlyph.textContent = step.icon;
 
@@ -590,26 +697,20 @@ window.MatInteractiva = window.MatInteractiva || {};
     }
     if (nextBtn) {
       if (idx === 0) {
-        nextBtn.textContent = 'Comenzar recorrido →';
+        nextBtn.textContent = 'Comenzar →';
       } else if (idx === TOUR_STEPS.length - 1) {
-        nextBtn.textContent = '🚀 ¡Empezar a estudiar!';
+        nextBtn.textContent = 'Empezar ahora';
       } else {
         nextBtn.textContent = 'Siguiente →';
       }
     }
 
-    rootEl.querySelectorAll('[data-wt-step]').forEach((dot, dIdx) => {
-      dot.classList.toggle('is-active', dIdx === idx);
-      dot.classList.toggle('is-done', dIdx < idx);
-      dot.setAttribute('aria-selected', dIdx === idx ? 'true' : 'false');
-    });
-
     const reduced = prefersReducedMotion();
     if (dialoguesEl) {
       dialoguesEl.innerHTML = (step.dialogues || []).map((htmlLine, lineIdx) => `
-        <div class="wt-dialogue-bubble ${reduced || lineIdx === 0 ? 'is-visible' : ''}" data-beat="${lineIdx}">
+        <p class="wt-dialogue-line ${reduced || lineIdx === 0 ? 'is-visible' : ''}" data-beat="${lineIdx}">
           ${htmlLine}
-        </div>
+        </p>
       `).join('');
     }
 
@@ -620,30 +721,27 @@ window.MatInteractiva = window.MatInteractiva || {};
     }
 
     if (!reduced && dialoguesEl) {
-      avatarEl?.classList.add('is-speaking');
-      const bubbles = [...dialoguesEl.querySelectorAll('.wt-dialogue-bubble')];
-      bubbles.forEach((b, bIdx) => {
-        if (bIdx === 0) return;
+      const lines = [...dialoguesEl.querySelectorAll('.wt-dialogue-line')];
+      lines.forEach((line, lIdx) => {
+        if (lIdx === 0) return;
         const tid = setTimeout(() => {
-          b.classList.add('is-visible');
-        }, bIdx * DIALOGUE_BEAT_MS);
+          line.classList.add('is-visible');
+        }, lIdx * DIALOGUE_BEAT_MS);
         dialogueTimers.push(tid);
       });
 
-      const pillsDelay = Math.max(400, bubbles.length * DIALOGUE_BEAT_MS - 250);
       const pillTimer = setTimeout(() => {
         if (!rootEl) return;
         rootEl.querySelectorAll('.wt-highlight-pill').forEach((pill, pIdx) => {
-          const pt = setTimeout(() => pill.classList.add('is-visible'), pIdx * 95);
+          const pt = setTimeout(() => pill.classList.add('is-visible'), pIdx * 70);
           dialogueTimers.push(pt);
         });
-        avatarEl?.classList.remove('is-speaking');
-      }, pillsDelay);
+      }, Math.max(300, lines.length * DIALOGUE_BEAT_MS - 220));
       dialogueTimers.push(pillTimer);
     }
 
-    // Re-disparar animación sutil de entrada de la tarjeta
     if (cardEl) {
+      cardEl.scrollTop = 0;
       cardEl.classList.remove('is-step-enter');
       void cardEl.offsetWidth;
       cardEl.classList.add('is-step-enter');
@@ -656,21 +754,54 @@ window.MatInteractiva = window.MatInteractiva || {};
     currentStepIdx = bounded;
     const step = TOUR_STEPS[bounded];
 
+    clearLayoutTimers();
+    // 1. Liberar brevemente para navegar y encuadrar el objetivo al instante
+    setTourScrollLock(false);
     executeStepNavigation(step);
     renderStepContent(step, bounded);
 
-    // Esperar un frame para que el DOM recién renderizado tenga geometría estable
-    const reposition = () => {
-      if (!isActive) return;
+    const finalizeLayout = () => {
+      if (!isActive || currentStepIdx !== bounded) return;
+      frameTargetInstantly(step);
+      setTourScrollLock(true);
       positionSpotlightAndCard(step);
     };
+
     if (typeof requestAnimationFrame === 'function') {
       requestAnimationFrame(() => {
-        reposition();
-        setTimeout(reposition, 180);
+        finalizeLayout();
+        requestAnimationFrame(() => {
+          if (isActive && currentStepIdx === bounded) {
+            positionSpotlightAndCard(step);
+          }
+        });
       });
     } else {
-      reposition();
+      finalizeLayout();
+    }
+
+    // Si el paso abre un panel animado (menú lateral móvil o Ajustes),
+    // re-medir al terminar la transición para encuadrar el panel completo.
+    if (step.openSidebarMobile || step.previewAction === 'settings') {
+      const targetEl = findVisibleTarget(step.targetSelector);
+      if (targetEl && typeof targetEl.addEventListener === 'function') {
+        const onEnd = () => {
+          if (isActive && currentStepIdx === bounded) {
+            positionSpotlightAndCard(step);
+          }
+        };
+        targetEl.addEventListener('transitionend', onEnd, { once: true });
+      }
+      layoutTimers.push(setTimeout(() => {
+        if (isActive && currentStepIdx === bounded) {
+          positionSpotlightAndCard(step);
+        }
+      }, 220));
+      layoutTimers.push(setTimeout(() => {
+        if (isActive && currentStepIdx === bounded) {
+          positionSpotlightAndCard(step);
+        }
+      }, 420));
     }
 
     if (isAutoPlaying) {
@@ -683,19 +814,19 @@ window.MatInteractiva = window.MatInteractiva || {};
     isActive = false;
     stopAutoPlay();
     clearDialogueTimers();
+    clearLayoutTimers();
     closeTemporaryPanels();
+    detachInputScrollBlockers();
+    setTourScrollLock(false);
 
     if (rootEl) {
-      rootEl.classList.remove('is-open', 'is-autoplaying');
+      rootEl.classList.remove('is-open', 'is-autoplaying', 'is-centered-step', 'is-mobile-sheet');
       rootEl.hidden = true;
     }
 
-    if (typeof document !== 'undefined') {
-      document.documentElement.classList.remove('has-welcome-tour');
-      if (keydownHandler) {
-        document.removeEventListener('keydown', keydownHandler);
-        keydownHandler = null;
-      }
+    if (typeof document !== 'undefined' && keydownHandler) {
+      document.removeEventListener('keydown', keydownHandler);
+      keydownHandler = null;
     }
     if (typeof window !== 'undefined' && repositionHandler) {
       window.removeEventListener('resize', repositionHandler);
@@ -711,6 +842,9 @@ window.MatInteractiva = window.MatInteractiva || {};
 
     if (ns.App && typeof ns.App.navigateToDashboard === 'function') {
       ns.App.navigateToDashboard();
+    }
+    if (ns.App && typeof ns.App.syncModalScrollLock === 'function') {
+      ns.App.syncModalScrollLock();
     }
 
     haptic(meta.skipped ? 'light' : 'achievement');
@@ -734,7 +868,12 @@ window.MatInteractiva = window.MatInteractiva || {};
 
     rootEl.hidden = false;
     rootEl.classList.add('is-open');
-    document.documentElement.classList.add('has-welcome-tour');
+    setTourScrollLock(true);
+    attachInputScrollBlockers();
+
+    if (ns.App && typeof ns.App.syncModalScrollLock === 'function') {
+      ns.App.syncModalScrollLock();
+    }
 
     const autoBtn = rootEl.querySelector('#wt-btn-auto');
     if (autoBtn) {
@@ -758,13 +897,27 @@ window.MatInteractiva = window.MatInteractiva || {};
         ev.preventDefault();
         stopAutoPlay();
         if (currentStepIdx > 0) goToStep(currentStepIdx - 1);
+      } else if (
+        ev.key === ' ' ||
+        ev.key === 'PageDown' ||
+        ev.key === 'PageUp' ||
+        ev.key === 'ArrowDown' ||
+        ev.key === 'ArrowUp' ||
+        ev.key === 'Home' ||
+        ev.key === 'End'
+      ) {
+        ev.preventDefault();
       }
     };
     document.addEventListener('keydown', keydownHandler);
 
     repositionHandler = () => {
       if (isActive) {
-        positionSpotlightAndCard(TOUR_STEPS[currentStepIdx]);
+        const step = TOUR_STEPS[currentStepIdx];
+        setTourScrollLock(false);
+        frameTargetInstantly(step);
+        setTourScrollLock(true);
+        positionSpotlightAndCard(step);
       }
     };
     if (typeof window !== 'undefined') {

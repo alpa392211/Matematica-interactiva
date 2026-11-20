@@ -172,17 +172,27 @@ test('Teclado virtual oscuro de MathLive recibe botón de cierre en cada barra y
   assert.match(toolsCss, /\.ML__keyboard \.mat-mlk-close-btn/);
 });
 
-test('WelcomeTour cubre menú por menú con diálogos progresivos y navegación sin alterar progreso', () => {
+test('WelcomeTour cubre menú por menú con diálogos progresivos, bloqueo de scroll y diseño móvil limpio', () => {
   const html = fs.readFileSync(path.join(ROOT_DIR, 'index.html'), 'utf8');
   const appCode = fs.readFileSync(path.join(ROOT_DIR, 'js', 'app.js'), 'utf8');
   const compCss = fs.readFileSync(path.join(ROOT_DIR, 'css', 'components.css'), 'utf8');
+  const layoutCss = fs.readFileSync(path.join(ROOT_DIR, 'css', 'layout.css'), 'utf8');
+  const tourCode = fs.readFileSync(path.join(ROOT_DIR, 'js', 'tools', 'welcome-tour.js'), 'utf8');
 
   assert.match(html, /js\/tools\/welcome-tour\.js/);
   assert.match(html, /id="btn-start-welcome-tour"/);
   assert.match(appCode, /id="btn-hero-tour"/);
   assert.match(appCode, /previewOnly/);
+  assert.match(appCode, /function scrollPageToTop\(\)/);
+  assert.match(layoutCss, /html\.has-welcome-tour/);
+  assert.match(layoutCss, /body\.has-welcome-tour/);
+  assert.match(tourCode, /addEventListener\('wheel'/);
+  assert.match(tourCode, /addEventListener\('touchmove'/);
+  assert.match(tourCode, /function frameTargetInstantly\(/);
   assert.match(compCss, /\.wt-spotlight/);
-  assert.match(compCss, /\.wt-dialogue-bubble/);
+  assert.match(compCss, /\.wt-dialogue-line/);
+  assert.match(compCss, /\.wt-overlay\.is-mobile-sheet \.wt-dialog-card/);
+  assert.match(compCss, /\.wt-nav-btn\[hidden\]/);
 
   const sandbox = {
     console,
@@ -192,7 +202,7 @@ test('WelcomeTour cubre menú por menú con diálogos progresivos y navegación 
   };
   sandbox.window = sandbox;
 
-  vm.runInNewContext(fs.readFileSync(path.join(ROOT_DIR, 'js', 'tools', 'welcome-tour.js'), 'utf8'), sandbox);
+  vm.runInNewContext(tourCode, sandbox);
   const Tour = sandbox.MatInteractiva.WelcomeTour;
 
   assert.ok(Tour, 'Debe exponer window.MatInteractiva.WelcomeTour');

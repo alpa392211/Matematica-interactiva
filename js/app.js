@@ -298,6 +298,15 @@ window.MatInteractiva = window.MatInteractiva || {};
     });
   }
 
+  function isWelcomeTourActive() {
+    return Boolean(ns.WelcomeTour && typeof ns.WelcomeTour.isActive === 'function' && ns.WelcomeTour.isActive());
+  }
+
+  function scrollPageToTop() {
+    if (typeof window === 'undefined' || typeof window.scrollTo !== 'function') return;
+    window.scrollTo({ top: 0, behavior: isWelcomeTourActive() ? 'auto' : 'smooth' });
+  }
+
   function syncFloatingMenuButton() {
     if (typeof document === 'undefined' || typeof window === 'undefined') return;
     const menuBtn = document.getElementById('btn-floating-open-sidebar');
@@ -307,7 +316,7 @@ window.MatInteractiva = window.MatInteractiva || {};
     const isMobile = window.innerWidth <= 900;
     const sidebarOpen = Boolean(document.getElementById('app-sidebar')?.classList.contains('open'));
     const expandedGraph = Boolean(document.body.classList.contains('has-expanded-graph'));
-    const hasOverlay = activeDialogStack.length > 0 || sidebarOpen || expandedGraph || document.documentElement.classList.contains('has-open-overlay');
+    const hasOverlay = activeDialogStack.length > 0 || sidebarOpen || expandedGraph || isWelcomeTourActive() || document.documentElement.classList.contains('has-open-overlay');
 
     let scrolledPastHeader = false;
     if (isMobile && !hasOverlay) {
@@ -346,8 +355,28 @@ window.MatInteractiva = window.MatInteractiva || {};
     const sidebarOpen = Boolean(document.getElementById('app-sidebar')?.classList.contains('open'));
     const calcFnSheetOpen = Boolean(document.getElementById('calc-fn-mobile-sheet-backdrop'));
     const expandedGraph = Boolean(document.body.classList.contains('has-expanded-graph'));
-    const hasOverlay = activeDialogStack.length > 0 || sidebarOpen || calcFnSheetOpen || expandedGraph;
+    const tourActive = isWelcomeTourActive();
+    const hasOverlay = activeDialogStack.length > 0 || sidebarOpen || calcFnSheetOpen || expandedGraph || tourActive;
     const wasLocked = document.documentElement.classList.contains('has-open-overlay');
+
+    if (tourActive) {
+      // Durante el recorrido, welcome-tour.js gestiona el bloqueo de scroll sin fijar body con offset stale
+      if (wasLocked) {
+        const htmlEl = document.documentElement;
+        const prevScrollBehavior = htmlEl.style.scrollBehavior;
+        htmlEl.style.scrollBehavior = 'auto';
+        htmlEl.classList.remove('has-open-overlay');
+        document.body.classList.remove('has-open-overlay');
+        htmlEl.style.removeProperty('--scroll-lock-top');
+        if (prevScrollBehavior) {
+          htmlEl.style.scrollBehavior = prevScrollBehavior;
+        } else {
+          htmlEl.style.removeProperty('scroll-behavior');
+        }
+      }
+      syncFloatingMenuButton();
+      return;
+    }
 
     if (hasOverlay && !wasLocked) {
       lockedScrollY = (typeof window !== 'undefined' ? (window.scrollY || window.pageYOffset || 0) : 0);
@@ -2537,7 +2566,7 @@ window.MatInteractiva = window.MatInteractiva || {};
     });
 
     enhanceHorizontalScrollStrips(main);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollPageToTop();
   }
 
   /* ------------------------------------------------------------------------
@@ -2572,7 +2601,7 @@ window.MatInteractiva = window.MatInteractiva || {};
     });
 
     renderSubjectWorkspace(subj, topic);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollPageToTop();
   }
 
   function renderSubjectWorkspace(subj, topic) {
@@ -3961,7 +3990,7 @@ window.MatInteractiva = window.MatInteractiva || {};
     }
 
     enhanceHorizontalScrollStrips(main);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollPageToTop();
   }
 
   function openQuickCalculator(returnFocusEl = null) {

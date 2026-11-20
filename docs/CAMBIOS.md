@@ -508,3 +508,13 @@ Este archivo documenta de forma acumulativa cada fase ejecutada, sus archivos mo
     - Ampliadas las pruebas para validar los 192 ejemplos extra en KaTeX estricto, el botón de cierre del teclado MathLive, los 4 tipos de letra y el recorrido de bienvenida; versión elevada a `1.9.0` y precaché regenerado (`84` recursos).
 - **Verificación**: Auditoría sintáctica (`node --check`), regeneración de precaché (`node scripts/update-precache.mjs`) y ejecución completa de `node --test tests/*.test.js`.
 
+---
+## v1.9.1 — Corrección de animación de bienvenida, bloqueo estricto de scroll, diseño amigable en celular y contraste gris en modo claro
+- **Qué cambió**:
+  - **Bloqueo estricto de scroll durante el recorrido ([js/tools/welcome-tour.js](../js/tools/welcome-tour.js), [css/layout.css](../css/layout.css), [js/app.js](../js/app.js))**: añadidas clases `html.has-welcome-tour` / `body.has-welcome-tour`, bloqueo en fase de captura de eventos `wheel`, `touchmove` y teclas de desplazamiento, e integración con `syncModalScrollLock()` y `scrollPageToTop()` (scroll instantáneo `behavior: 'auto'` durante transiciones del recorrido para evitar desfases).
+  - **Encuadre exacto y cero recortes ([js/tools/welcome-tour.js](../js/tools/welcome-tour.js))**: agregado `frameTargetInstantly()` para centrar elementos fuera de pantalla (como el Editor Visual) antes de bloquear el scroll, re-medición tras `transitionend` en paneles animados (menú lateral móvil y Ajustes) y acotamiento estricto del foco y la tarjeta dentro del viewport visible.
+  - **Diseño sereno y amigable en celular ([css/components.css](../css/components.css), [js/tools/welcome-tour.js](../js/tools/welcome-tour.js))**: reemplazada la tira de 12 puntos y órbita recargada por una hoja inferior limpia con barra de progreso lineal, diálogos concisos, botones táctiles amplios y ocultación correcta de `.wt-nav-btn[hidden]` en el paso 1.
+  - **Mejor contraste en modo claro con tonos grises ([css/variables.css](../css/variables.css), [css/components.css](../css/components.css))**: refinados fondo base (`#e5e7eb`), superficies secundarias, bordes (`rgba(71, 85, 105, 0.24)`), píldoras, tarjetas en celular y paleta neutra del recorrido de bienvenida en modo claro y oscuro.
+- **Verificación**: Inspección visual en Chromium headless en escritorio (`1280×720`) y móvil (`390×844`) en modo claro y oscuro, comprobación real de bloqueo `mouseWheel`, auditoría sintáctica y suite `node --test tests/*.test.js` aprobada (`65/65`).
+
+

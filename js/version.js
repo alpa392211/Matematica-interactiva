@@ -10,12 +10,25 @@
 
   const APP_NAME = 'MateTic';
   const APP_TAGLINE = 'Matemáticas Interactivas';
-  const APP_VERSION = '1.9.0';
+  const APP_VERSION = '1.9.1';
   const APP_RELEASE_DATE = '2026-11-20';
   const STUDIO_NAME = 'ALPA Studio';
   const STUDIO_MEANING = '';
 
   const RELEASE_NOTES = [
+    {
+      version: '1.9.1',
+      date: '2026-11-20',
+      items: [
+        'Bloqueo estricto de scroll durante la animación de bienvenida: impide desplazar la página de fondo con rueda, gestos táctiles o teclas mientras el recorrido está activo.',
+        'Encuadre exacto del foco Spotlight en escritorio y celular: corrige el desfase en el panel principal, el recorte de tarjetas en pantallas cortas y el desplazamiento automático hacia el editor visual.',
+        'Recorrido de bienvenida rediseñado para celular: hoja inferior compacta, barra de progreso lineal limpia, textos más breves y botones táctiles amplios sin saturación visual.',
+        'Ajuste de tiempos al abrir el menú lateral y Ajustes durante el recorrido para que el foco enmarque el panel completo sin recortes.',
+        'Mejor contraste global en modo claro con paleta de tonos grises neutros: bordes más definidos, superficies secundarias diferenciadas y textos más legibles en celular.',
+        'Ocultación limpia del botón Anterior en la pantalla inicial del recorrido para mostrar un botón principal Comenzar a ancho completo.',
+        'Verificación visual en escritorio y celular (modo claro y oscuro) y suite completa de pruebas actualizada.'
+      ]
+    },
     {
       version: '1.9.0',
       date: '2026-11-20',

@@ -8,20 +8,20 @@
   color-scheme: light;
 
   /* ------------------------------------------------------------------------
-     1. Paleta Base y Atmósfera (Modo Claro — Fondo Índigo Cristal por defecto)
+     1. Paleta Base y Atmósfera (Modo Claro — Contraste nítido en tonos grises)
      ------------------------------------------------------------------------ */
-  --bg-body: #e6ebf5;
+  --bg-body: #e5e7eb;
   --bg-surface: rgba(255, 255, 255, 0.94);
   --bg-surface-solid: #ffffff;
-  --bg-surface-alt: rgba(241, 245, 249, 0.94);
-  --bg-surface-hover: rgba(238, 242, 255, 0.96);
-  --bg-sidebar: rgba(248, 250, 252, 0.92);
-  --bg-glass: rgba(255, 255, 255, 0.84);
+  --bg-surface-alt: rgba(235, 238, 244, 0.96);
+  --bg-surface-hover: rgba(226, 232, 240, 0.96);
+  --bg-sidebar: rgba(243, 244, 246, 0.96);
+  --bg-glass: rgba(255, 255, 255, 0.90);
 
-  /* Halos ambientales */
-  --lg-ambient-1: rgba(99, 102, 241, 0.25);
-  --lg-ambient-2: rgba(245, 158, 11, 0.18);
-  --lg-ambient-3: rgba(129, 140, 248, 0.22);
+  /* Halos ambientales sutiles en gris frío */
+  --lg-ambient-1: rgba(100, 116, 139, 0.14);
+  --lg-ambient-2: rgba(148, 163, 184, 0.16);
+  --lg-ambient-3: rgba(71, 85, 105, 0.12);
 
   /* Parámetros ópticos Liquid Glass (Modo Normal) */
   --lg-blur-nav: 24px;
@@ -32,25 +32,25 @@
   --lg-sat-panel: 160%;
   --lg-sheen-opacity: 0.72;
 
-  /* Superficies con transparencia reducida + velo protector (WCAG AA) */
-  --lg-header-bg: rgba(255, 255, 255, 0.90);
-  --lg-header-scrim: linear-gradient(180deg, rgba(255, 255, 255, 0.78) 0%, rgba(255, 255, 255, 0.62) 100%);
-  --lg-sidebar-bg: rgba(248, 250, 252, 0.92);
-  --lg-sidebar-scrim: linear-gradient(180deg, rgba(255, 255, 255, 0.80) 0%, rgba(248, 250, 252, 0.68) 100%);
-  --lg-modal-bg: rgba(255, 255, 255, 0.97);
-  --lg-modal-scrim: linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(248, 250, 252, 0.82) 100%);
-  --lg-popover-bg: rgba(255, 255, 255, 0.98);
-  --lg-backdrop-bg: rgba(15, 23, 42, 0.56);
-  --lg-expanded-graph-bg: #f8fafc;
+  /* Superficies con transparencia reducida + velo protector (WCAG AA/AAA) */
+  --lg-header-bg: rgba(248, 250, 252, 0.95);
+  --lg-header-scrim: linear-gradient(180deg, rgba(248, 250, 252, 0.90) 0%, rgba(241, 245, 249, 0.80) 100%);
+  --lg-sidebar-bg: rgba(243, 244, 246, 0.96);
+  --lg-sidebar-scrim: linear-gradient(180deg, rgba(248, 250, 252, 0.88) 0%, rgba(241, 245, 249, 0.78) 100%);
+  --lg-modal-bg: rgba(255, 255, 255, 0.98);
+  --lg-modal-scrim: linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(243, 244, 246, 0.90) 100%);
+  --lg-popover-bg: rgba(255, 255, 255, 0.99);
+  --lg-backdrop-bg: rgba(15, 23, 42, 0.58);
+  --lg-expanded-graph-bg: #f3f4f6;
 
-  /* Píldoras discretas y activas en cristal */
-  --lg-pill-idle-bg: rgba(255, 255, 255, 0.46);
-  --lg-pill-idle-border: rgba(15, 23, 42, 0.11);
-  --lg-pill-idle-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72), 0 2px 6px rgba(15, 23, 42, 0.04);
-  --lg-pill-bg: rgba(255, 255, 255, 0.72);
-  --lg-pill-border: rgba(15, 23, 42, 0.14);
-  --lg-pill-active-bg: rgba(255, 255, 255, 0.90);
-  --lg-pill-active-border: rgba(99, 102, 241, 0.32);
+  /* Píldoras discretas y activas en tonos grises contrastados */
+  --lg-pill-idle-bg: rgba(226, 232, 240, 0.68);
+  --lg-pill-idle-border: rgba(71, 85, 105, 0.24);
+  --lg-pill-idle-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78), 0 1px 4px rgba(15, 23, 42, 0.06);
+  --lg-pill-bg: rgba(241, 245, 249, 0.92);
+  --lg-pill-border: rgba(71, 85, 105, 0.28);
+  --lg-pill-active-bg: rgba(255, 255, 255, 0.98);
+  --lg-pill-active-border: rgba(79, 70, 229, 0.42);
 
   /* Borde especular degradado de 1px */
   --lg-specular-gradient: linear-gradient(
@@ -60,7 +60,7 @@
     rgba(255, 255, 255, 0.14) 70%,
     rgba(255, 255, 255, 0.74) 100%
   );
-  --lg-border-outer: rgba(15, 23, 42, 0.08);
+  --lg-border-outer: rgba(51, 65, 85, 0.18);
 
   /* Paleta Primaria (Índigo + Azul Real Matemático) */
   --primary-900: #1e1b4b;
@@ -101,16 +101,16 @@
   --danger-100: #fee2e2;
   --danger-50:  #fef2f2;
 
-  /* Tipografía y Texto (WCAG AA >= 4.5:1) */
+  /* Tipografía y Texto (Alto contraste WCAG AA/AAA) */
   --text-main: #0f172a;
   --text-secondary: #1e293b;
-  --text-muted: #475569;
-  --text-light: #64748b;
+  --text-muted: #334155;
+  --text-light: #475569;
   --text-inverse: #ffffff;
 
-  /* Bordes y Divisores */
-  --border-light: rgba(148, 163, 184, 0.28);
-  --border-medium: rgba(100, 116, 139, 0.36);
+  /* Bordes y Divisores con contraste claro */
+  --border-light: rgba(71, 85, 105, 0.24);
+  --border-medium: rgba(51, 65, 85, 0.38);
   --border-focus: #4f46e5;
   --focus-ring: 0 0 0 3px rgba(99, 102, 241, 0.24);
 
