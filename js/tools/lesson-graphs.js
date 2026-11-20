@@ -348,13 +348,30 @@ window.MatInteractiva = window.MatInteractiva || {};
     drawWidgetCanvas(root, state, widgetId);
   }
 
+  function buildFnFieldHtml(widgetId, labelLatex) {
+    return `
+      <div class="lesson-control-group">
+        <label for="${widgetId}-fn-mf"><span>${labelLatex}</span></label>
+        <div class="lesson-fn-input-row">
+          <div id="${widgetId}-fn-mount" class="lesson-fn-math-mount"></div>
+          <button
+            type="button"
+            class="btn btn-outline btn-sm lesson-fn-vkb-btn"
+            id="${widgetId}-fn-vkb-btn"
+            aria-expanded="false"
+            title="Abrir Teclado Matemático">
+            ⌨️ Teclado
+          </button>
+        </div>
+        <div id="${widgetId}-fn-vkb-drawer" class="exercise-vkb-drawer is-collapsed"></div>
+      </div>
+    `;
+  }
+
   function buildControlsHtml(state, widgetId) {
     if (state.mode === 'limits') {
       return `
-        <div class="lesson-control-group">
-          <label for="${widgetId}-fn"><span>Función $f(x)$:</span></label>
-          <input type="text" class="fn-input" id="${widgetId}-fn" value="${state.fnExpr}" />
-        </div>
+        ${buildFnFieldHtml(widgetId, 'Función $f(x)$:')}
         <div class="lesson-control-group">
           <label for="${widgetId}-rng-x0">
             <span>Valor objetivo ($x \\to a$):</span>
@@ -374,10 +391,7 @@ window.MatInteractiva = window.MatInteractiva || {};
 
     if (state.mode === 'derivatives') {
       return `
-        <div class="lesson-control-group">
-          <label for="${widgetId}-fn"><span>Función $f(x)$:</span></label>
-          <input type="text" class="fn-input" id="${widgetId}-fn" value="${state.fnExpr}" />
-        </div>
+        ${buildFnFieldHtml(widgetId, 'Función $f(x)$:')}
         <div class="lesson-control-group">
           <label for="${widgetId}-rng-x0">
             <span>Punto de tangencia ($x_0$):</span>
@@ -407,10 +421,7 @@ window.MatInteractiva = window.MatInteractiva || {};
 
     if (state.mode === 'integrals') {
       return `
-        <div class="lesson-control-group">
-          <label for="${widgetId}-fn"><span>Integrando $f(x)$:</span></label>
-          <input type="text" class="fn-input" id="${widgetId}-fn" value="${state.fnExpr}" />
-        </div>
+        ${buildFnFieldHtml(widgetId, 'Integrando $f(x)$:')}
         <div class="lesson-control-group">
           <label for="${widgetId}-rng-a">
             <span>Límite inferior ($a$):</span>
@@ -436,10 +447,7 @@ window.MatInteractiva = window.MatInteractiva || {};
     }
 
     return `
-      <div class="lesson-control-group">
-        <label for="${widgetId}-fn"><span>Expresión $f(x)$:</span></label>
-        <input type="text" class="fn-input" id="${widgetId}-fn" value="${state.fnExpr}" />
-      </div>
+      ${buildFnFieldHtml(widgetId, 'Expresión $f(x)$:')}
       <div class="lesson-control-group">
         <label for="${widgetId}-rng-x0">
           <span>Inspeccionar punto ($x_0$):</span>
@@ -571,6 +579,63 @@ window.MatInteractiva = window.MatInteractiva || {};
       markGestureHintSeen();
     });
 
+    let fnController = null;
+    const fnMount = root.querySelector(`#${widgetId}-fn-mount`);
+    const fnVkbBtn = root.querySelector(`#${widgetId}-fn-vkb-btn`);
+    const fnVkbDrawer = root.querySelector(`#${widgetId}-fn-vkb-drawer`);
+    let fnVkbOpen = false;
+
+    const setFnVkbOpen = (nextOpen) => {
+      fnVkbOpen = Boolean(nextOpen);
+      if (fnVkbDrawer) {
+        fnVkbDrawer.classList.toggle('is-open', fnVkbOpen);
+        fnVkbDrawer.classList.toggle('is-collapsed', !fnVkbOpen);
+      }
+      if (fnVkbBtn) {
+        fnVkbBtn.classList.toggle('active', fnVkbOpen);
+        fnVkbBtn.setAttribute('aria-expanded', fnVkbOpen ? 'true' : 'false');
+        fnVkbBtn.textContent = fnVkbOpen ? '✕ Ocultar' : '⌨️ Teclado';
+      }
+      if (ns.App && typeof ns.App.syncFloatingMenuButton === 'function') {
+        ns.App.syncFloatingMenuButton();
+      }
+    };
+
+    if (fnMount && ns.MathInput && typeof ns.MathInput.createMathFieldController === 'function') {
+      fnController = ns.MathInput.createMathFieldController(fnMount, {
+        id: `${widgetId}-fn-mf`,
+        fallbackInputId: `${widgetId}-fn`,
+        initialCasValue: state.fnExpr,
+        compact: true,
+        hideNativeToggle: true,
+        disableNativeKeyboard: true,
+        ariaLabel: 'Expresión matemática de la función f(x)',
+        onChange: (casVal) => {
+          state.fnExpr = casVal;
+          drawWidgetCanvas(root, state, widgetId);
+        }
+      });
+
+      if (fnVkbDrawer && typeof ns.MathInput.renderVisualKeyboard === 'function') {
+        ns.MathInput.renderVisualKeyboard(fnVkbDrawer, () => fnController, {
+          collapsible: true,
+          initialCategory: 'funciones',
+          title: '⌨️ Teclado Matemático',
+          onClose: () => setFnVkbOpen(false)
+        });
+      }
+
+      fnMount.addEventListener('click', () => {
+        if (!fnVkbOpen) setFnVkbOpen(true);
+      });
+    }
+
+    fnVkbBtn?.addEventListener('mousedown', (ev) => ev.preventDefault());
+    fnVkbBtn?.addEventListener('click', () => {
+      setFnVkbOpen(!fnVkbOpen);
+      if (fnVkbOpen && fnController) fnController.focus();
+    });
+
     root.querySelectorAll('[data-lg-preset]').forEach(btn => {
       btn.addEventListener('click', () => {
         const idx = Number(btn.getAttribute('data-lg-preset'));
@@ -585,8 +650,12 @@ window.MatInteractiva = window.MatInteractiva || {};
         if (p.n !== undefined) state.riemannN = p.n;
         state.holeAt = p.holeAt !== undefined ? p.holeAt : null;
 
-        const fnInp = root.querySelector(`#${widgetId}-fn`);
-        if (fnInp) fnInp.value = state.fnExpr;
+        if (fnController) {
+          fnController.setCasValue(state.fnExpr, { silent: true });
+        } else {
+          const fnInp = root.querySelector(`#${widgetId}-fn`);
+          if (fnInp) fnInp.value = state.fnExpr;
+        }
         const rngX0 = root.querySelector(`#${widgetId}-rng-x0`);
         if (rngX0) rngX0.value = state.x0;
         const rngH = root.querySelector(`#${widgetId}-rng-h`);
@@ -603,9 +672,9 @@ window.MatInteractiva = window.MatInteractiva || {};
       });
     });
 
-    const fnInp = root.querySelector(`#${widgetId}-fn`);
-    fnInp?.addEventListener('input', () => {
-      state.fnExpr = fnInp.value;
+    const fnInpFallback = !fnController ? root.querySelector(`#${widgetId}-fn`) : null;
+    fnInpFallback?.addEventListener('input', () => {
+      state.fnExpr = fnInpFallback.value;
       drawWidgetCanvas(root, state, widgetId);
     });
 

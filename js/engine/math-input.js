@@ -1164,8 +1164,9 @@ window.MatInteractiva = window.MatInteractiva || {};
     let suppressInputEvent = false;
 
     function setupDOM() {
+      const noNativeKb = Boolean(options.disableNativeKeyboard || options.hideNativeToggle);
       mountEl.innerHTML = `
-        <div class="mathlive-field-wrapper ${options.compact ? 'is-compact' : ''}" data-mathlive-ready="true">
+        <div class="mathlive-field-wrapper ${options.compact ? 'is-compact' : ''} ${noNativeKb ? 'is-no-native-kb' : ''}" data-mathlive-ready="true">
           <math-field
             id="${fieldId}"
             class="mat-math-field ${options.compact ? 'mat-math-field-compact' : ''}"
@@ -1182,6 +1183,7 @@ window.MatInteractiva = window.MatInteractiva || {};
             placeholder="${placeholderText.replace(/"/g, '&quot;')}"
             autocomplete="off"
             spellcheck="false"
+            ${noNativeKb ? 'inputmode="none" readonly' : ''}
             style="display:none;"
           />
         </div>
@@ -1191,7 +1193,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       fallbackInput = mountEl.querySelector('.mat-fallback-input');
 
       const nativeKbBtn = mountEl.querySelector('.mat-native-kb-toggle');
-      if (nativeKbBtn) {
+      if (nativeKbBtn && !noNativeKb) {
         nativeKbBtn.addEventListener('mousedown', (ev) => ev.preventDefault());
         nativeKbBtn.addEventListener('click', () => {
           const wantsNative = nativeKbBtn.getAttribute('aria-pressed') !== 'true';

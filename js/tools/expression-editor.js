@@ -470,6 +470,8 @@ window.MatInteractiva = window.MatInteractiva || {};
           id: 'editor-primary-mathfield',
           fallbackInputId: 'editor-primary-input',
           initialCasValue: initialValue,
+          hideNativeToggle: true,
+          disableNativeKeyboard: true,
           placeholder: 'Escribe aquí tu operación, expresión, función o ecuación, o usa el teclado visual...',
           ariaLabel: 'Campo principal de expresión matemática',
           onChange: (casVal, meta) => {

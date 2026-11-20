@@ -3624,6 +3624,8 @@ window.MatInteractiva = window.MatInteractiva || {};
           initialCasValue: initialVal,
           placeholder,
           compact: true,
+          hideNativeToggle: true,
+          disableNativeKeyboard: true,
           ariaLabel: `Respuesta matemática para el ejercicio ${ex.id}`,
           onSubmit: () => {
             box.querySelector(`[data-check-ex="${ex.id}"]`)?.click();

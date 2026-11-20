@@ -594,6 +594,39 @@
   border-radius: 0 4px 4px 0;
 }
 
+.fs-formula-kind-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.14rem 0.48rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--fs-accent, #2563EB) 10%, #FFFFFF);
+  color: var(--fs-accent, #1D4ED8);
+  border: 1px solid color-mix(in srgb, var(--fs-accent, #2563EB) 28%, #CBD5E1);
+  flex-shrink: 0;
+  line-height: 1.3;
+}
+
+.fs-meta-steps {
+  grid-column: 1 / -1;
+  background: #F8FAFC;
+  border-left: 3px solid var(--fs-accent, #2563EB);
+  padding: 0.42rem 0.7rem;
+  border-radius: 0 4px 4px 0;
+}
+
+.fs-method-steps {
+  list-style: decimal;
+  margin: 0.28rem 0 0 1.25rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.24rem;
+}
+
+.fs-method-steps li {
+  color: var(--text-secondary);
+}
+
 .fs-print-footer {
   border-top: 1px solid var(--border-light);
   padding-top: 0.85rem;
@@ -875,6 +908,29 @@
     background: #FFFFFF !important;
     border-left: 2pt solid #475569 !important;
     padding-left: 0.2cm !important;
+  }
+
+  .fs-formula-kind-badge {
+    background: #FFFFFF !important;
+    color: #000000 !important;
+    border: 0.6pt solid #475569 !important;
+    font-size: 7.5pt !important;
+  }
+
+  .fs-meta-steps {
+    grid-column: 1 / -1 !important;
+    background: #FFFFFF !important;
+    border-left: 2pt solid #0F172A !important;
+    padding: 0.12cm 0.2cm !important;
+  }
+
+  .fs-method-steps {
+    margin: 0.1cm 0 0 0.45cm !important;
+    gap: 0.06cm !important;
+  }
+
+  .fs-method-steps li {
+    color: #1E293B !important;
   }
 
   .fs-print-footer {

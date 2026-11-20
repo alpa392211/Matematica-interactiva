@@ -10,12 +10,38 @@
 
   const APP_NAME = 'MateTic';
   const APP_TAGLINE = 'Matemáticas Interactivas';
-  const APP_VERSION = '1.9.3';
+  const APP_VERSION = '1.10.0';
   const APP_RELEASE_DATE = '2026-11-20';
   const STUDIO_NAME = 'ALPA Studio';
   const STUDIO_MEANING = '';
 
   const RELEASE_NOTES = [
+    {
+      version: '1.10.0',
+      date: '2026-11-20',
+      items: [
+        'Formularios actualizados con todos los métodos de resolución de las 9 ramas matemáticas: ahora el compendio reúne 154 fichas (104 fórmulas y 50 métodos paso a paso) listas para estudiar o imprimir en tamaño Carta.',
+        'Aritmética y Álgebra ampliadas: incorporados PEMDAS, atajo «raíz primero», Algoritmo de Euclides y limpieza de fracciones complejas por MCM, proporcionalidad directa/inversa, congruencias y combinatoria, método ac, Ruffini, completar cuadrados (TCP), racionalización cúbica, sistemas 2×2 (reducción, sustitución, igualación y Cramer) e inecuaciones por tabla de signos.',
+        'Geometría, Trigonometría y Funciones completas: añadidas ternas pitagóricas, descomposición por altura, Tales y potencia de un punto, vector normal y excentricidad, triángulo auxiliar y ángulo de referencia por cuadrantes, demostración de identidades, ecuaciones trigonométricas, filtro de 3 semáforos para dominios, cálculo de inversas, división polinomial para asíntotas oblicuas y ecuaciones exponenciales/logarítmicas.',
+        'Límites y Derivadas con todos sus métodos: incluidos ε-δ (Cauchy-Weierstrass), cambio de variable racionalizador, traslación al origen, límites al infinito (términos dominantes, t = -x e inversión 1/x), test de asíntotas verticales, Teorema del Sándwich, protocolo de continuidad por partes, derivadas laterales, diferenciación numérica centrada, linealización, extremos absolutos en [a, b], optimización con MA-MG y polinomios de Taylor/Maclaurin.',
+        'Integrales, Cálculo Aplicado, EDO y Álgebra Lineal: agregados sustitución radical completa, método tabular (DI) de partes, coeficientes indeterminados, cambio de límites y simetría par/impar, área neta vs. total, Regla del Trapecio y de Simpson, integrales impropias, atajo de Arquímedes, cinemática, EDO separables (indefinida y definida), factor integrante de 1.º orden, EDO homogénea de 2.º orden, inversa 2×2, ortogonalidad y eigenvalores.',
+        'Nueva presentación de fichas de método con insignia ⚙️ Método, guía numerada paso a paso, renderizado KaTeX también en los títulos y búsqueda instantánea por pasos o palabra «método».',
+        'Validación estricta de las 1,448 expresiones KaTeX del formulario sin errores de sintaxis y compatibilidad total con impresión PDF en formato Carta.'
+      ]
+    },
+    {
+      version: '1.9.4',
+      date: '2026-11-20',
+      items: [
+        'Teclado matemático integrado en todas las gráficas interactivas: tanto el Graficador completo como las gráficas dentro de cada lección ahora usan el campo matemático y el teclado visual de 6 categorías en lugar de campos de texto simples.',
+        'Entrada matemática unificada en celular: bloqueado el despliegue del teclado convencional del teléfono en campos de ecuaciones y funciones para escribir siempre con los símbolos matemáticos de la app.',
+        'Botón ✕ Ocultar ajustado en la barra del teclado oscuro de MathLive: ahora cabe completo y sin recortes incluso en pantallas de 360 px.',
+        'Diálogo contextual de confirmación restaurado en celular: al cambiar de sección de estudio se muestra como tarjeta flotante compacta y centrada sobre el fondo difuminado, sin cubrir toda la pantalla.',
+        'Ocultación automática de los botones flotantes también al abrir el teclado matemático desde el Graficador o las gráficas de lección.',
+        'Conservado intacto el comportamiento de tableta y escritorio y el funcionamiento de todos los presets y controles de cálculo.',
+        'Verificación visual y funcional completa en celular y escritorio con las 65 pruebas automatizadas aprobadas.'
+      ]
+    },
     {
       version: '1.9.3',
       date: '2026-11-20',

@@ -1067,6 +1067,30 @@
   .ML__keyboard {
     font-size: 1.15rem !important;
   }
+  .ML__keyboard .MLK__toolbar {
+    padding: 3px 6px !important;
+    gap: 0.2rem !important;
+    flex-wrap: nowrap !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .ML__keyboard .MLK__toolbar > .left {
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+    overflow-x: auto !important;
+    scrollbar-width: none !important;
+  }
+  .ML__keyboard .MLK__toolbar > .right {
+    flex: 0 0 auto !important;
+    gap: 0.18rem !important;
+  }
+  .ML__keyboard .mat-mlk-close-btn {
+    padding: 0.24rem 0.52rem !important;
+    min-height: 28px !important;
+    font-size: 0.7rem !important;
+    gap: 0.22rem !important;
+    margin: 0 0 0 0.15rem !important;
+  }
   .ML__keyboard--plate {
     padding: 4px 2px !important;
     width: 100% !important;
@@ -1084,9 +1108,9 @@
   .ML__keyboard .track,
   .ML__keyboard .segmented-control button,
   .ML__keyboard [role="tablist"] [role="tab"] {
-    font-size: 0.95rem !important;
-    padding: 8px 10px !important;
-    min-height: 40px !important;
+    font-size: 0.84rem !important;
+    padding: 6px 7px !important;
+    min-height: 36px !important;
   }
 
   /* --- Graficador ------------------------------------------------------- */
@@ -1164,12 +1188,12 @@
     display: none;
   }
 
-  /* Modal de calculadora rápida a pantalla completa limpia (sin afectar bottom sheets) */
-  .quick-modal-backdrop:not(.sheet-modal-backdrop) {
+  /* Modal de calculadora rápida a pantalla completa limpia (sin afectar bottom sheets ni diálogos contextuales) */
+  .quick-modal-backdrop:not(.sheet-modal-backdrop):not(.app-confirm-backdrop) {
     padding: 0;
     align-items: stretch;
   }
-  .quick-modal-window:not(.sheet-modal-window) {
+  .quick-modal-window:not(.sheet-modal-window):not(.app-confirm-window) {
     display: flex;
     flex-direction: column;
     max-width: 100%;
@@ -1178,6 +1202,19 @@
     max-height: 100vh;
     max-height: 100dvh;
     border-radius: 0;
+  }
+  /* Diálogo contextual de confirmación: compacto, centrado y con fondo difuminado */
+  .quick-modal-backdrop.app-confirm-backdrop {
+    padding: 1rem;
+    align-items: center;
+    justify-content: center;
+  }
+  .quick-modal-window.app-confirm-window {
+    width: min(100%, 400px);
+    max-width: 400px;
+    height: auto;
+    max-height: 85dvh;
+    border-radius: var(--radius-glass);
   }
   .quick-modal-backdrop.sheet-modal-backdrop {
     padding: 0;

@@ -202,10 +202,19 @@ window.MatInteractiva = window.MatInteractiva || {};
                   <input type="checkbox" data-fn-toggle="${idx}" ${fn.visible ? 'checked' : ''} title="Mostrar/Ocultar" />
                   <span class="fn-color-dot" style="background:${fn.color}"></span>
                   <span class="fn-label">${fn.label}</span>
-                  <input type="text" class="fn-input" data-fn-expr="${idx}" value="${fn.expr}" placeholder="Ej: x^2 - 4" />
+                  <div class="fn-math-mount" data-fn-mount="${idx}"></div>
                 </div>
               `).join('')}
             </div>
+            <button
+              type="button"
+              class="btn btn-outline btn-sm grapher-vkb-toggle-btn"
+              id="btn-grapher-vkb"
+              aria-expanded="false"
+              title="Abrir Teclado Matemático para escribir funciones">
+              ⌨️ Teclado Matemático
+            </button>
+            <div id="grapher-vkb-drawer" class="exercise-vkb-drawer is-collapsed"></div>
           </div>
 
           <details class="grapher-section-block grapher-mobile-details" ${isCompactPhone ? '' : 'open'}>
@@ -301,6 +310,105 @@ window.MatInteractiva = window.MatInteractiva || {};
   }
 
   function bindGrapherEvents(container) {
+    const fnControllers = {};
+    let activeFnIndex = 0;
+    let grapherVkbOpen = false;
+    const vkbBtn = container.querySelector('#btn-grapher-vkb');
+    const vkbDrawer = container.querySelector('#grapher-vkb-drawer');
+
+    const setGrapherVkbOpen = (nextOpen) => {
+      grapherVkbOpen = Boolean(nextOpen);
+      if (vkbDrawer) {
+        vkbDrawer.classList.toggle('is-open', grapherVkbOpen);
+        vkbDrawer.classList.toggle('is-collapsed', !grapherVkbOpen);
+      }
+      if (vkbBtn) {
+        vkbBtn.classList.toggle('active', grapherVkbOpen);
+        vkbBtn.setAttribute('aria-expanded', grapherVkbOpen ? 'true' : 'false');
+        vkbBtn.textContent = grapherVkbOpen ? '✕ Ocultar Teclado Matemático' : '⌨️ Teclado Matemático';
+      }
+      if (ns.App && typeof ns.App.syncFloatingMenuButton === 'function') {
+        ns.App.syncFloatingMenuButton();
+      }
+    };
+
+    const handleFnChange = (idx, rawVal) => {
+      if (idx === 0 && ns.MathParser && typeof ns.MathParser.extractGrapherPayload === 'function' &&
+          (/^(limite|lim|derivada|deriv|d\/dx|integral|int)\s*\(/i.test(rawVal.trim()) || /\\lim\b/.test(rawVal))) {
+        const extracted = ns.MathParser.extractGrapherPayload(rawVal, state.tangentX);
+        state.functions[0].expr = extracted.expr || rawVal;
+        if (extracted.kind === 'limit' && typeof extracted.tangentX === 'number' && isFinite(extracted.tangentX)) {
+          state.tangentX = extracted.tangentX;
+          const tanInp = container.querySelector('#inp-tangent-x');
+          if (tanInp) tanInp.value = state.tangentX;
+        } else if (extracted.kind === 'derivative') {
+          state.showDerivative = true;
+          const chkD = container.querySelector('#chk-show-deriv');
+          if (chkD) chkD.checked = true;
+        } else if (extracted.kind === 'integral') {
+          state.showIntegral = true;
+          const chkI = container.querySelector('#chk-show-int');
+          if (chkI) chkI.checked = true;
+          if (typeof extracted.integralA === 'number' && isFinite(extracted.integralA)) {
+            state.integralA = extracted.integralA;
+            const inpA = container.querySelector('#inp-int-a');
+            if (inpA) inpA.value = state.integralA;
+          }
+          if (typeof extracted.integralB === 'number' && isFinite(extracted.integralB)) {
+            state.integralB = extracted.integralB;
+            const inpB = container.querySelector('#inp-int-b');
+            if (inpB) inpB.value = state.integralB;
+          }
+        }
+      } else {
+        state.functions[idx].expr = rawVal;
+      }
+      drawGraph();
+      updateAnalysisAndTable();
+    };
+
+    container.querySelectorAll('[data-fn-mount]').forEach(mountEl => {
+      const idx = Number(mountEl.getAttribute('data-fn-mount'));
+      const fnObj = state.functions[idx];
+      if (!fnObj) return;
+      if (ns.MathInput && typeof ns.MathInput.createMathFieldController === 'function') {
+        const ctrl = ns.MathInput.createMathFieldController(mountEl, {
+          id: `grapher-mf-${idx}`,
+          fallbackInputId: `grapher-fn-${idx}`,
+          initialCasValue: fnObj.expr,
+          placeholder: 'Ej: x^2 - 4',
+          compact: true,
+          hideNativeToggle: true,
+          disableNativeKeyboard: true,
+          ariaLabel: `Expresión para ${fnObj.label}`,
+          onChange: (casVal) => handleFnChange(idx, casVal)
+        });
+        fnControllers[idx] = ctrl;
+        mountEl.addEventListener('focusin', () => { activeFnIndex = idx; });
+        mountEl.addEventListener('click', () => {
+          activeFnIndex = idx;
+          if (!grapherVkbOpen) setGrapherVkbOpen(true);
+        });
+      }
+    });
+
+    if (vkbDrawer && ns.MathInput && typeof ns.MathInput.renderVisualKeyboard === 'function') {
+      ns.MathInput.renderVisualKeyboard(vkbDrawer, () => fnControllers[activeFnIndex] || fnControllers[0], {
+        collapsible: true,
+        initialCategory: 'funciones',
+        title: '⌨️ Teclado Matemático',
+        onClose: () => setGrapherVkbOpen(false)
+      });
+    }
+
+    vkbBtn?.addEventListener('mousedown', (ev) => ev.preventDefault());
+    vkbBtn?.addEventListener('click', () => {
+      setGrapherVkbOpen(!grapherVkbOpen);
+      if (grapherVkbOpen) {
+        (fnControllers[activeFnIndex] || fnControllers[0])?.focus();
+      }
+    });
+
     // Presets
     container.querySelectorAll('[data-preset]').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -310,47 +418,8 @@ window.MatInteractiva = window.MatInteractiva || {};
         state.centerX = 0;
         state.centerY = 0;
         state.scale = 42;
-        const inp = container.querySelector('[data-fn-expr="0"]');
-        if (inp) inp.value = expr;
-        drawGraph();
-        updateAnalysisAndTable();
-      });
-    });
-
-    // Inputs de funciones
-    container.querySelectorAll('[data-fn-expr]').forEach(inp => {
-      inp.addEventListener('input', () => {
-        const idx = Number(inp.getAttribute('data-fn-expr'));
-        const rawVal = inp.value;
-        if (idx === 0 && ns.MathParser && typeof ns.MathParser.extractGrapherPayload === 'function' &&
-            (/^(limite|lim|derivada|deriv|d\/dx|integral|int)\s*\(/i.test(rawVal.trim()) || /\\lim\b/.test(rawVal))) {
-          const extracted = ns.MathParser.extractGrapherPayload(rawVal, state.tangentX);
-          state.functions[0].expr = extracted.expr || rawVal;
-          if (extracted.kind === 'limit' && typeof extracted.tangentX === 'number' && isFinite(extracted.tangentX)) {
-            state.tangentX = extracted.tangentX;
-            const tanInp = container.querySelector('#inp-tangent-x');
-            if (tanInp) tanInp.value = state.tangentX;
-          } else if (extracted.kind === 'derivative') {
-            state.showDerivative = true;
-            const chkD = container.querySelector('#chk-show-deriv');
-            if (chkD) chkD.checked = true;
-          } else if (extracted.kind === 'integral') {
-            state.showIntegral = true;
-            const chkI = container.querySelector('#chk-show-int');
-            if (chkI) chkI.checked = true;
-            if (typeof extracted.integralA === 'number' && isFinite(extracted.integralA)) {
-              state.integralA = extracted.integralA;
-              const inpA = container.querySelector('#inp-int-a');
-              if (inpA) inpA.value = state.integralA;
-            }
-            if (typeof extracted.integralB === 'number' && isFinite(extracted.integralB)) {
-              state.integralB = extracted.integralB;
-              const inpB = container.querySelector('#inp-int-b');
-              if (inpB) inpB.value = state.integralB;
-            }
-          }
-        } else {
-          state.functions[idx].expr = rawVal;
+        if (fnControllers[0]) {
+          fnControllers[0].setCasValue(expr, { silent: true });
         }
         drawGraph();
         updateAnalysisAndTable();

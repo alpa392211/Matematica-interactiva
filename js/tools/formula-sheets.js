@@ -22,7 +22,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       symbol: '÷',
       color: '#2563EB',
       levelTag: 'Fundamentos',
-      description: 'Axiomas de campo de los números reales, valor absoluto, aritmética de fracciones, razones y proporciones, leyes de exponentes y radicales.',
+      description: 'Axiomas de campo de los números reales, valor absoluto, fracciones, proporciones, exponentes, radicales y métodos de resolución aritmética (PEMDAS, Euclides, MCM, regla de tres, congruencias y combinatoria).',
       sections: [
         {
           id: 'arit-sec-1',
@@ -111,12 +111,83 @@ window.MatInteractiva = window.MatInteractiva || {};
               conditions: 'Condición: $b \\neq 0$; si $n$ o $m$ son pares, $a \\ge 0$ y $b > 0$. Nota: $\\sqrt{a + b} \\neq \\sqrt{a} + \\sqrt{b}$ (la raíz NO se distribuye en sumas ni restas).'
             }
           ]
+        },
+        {
+          id: 'arit-sec-4',
+          title: '1.4 Métodos de Resolución Aritmética y Teoría de Números',
+          formulas: [
+            {
+              code: '1.4.1',
+              kind: 'method',
+              name: 'Jerarquía Estricta de Operaciones de Adentro hacia Afuera (PEMDAS)',
+              latex: '(\\;),\\; [\\;],\\; \\{\\;\\} \\;\\longrightarrow\\; a^n,\\; \\sqrt[n]{a} \\;\\longrightarrow\\; \\times,\\; \\div \\;\\longrightarrow\\; +,\\; -',
+              variables: 'Orden de evaluación: signos de agrupación más internos, luego potencias y raíces, después productos/cocientes de izquierda a derecha y al final sumas/restas.',
+              steps: [
+                'Ubica los paréntesis, corchetes o llaves más internos y reduce su contenido a un solo valor.',
+                'Evalúa potencias y radicales antes de multiplicar por coeficientes vecinos (recuerda que $-3^2 = -9$ mientras $(-3)^2 = 9$).',
+                'Ejecuta multiplicaciones y divisiones estrictamente de izquierda a derecha; realiza sumas y restas al final.'
+              ],
+              conditions: 'Úsalo en cualquier expresión combinada larga; en fracciones, el numerador y el denominador actúan como paréntesis implícitos.'
+            },
+            {
+              code: '1.4.2',
+              kind: 'method',
+              name: 'Reescritura a Potencias Fraccionarias/Negativas y Atajo «Raíz Primero»',
+              latex: 'a^{\\frac{m}{n}} = \\left(\\sqrt[n]{a}\\right)^m, \\qquad \\frac{1}{a^k} = a^{-k}, \\qquad a^{-\\frac{m}{n}} = \\frac{1}{\\left(\\sqrt[n]{a}\\right)^m}',
+              variables: 'Donde $a$ es la base (descomponible en factores primos), $m$ el exponente entero y $n \\ge 2$ el índice radical.',
+              steps: [
+                'Transforma cada radical $\\sqrt[n]{a^m}$ a $a^{m/n}$ y sube denominadores $\\frac{1}{a^k}$ como $a^{-k}$ para operar uniformemente.',
+                'Descompón bases compuestas en factores primos (ej. $27 = 3^3$, $16 = 2^4$) y agrupa exponentes de igual base.',
+                'Para evaluar $a^{m/n}$ a mano sin calculadora, extrae primero la raíz $\\sqrt[n]{a}$ con números pequeños y eleva después a la $m$.'
+              ],
+              conditions: 'Indispensable antes de derivar o integrar radicales y cocientes monómicos. Si $n$ es par, exige $a \\ge 0$ (y $a > 0$ si el exponente es negativo).'
+            },
+            {
+              code: '1.4.3',
+              kind: 'method',
+              name: 'Algoritmo de Euclides (MCD), Método del MCM y Limpieza de Fracciones Complejas',
+              latex: '\\text{MCD}(a, b) = \\text{MCD}(b,\\; a \\bmod b) \\qquad \\quad \\frac{\\dfrac{a}{b} \\pm \\dfrac{c}{d}}{\\dfrac{e}{f} \\pm \\dfrac{g}{h}} = \\frac{M\\!\\left(\\dfrac{a}{b} \\pm \\dfrac{c}{d}\\right)}{M\\!\\left(\\dfrac{e}{f} \\pm \\dfrac{g}{h}\\right)}',
+              variables: 'Donde $a \\bmod b$ es el residuo de dividir $a$ entre $b$, y $M = \\text{MCM}(b, d, f, h)$ es el mínimo común múltiplo global de todos los denominadores.',
+              steps: [
+                'Para hallar $\\text{MCD}(a, b)$, divide sucesivamente el divisor entre el residuo hasta obtener residuo $0$; el último divisor no nulo es el MCD (y $\\text{MCM} = |a \\cdot b| / \\text{MCD}$).',
+                'Para sumar varias fracciones, amplifica cada una al $\\text{MCM}$ de sus denominadores y suma solo los numeradores.',
+                'En fracciones complejas con sumas arriba y abajo, multiplica todos los términos del numerador y denominador por el $\\text{MCM}$ global $M$ para eliminar denominadores de golpe.'
+              ],
+              conditions: 'Todos los denominadores deben ser distintos de cero ($b, d, f, h \\neq 0$) y el denominador global no puede anularse.'
+            },
+            {
+              code: '1.4.4',
+              kind: 'method',
+              name: 'Proporcionalidad Directa, Inversa y Método de Reducción a la Unidad (Regla de Tres)',
+              latex: '\\text{Directa: } \\frac{y}{x} = k \\implies y_2 = \\frac{y_1 x_2}{x_1} \\qquad \\quad \\text{Inversa: } x \\cdot y = k \\implies y_2 = \\frac{x_1 y_1}{x_2}',
+              variables: 'Donde $k$ es la constante de proporcionalidad, $(x_1, y_1)$ el par conocido y $y_2$ el valor buscado asociado a $x_2$.',
+              steps: [
+                'Compara cada magnitud conocida con la incógnita: si al crecer una la otra crece en igual razón es directa; si disminuye en razón recíproca es inversa.',
+                'En proporcionalidad directa conserva cocientes constantes ($y/x = k$); en inversa conserva productos constantes ($x \\cdot y = k$).',
+                'Alternativamente, reduce el problema a $1$ unidad base y escala después al valor objetivo (ideal para regla de tres compuesta).'
+              ],
+              conditions: 'Condición: $x_1 \\neq 0$ y $x_2 \\neq 0$. Verifica siempre el sentido físico del resultado (ej. más obreros implican menos días).'
+            },
+            {
+              code: '1.4.5',
+              kind: 'method',
+              name: 'Aritmética Modular (Congruencias) y Principios de Conteo Combinatorio',
+              latex: 'a \\equiv b \\pmod{m} \\iff m \\mid (a - b) \\qquad \\quad P_n = n! \\qquad \\quad \\binom{n}{r} = \\frac{n!}{r!\\,(n - r)!}',
+              variables: 'Donde $m \\in \\mathbb{Z}^+$ es el módulo de congruencia, $P_n$ las permutaciones de $n$ elementos distintos y $\\binom{n}{r}$ las combinaciones sin orden.',
+              steps: [
+                'En congruencias módulo $m$, reduce bases y productos parciales a su residuo en $\\{0, 1, \\dots, m-1\\}$ (o busca ciclos en potencias $a^k \\bmod m$).',
+                'En conteo, decide primero si importa el orden: si importa usa permutaciones $P(n,r) = \\frac{n!}{(n-r)!}$; si no importa usa combinaciones $\\binom{n}{r}$.',
+                'Recuerda la convención $0! = 1$ y la simetría $\\binom{n}{r} = \\binom{n}{n-r}$ para abreviar cálculos.'
+              ],
+              conditions: 'Condiciones: $m \\ge 1$, $n, r \\in \\mathbb{Z}$ con $0 \\le r \\le n$.'
+            }
+          ]
         }
       ]
     },
 
     /* ======================================================================
-       2. FORMULARIO DE ÁLGEBRA (12 Fórmulas Exhaustivas)
+       2. FORMULARIO DE ÁLGEBRA (Fórmulas y Métodos de Resolución)
        ====================================================================== */
     {
       id: 'algebra',
@@ -126,7 +197,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       symbol: 'x²',
       color: '#1D4ED8',
       levelTag: 'Álgebra Superior',
-      description: 'Productos notables, teoremas de factorización, racionalización de denominadores, ecuaciones lineales y cuadráticas, logaritmos y progresiones.',
+      description: 'Productos notables, factorización (método ac, Ruffini, TCP), racionalización cuadrada/cúbica y cambio de variable, ecuaciones lineales, cuadráticas, sistemas 2×2, inecuaciones, logaritmos y progresiones.',
       sections: [
         {
           id: 'alg-sec-1',
@@ -235,12 +306,109 @@ window.MatInteractiva = window.MatInteractiva || {};
               conditions: 'En la suma geométrica se requiere $r \\neq 1$. Si $|r| < 1$, la serie infinita converge a $S_\\infty = \\frac{g_1}{1 - r}$.'
             }
           ]
+        },
+        {
+          id: 'alg-sec-5',
+          title: '2.5 Métodos de Factorización, Racionalización, Ecuaciones y Sistemas',
+          formulas: [
+            {
+              code: '2.5.1',
+              kind: 'method',
+              name: 'Árbol de Factorización y Trinomio $ax^2 + bx + c$ (Método $ac$ y Método $a/a$)',
+              latex: 'ax^2 + bx + c = ax^2 + px + qx + c = \\frac{(ax + p)(ax + q)}{a} \\qquad (p \\cdot q = a \\cdot c,\\;\\; p + q = b)',
+              variables: 'Donde $a \\neq 0$, $p$ y $q$ son los dos números que multiplicados dan $ac$ y sumados dan $b$.',
+              steps: [
+                'Paso 0 obligatorio: extrae siempre el Máximo Factor Común (MFC). Luego clasifica por términos: 2 términos (diferencia de cuadrados o cubos), 3 términos (TCP, tanteo o método $ac$), 4 términos (agrupación 2 y 2).',
+                'Para $ax^2 + bx + c$ ($a \\neq 1$), calcula $a \\cdot c$ y encuentra $p, q$ tales que $p \\cdot q = ac$ y $p + q = b$.',
+                'Camino A (agrupación): parte $bx = px + qx$ y factoriza por parejas. Camino B ($a/a$): forma $\\frac{(ax + p)(ax + q)}{a}$ y cancela $a$ dividiendo los paréntesis.'
+              ],
+              conditions: 'Válido sobre $\\mathbb{Q}$ cuando $\\Delta = b^2 - 4ac$ es un cuadrado perfecto; de lo contrario usa completar cuadrados o fórmula general.'
+            },
+            {
+              code: '2.5.2',
+              kind: 'method',
+              name: 'Teorema del Factor y División Sintética (Regla de Ruffini) para Polinomios de Grado $\\ge 3$',
+              latex: 'P(r) = 0 \\iff P(x) = (x - r) \\cdot Q(x) \\qquad \\text{con } r \\in \\left\\{\\pm\\frac{\\text{divisor de } a_0}{\\text{divisor de } a_n}\\right\\}',
+              variables: 'Donde $P(x)$ es un polinomio de grado $n \\ge 3$, $r$ una raíz real (o $r = a$ en límites $\\frac{0}{0}$ cuando $x \\to a$) y $Q(x)$ el polinomio cociente de grado $n - 1$.',
+              steps: [
+                'Identifica una raíz $r$ (divisor del término independiente $a_0$, o directamente $x = a$ en indeterminaciones $\\frac{0}{0}$).',
+                'Acomoda los coeficientes de $P(x)$ en orden descendente rellenando con $0$ cualquier grado faltante y ejecuta la tabla de Ruffini.',
+                'Si el último número (residuo) es $0$, escribe $P(x) = (x - r)Q(x)$ y repite sobre $Q(x)$ hasta factorizar completamente.'
+              ],
+              conditions: 'La división sintética estándar divide únicamente por binomios mónicos de primer grado $(x - r)$.'
+            },
+            {
+              code: '2.5.3',
+              kind: 'method',
+              name: 'Método de Completar el Trinomio Cuadrado Perfecto (TCP)',
+              latex: 'x^2 + bx + c = \\left(x + \\frac{b}{2}\\right)^2 + c - \\left(\\frac{b}{2}\\right)^2 \\qquad ax^2 + bx + c = 0 \\iff \\left(x + \\frac{b}{2a}\\right)^2 = \\frac{b^2 - 4ac}{4a^2}',
+              variables: 'Donde $\\left(\\frac{b}{2}\\right)^2$ es el término que completa el cuadrado perfecto de $x^2 + bx$.',
+              steps: [
+                'Si $a \\neq 1$, divide la ecuación (o factoriza $a$) para dejar coeficiente $1$ en $x^2$.',
+                'Toma la mitad del coeficiente lineal, elévala al cuadrado y súmala y réstala: $\\pm (b/2)^2$.',
+                'Agrupa el TCP $(x + b/2)^2$; para factorizar aplica diferencia de cuadrados $A^2 - B^2$, y para resolver ecuaciones saca raíz $\\pm$ a ambos lados.'
+              ],
+              conditions: 'Método universal: funciona incluso con raíces irracionales, halla el vértice $(h, k)$ de parábolas y simplifica integrales con cuadráticas.'
+            },
+            {
+              code: '2.5.4',
+              kind: 'method',
+              name: 'Racionalización Cúbica, Factorización Inversa y Cambio de Variable Radical',
+              latex: '\\frac{N}{\\sqrt[3]{A} \\mp \\sqrt[3]{B}} = \\frac{N\\left(\\sqrt[3]{A^2} \\pm \\sqrt[3]{AB} + \\sqrt[3]{B^2}\\right)}{A \\mp B} \\qquad A - B = \\left(\\sqrt{A} - \\sqrt{B}\\right)\\left(\\sqrt{A} + \\sqrt{B}\\right)',
+              variables: 'Donde $\\sqrt[3]{A^2} \\pm \\sqrt[3]{AB} + \\sqrt[3]{B^2}$ es el factor racionalizador cúbico; en el cambio de variable se define $u = \\sqrt[n]{g(x)}$.',
+              steps: [
+                'Conjugado clásico (raíz cuadrada): multiplica arriba y abajo por el conjugado y expande únicamente el lado donde se juntan los conjugados.',
+                'Raíz cúbica ($a \\mp b$): multiplica numerador y denominador por $a^2 \\pm ab + b^2$ para generar $a^3 \\mp b^3$ sin raíces.',
+                'Alternativas rápidas: factoriza $x - a = (\\sqrt{x} - \\sqrt{a})(\\sqrt{x} + \\sqrt{a})$ para tachar directo, o haz $u = \\sqrt[n]{g(x)}$ para transformar radicales en polinomios.'
+              ],
+              conditions: 'Condiciones: $A \\mp B \\neq 0$; en radicales de índice par exige $A \\ge 0$ y $B \\ge 0$.'
+            },
+            {
+              code: '2.5.5',
+              kind: 'method',
+              name: 'Ecuación Lineal de Primer Grado y Método del Producto Cero ($A \\cdot B = 0$)',
+              latex: 'ax + b = cx + d \\implies x = \\frac{d - b}{a - c} \\qquad \\quad (px + m)(qx + n) = 0 \\iff x_1 = -\\frac{m}{p},\\;\\; x_2 = -\\frac{n}{q}',
+              variables: 'Donde $a, b, c, d, p, q, m, n \\in \\mathbb{R}$ son constantes con $a \\neq c$ y $p, q \\neq 0$.',
+              steps: [
+                'En ecuaciones lineales: elimina paréntesis y denominadores, agrupa los términos con $x$ en un lado y las constantes en el otro, y divide por $(a - c)$.',
+                'En ecuaciones cuadráticas factorizables: iguala todo a cero ($= 0$), factoriza en producto de binomios e iguala cada factor a cero por separado.',
+                'Comprueba tus raíces al instante con Vieta: $x_1 + x_2 = -b/a$ y $x_1 \\cdot x_2 = c/a$.'
+              ],
+              conditions: 'En la ecuación lineal, si $a = c$ y $b = d$ hay infinitas soluciones (identidad); si $a = c$ y $b \\neq d$ no existe solución.'
+            },
+            {
+              code: '2.5.6',
+              kind: 'method',
+              name: 'Métodos para Sistemas Lineales $2 \\times 2$ (Reducción, Sustitución, Igualación y Cramer)',
+              latex: '\\begin{cases} a_1 x + b_1 y = c_1 \\\\ a_2 x + b_2 y = c_2 \\end{cases} \\implies D = a_1 b_2 - a_2 b_1, \\quad x = \\frac{c_1 b_2 - c_2 b_1}{D}, \\quad y = \\frac{a_1 c_2 - a_2 c_1}{D}',
+              variables: 'Donde $D$ es el determinante principal del sistema, $D_x = c_1 b_2 - c_2 b_1$ y $D_y = a_1 c_2 - a_2 c_1$.',
+              steps: [
+                'Reducción (eliminación): multiplica las ecuaciones para obtener coeficientes opuestos en una incógnita y suma verticalmente.',
+                'Sustitución / Igualación: despeja la incógnita con coeficiente $\\pm 1$ en una ecuación e insértala en la otra (o despeja la misma en ambas e iguala).',
+                'Regla de Cramer: evalúa $D, D_x, D_y$ y calcula $x = D_x / D$, $y = D_y / D$.'
+              ],
+              conditions: 'Solución única si $D \\neq 0$ (rectas secantes). Si $D = 0$: infinitas soluciones si $D_x = D_y = 0$ (coincidentes) o sin solución si alguno es no nulo (paralelas).'
+            },
+            {
+              code: '2.5.7',
+              kind: 'method',
+              name: 'Inecuaciones Polinomiales y Racionales (Puntos Críticos y Tabla de Signos)',
+              latex: '\\frac{P(x)}{Q(x)} \\gtrless 0 \\implies \\text{puntos críticos: } P(x) = 0 \\;\\text{ y }\\; Q(x) = 0 \\quad (Q(x) \\neq 0 \\text{ siempre abierto})',
+              variables: 'Donde $P(x)$ y $Q(x)$ son polinomios factorizados en la desigualdad comparada estrictamente contra $0$.',
+              steps: [
+                'Pasa todos los términos a un lado dejando $0$ en el otro y une en una sola fracción $\\frac{P(x)}{Q(x)}$ (NUNCA multipliques en cruz por $Q(x)$ porque su signo varía).',
+                'Factoriza $P(x)$ y $Q(x)$ y ubica todos sus ceros ordenados en la recta real.',
+                'Evalúa un valor de prueba en cada subintervalo para armar la tabla de signos y selecciona los intervalos que satisfacen la desigualdad.'
+              ],
+              conditions: 'Las raíces del denominador $Q(x) = 0$ se excluyen SIEMPRE con paréntesis abierto $(\\,)$, incluso en $\\le$ o $\\ge$. Al multiplicar o dividir por un negativo, el sentido de la desigualdad se invierte.'
+            }
+          ]
         }
       ]
     },
 
     /* ======================================================================
-       3. FORMULARIO DE GEOMETRÍA (11 Fórmulas Exhaustivas)
+       3. FORMULARIO DE GEOMETRÍA (Fórmulas y Métodos de Resolución)
        ====================================================================== */
     {
       id: 'geometria',
@@ -250,7 +418,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       symbol: 'Δ',
       color: '#0284C7',
       levelTag: 'Geometría y Analítica',
-      description: 'Teorema de Pitágoras, áreas y perímetros de figuras planas, volúmenes de sólidos en el espacio y ecuaciones de Geometría Analítica.',
+      description: 'Teorema de Pitágoras, áreas y volúmenes, semejanza y potencia de un punto, ecuaciones de la recta, cónicas y métodos de resolución geométrica y analítica.',
       sections: [
         {
           id: 'geo-sec-1',
@@ -346,12 +514,83 @@ window.MatInteractiva = window.MatInteractiva || {};
               conditions: 'En la elipse $c^2 = a^2 - b^2$ ($a \\ge b > 0$); en la hipérbola $c^2 = a^2 + b^2$, siendo $c$ la distancia del centro a los focos.'
             }
           ]
+        },
+        {
+          id: 'geo-sec-4',
+          title: '3.4 Métodos y Estrategias de Resolución Geométrica y Analítica',
+          formulas: [
+            {
+              code: '3.4.1',
+              kind: 'method',
+              name: 'Método de Ternas Pitagóricas Escaladas y Diferencia de Cuadrados en Pitágoras',
+              latex: '(3k,\\; 4k,\\; 5k),\\;\\; (5k,\\; 12k,\\; 13k),\\;\\; (8k,\\; 15k,\\; 17k) \\qquad \\quad b = \\sqrt{c^2 - a^2} = \\sqrt{(c - a)(c + a)}',
+              variables: 'Donde $k > 0$ es el factor de escala (MCD de los lados), $c$ la hipotenusa y $a, b$ los catetos del triángulo rectángulo.',
+              steps: [
+                'Divide los dos lados conocidos por su MCD para identificar si pertenecen a las ternas primitivas $(3, 4, 5)$, $(5, 12, 13)$ u $(8, 15, 17)$ y vuelve a multiplicar por $k$.',
+                'Si los lados son grandes y calculas un cateto sin calculadora, factoriza $c^2 - a^2 = (c - a)(c + a)$ antes de extraer la raíz.',
+                'Comprueba siempre que la hipotenusa $c$ sea estrictamente mayor que ambos catetos.'
+              ],
+              conditions: 'Aplica únicamente a triángulos rectángulos ($c > a > 0$).'
+            },
+            {
+              code: '3.4.2',
+              kind: 'method',
+              name: 'Descomposición por Altura (Proyección sobre la Base) frente a Fórmula de Herón',
+              latex: 'h^2 = a^2 - x^2 = b^2 - (c - x)^2 \\implies x = \\frac{a^2 + c^2 - b^2}{2c}, \\qquad A = \\frac{c \\cdot h}{2}',
+              variables: 'Donde $a, b, c$ son los tres lados del triángulo, $h$ la altura perpendicular al lado $c$ y $x, c - x$ las proyecciones sobre dicha base.',
+              steps: [
+                'Ruta A (Fórmula de Herón): calcula el semiperímetro $s = \\frac{a+b+c}{2}$ y evalúa $A = \\sqrt{s(s-a)(s-b)(s-c)}$.',
+                'Ruta B (Descomposición por altura): parte la base $c$ en $x$ y $c - x$, iguala $a^2 - x^2 = b^2 - (c - x)^2$ para despejar $x$, halla $h = \\sqrt{a^2 - x^2}$ y calcula $A = \\frac{c \\cdot h}{2}$.',
+                'Si además conoces un ángulo comprendido, verifica con el área trigonométrica $\\frac{1}{2}ab\\,\\text{sen}(C)$.'
+              ],
+              conditions: 'Útil cuando conoces los 3 lados y ningún ángulo; los lados deben cumplir la desigualdad triangular ($a + b > c$).'
+            },
+            {
+              code: '3.4.3',
+              kind: 'method',
+              name: 'Semejanza (Teorema de Tales), Corona Circular y Potencia de un Punto',
+              latex: '\\frac{a}{a\'} = \\frac{b}{b\'} = \\frac{c}{c\'} = k, \\quad \\frac{A}{A\'} = k^2 \\qquad A_{\\text{corona}} = \\pi(R^2 - r^2) \\qquad PA \\cdot PB = PC \\cdot PD = PT^2',
+              variables: 'Donde $k$ es la razón de semejanza lineal, $R > r$ los radios concéntricos, y $PA, PB, PC, PD, PT$ segmentos secantes o tangentes desde un punto $P$ a una circunferencia.',
+              steps: [
+                'En triángulos semejantes o rectas paralelas (Tales), plantea proporciones entre lados homólogos; recuerda que áreas escalan por $k^2$ y volúmenes por $k^3$.',
+                'En coronas circulares, resta áreas concéntricas $\\pi(R^2 - r^2)$ (factorizable como $\\pi(R-r)(R+r)$).',
+                'En cuerdas, secantes y tangentes desde $P$, iguala los productos de los segmentos $PA \\cdot PB = PC \\cdot PD = PT^2$.'
+              ],
+              conditions: 'Exige $k > 0$, $R > r > 0$ y que los segmentos se midan siempre desde el mismo punto de intersección $P$.'
+            },
+            {
+              code: '3.4.4',
+              kind: 'method',
+              name: 'Construcción de la Recta: Punto-Pendiente vs. Despeje de $b$ y Recta Perpendicular',
+              latex: 'b = y_0 - m x_0 \\implies y = mx + b \\qquad \\quad m_\\perp = -\\frac{1}{m} \\implies y - y_0 = -\\frac{1}{m}(x - x_0)',
+              variables: 'Donde $(x_0, y_0)$ es el punto de paso, $m$ la pendiente de la recta base, $b$ su ordenada al origen y $m_\\perp$ la pendiente perpendicular.',
+              steps: [
+                'Calcula $m = \\frac{y_2 - y_1}{x_2 - x_1}$ si dispones de dos puntos (o $m = f\'(x_0)$ si es una recta tangente).',
+                'Forma 1 (Punto-Pendiente): sustituye directamente en $y - y_0 = m(x - x_0)$ y despeja $y$.',
+                'Forma 2 (Despeje de $b$): evalúa $y_0 = m x_0 + b$ para hallar $b$; para una recta perpendicular o normal, reemplaza $m$ por $m_\\perp = -\\frac{1}{m}$.'
+              ],
+              conditions: 'La pendiente perpendicular $m_\\perp = -1/m$ exige $m \\neq 0$. Si $m = 0$ (recta horizontal), toda perpendicular es vertical ($x = x_0$).'
+            },
+            {
+              code: '3.4.5',
+              kind: 'method',
+              name: 'Distancia Mínima por Vector Normal y Excentricidad de las Cónicas',
+              latex: '\\vec{n} = (A, B), \\quad Q(t) = P_0 + t\\,\\vec{n}, \\quad d(P_0, L) = \\frac{|Ax_0 + By_0 + C|}{\\|\\vec{n}\\|} \\qquad \\quad e = \\frac{c}{a}',
+              variables: 'Donde $\\vec{n} = (A, B)$ es el vector normal a $Ax + By + C = 0$, $Q(t)$ la recta perpendicular desde $P_0(x_0, y_0)$, y $e$ la excentricidad de una cónica.',
+              steps: [
+                'Fórmula directa: escribe la recta en forma general $Ax + By + C = 0$ y evalúa $\\frac{|Ax_0 + By_0 + C|}{\\sqrt{A^2 + B^2}}$.',
+                'Comprobación vectorial/geométrica: avanza desde $P_0$ a lo largo de $\\vec{n} = (A, B)$ hasta cortar $L$ en el pie $Q$ y mide $\\|Q - P_0\\|$.',
+                'En cónicas, calcula $e = c/a$: en la circunferencia $e = 0$, en la elipse $0 < e < 1$, en la parábola $e = 1$ y en la hipérbola $e > 1$ (asíntotas $y - k = \\pm \\frac{b}{a}(x - h)$).'
+              ],
+              conditions: 'Se requiere $\\|\\vec{n}\\| = \\sqrt{A^2 + B^2} > 0$ y $a > 0$. Para tangentes a circunferencias, el radio del centro al punto de tangencia es siempre perpendicular a la tangente.'
+            }
+          ]
         }
       ]
     },
 
     /* ======================================================================
-       4. FORMULARIO DE TRIGONOMETRÍA (12 Fórmulas Exhaustivas)
+       4. FORMULARIO DE TRIGONOMETRÍA (Fórmulas y Métodos de Resolución)
        ====================================================================== */
     {
       id: 'trigonometria',
@@ -361,7 +600,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       symbol: 'θ',
       color: '#0D9488',
       levelTag: 'Trigonometría Analítica',
-      description: 'Conversión angular, razones en el triángulo rectángulo, círculo unitario, identidades trigonométricas fundamentales y leyes de senos y cosenos.',
+      description: 'Conversión angular, razones trigonométricas, círculo unitario, identidades fundamentales, leyes de senos y cosenos, ángulo de referencia, demostración de identidades y ecuaciones trigonométricas.',
       sections: [
         {
           id: 'trig-sec-1',
@@ -470,12 +709,70 @@ window.MatInteractiva = window.MatInteractiva || {};
               conditions: 'Válida para todo triángulo acutángulo, rectángulo u obtusángulo sin necesidad de conocer su altura perpendicular.'
             }
           ]
+        },
+        {
+          id: 'trig-sec-5',
+          title: '4.5 Métodos de Resolución Trigonométrica e Identidades',
+          formulas: [
+            {
+              code: '4.5.1',
+              kind: 'method',
+              name: 'Triángulo Rectángulo Auxiliar (SOH-CAH-TOA) y Deducción Pitagórica de las 6 Razones',
+              latex: 'P(\\theta) = (\\cos\\theta,\\; \\text{sen}\\,\\theta), \\qquad \\theta = \\frac{s}{r} \\qquad \\quad \\cos\\theta = \\pm\\sqrt{1 - \\text{sen}^2(\\theta)}',
+              variables: 'Donde $P(\\theta)$ es el punto terminal en el círculo unitario ($r = 1$), $s$ es la longitud de arco y el signo $\\pm$ depende del cuadrante de $\\theta$.',
+              steps: [
+                'Camino geométrico: con una razón conocida, dibuja un triángulo rectángulo auxiliar etiquetando catetos/hipotenusa con SOH-CAH-TOA y halla el lado faltante con Pitágoras.',
+                'Camino algebraico: sustituye el valor conocido en $\\text{sen}^2(\\theta) + \\cos^2(\\theta) = 1$, despeja la raíz y calcula $\\tan(\\theta) = \\frac{\\text{sen}(\\theta)}{\\cos(\\theta)}$ y las recíprocas.',
+                'Ajusta siempre el signo ($+$ o $-$) de cada razón según el cuadrante en que cae el ángulo $\\theta$.'
+              ],
+              conditions: 'Al trabajar en el círculo unitario, recuerda siempre $-1 \\le \\text{sen}(\\theta) \\le 1$ y $-1 \\le \\cos(\\theta) \\le 1$.'
+            },
+            {
+              code: '4.5.2',
+              kind: 'method',
+              name: 'Reducción al Primer Cuadrante (Ángulo de Referencia y Signos por Cuadrante)',
+              latex: '\\theta_{\\text{ref}} = \\begin{cases} \\theta, & \\text{Cuadrante I (Todas } +) \\\\ \\pi - \\theta, & \\text{Cuadrante II (sen, csc } +) \\\\ \\theta - \\pi, & \\text{Cuadrante III (tan, cot } +) \\\\ 2\\pi - \\theta, & \\text{Cuadrante IV (cos, sec } +) \\end{cases}',
+              variables: 'Donde $\\theta \\in [0, 2\\pi)$ es el ángulo en posición estándar y $\\theta_{\\text{ref}} \\in \\left[0, \\frac{\\pi}{2}\\right]$ su ángulo agudo al eje horizontal $X$.',
+              steps: [
+                'Reduce ángulos fuera de $[0, 2\\pi)$ sumando o restando múltiplos de $2\\pi$ (o $360^\\circ$) para hallar el ángulo coterminal.',
+                'Determina el cuadrante y mide la distancia más corta al eje horizontal ($\\pi$ o $2\\pi$): ese valor es $\\theta_{\\text{ref}}$.',
+                'Evalúa la razón en $\\theta_{\\text{ref}}$ y antepone el signo del cuadrante (regla mnemotécnica: I Todas $+$, II Sen $+$, III Tan $+$, IV Cos $+$).'
+              ],
+              conditions: 'Mide el ángulo de referencia SIEMPRE respecto al eje horizontal $X$ ($0, \\pi, 2\\pi$), nunca respecto al eje vertical $Y$.'
+            },
+            {
+              code: '4.5.3',
+              kind: 'method',
+              name: 'Demostración de Identidades: Conversión a Senos/Cosenos y Conjugado Trigonométrico',
+              latex: '\\frac{1 - \\cos x}{\\text{sen}\\,x} = \\frac{(1 - \\cos x)(1 + \\cos x)}{\\text{sen}\\,x\\,(1 + \\cos x)} = \\frac{\\text{sen}^2 x}{\\text{sen}\\,x\\,(1 + \\cos x)} = \\frac{\\text{sen}\\,x}{1 + \\cos x}',
+              variables: 'Donde $1 \\pm \\cos x$ y $1 \\pm \\text{sen}\\,x$ son pares conjugados trigonométricos que producen identidades pitagóricas al multiplicarse.',
+              steps: [
+                'Parte del lado más complejo de la igualdad (NUNCA muevas términos cruzando el signo $=$ al demostrar una identidad).',
+                'Estrategia 1 (Todo a senos y cosenos): sustituye $\\tan, \\cot, \\sec, \\csc$ por fracciones en $\\text{sen}$ y $\\cos$, suma con común denominador y reduce con $\\text{sen}^2 + \\cos^2 = 1$.',
+                'Estrategia 2 (Algebraica / Conjugado): factoriza diferencias de cuadrados ($1 - \\cos^2 x = \\text{sen}^2 x$) o multiplica arriba y abajo por $(1 \\pm \\cos x)$.'
+              ],
+              conditions: 'Válido en todo punto donde no se anulen los denominadores introducidos (ej. $\\text{sen}\\,x \\neq 0$ y $1 + \\cos x \\neq 0$).'
+            },
+            {
+              code: '4.5.4',
+              kind: 'method',
+              name: 'Resolución de Ecuaciones Trigonométricas en $[0, 2\\pi)$ por Sustitución Cuadrática',
+              latex: 'a\\,u^2 + b\\,u + c = 0 \\qquad (u = \\text{sen}\\,x \\text{ o } \\cos x,\\;\\; |u| \\le 1) \\implies x \\in [0, 2\\pi)',
+              variables: 'Donde $u$ es la variable auxiliar trigonométrica y el conjunto solución incluye todas las soluciones del intervalo principal $[0, 2\\pi)$.',
+              steps: [
+                'Aplica identidades pitagóricas o de ángulo doble hasta expresar toda la ecuación en términos de una sola razón trigonométrica.',
+                'Sustituye $u = \\text{sen}\\,x$ (o $\\cos x, \\tan x$) y resuelve la ecuación polinomial resultante (factorizando o por fórmula general).',
+                'Descarta raíces fuera de $[-1, 1]$ para seno/coseno y encuentra TODOS los ángulos en $[0, 2\\pi)$ con su ángulo de referencia en los cuadrantes con el signo correcto.'
+              ],
+              conditions: 'Para soluciones generales en $\\mathbb{R}$, suma $+2k\\pi$ ($k \\in \\mathbb{Z}$) en seno/coseno y $+k\\pi$ en tangente/cotangente.'
+            }
+          ]
         }
       ]
     },
 
     /* ======================================================================
-       5. FORMULARIO DE FUNCIONES (10 Fórmulas Exhaustivas)
+       5. FORMULARIO DE FUNCIONES (Fórmulas y Métodos de Resolución)
        ====================================================================== */
     {
       id: 'funciones',
@@ -485,7 +782,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       symbol: 'f(x)',
       color: '#4F46E5',
       levelTag: 'Precálculo',
-      description: 'Restricciones de dominio, paridad, tasa de variación media, álgebra y composición de funciones, función inversa, transformaciones y asíntotas.',
+      description: 'Restricciones de dominio (3 semáforos), paridad, tasa de variación, álgebra y composición, cálculo de función inversa, división polinomial para asíntotas y ecuaciones exponenciales y logarítmicas.',
       sections: [
         {
           id: 'fun-sec-1',
@@ -574,12 +871,83 @@ window.MatInteractiva = window.MatInteractiva || {};
               conditions: 'En el modelo exponencial, si $k > 0$ hay crecimiento exponencial; si $k < 0$, decaimiento exponencial (vida media $t_{1/2} = \\frac{\\ln(2)}{|k|}$).'
             }
           ]
+        },
+        {
+          id: 'fun-sec-4',
+          title: '5.4 Métodos de Dominio, Inversa, Racionales y Ecuaciones Trascendentes',
+          formulas: [
+            {
+              code: '5.4.1',
+              kind: 'method',
+              name: 'Método de los 3 Semáforos e Intersección de Restricciones de Dominio',
+              latex: '\\text{Dom}(f) = \\{x \\in \\mathbb{R} \\mid Q(x) \\neq 0\\} \\cap \\{x \\mid g(x) \\ge 0\\} \\cap \\{x \\mid h(x) > 0\\}',
+              variables: 'Donde $Q(x)$ es cada denominador, $g(x)$ cada radicando de índice par y $h(x)$ cada argumento logarítmico presente en la expresión.',
+              steps: [
+                'Escanea la fórmula y lista cada restricción activa: denominadores ($\\neq 0$), raíces de índice par ($\\ge 0$) y logaritmos ($> 0$).',
+                'Resuelve cada ecuación o inecuación por separado sobre la recta real.',
+                'Intersecta todos los intervalos solución excluyendo cualquier punto aislado que anule un denominador.'
+              ],
+              conditions: 'Los polinomios, exponenciales, raíces impares, $\\text{sen}(x)$ y $\\cos(x)$ tienen dominio libre en todo $\\mathbb{R}$.'
+            },
+            {
+              code: '5.4.2',
+              kind: 'method',
+              name: 'Cálculo y Verificación de la Función Inversa ($x \\leftrightarrow y$ y Deshacer Capas)',
+              latex: 'y = f(x) \\xrightarrow{\\text{despejar } x} x = f^{-1}(y) \\xrightarrow{x \\leftrightarrow y} y = f^{-1}(x), \\qquad f(a) = b \\iff f^{-1}(b) = a',
+              variables: 'Donde $f$ es una función inyectiva (prueba de la recta horizontal) y $f^{-1}$ su función inversa simétrica respecto a $y = x$.',
+              steps: [
+                'Escribe $y = f(x)$ y verifica que $f$ sea inyectiva en el dominio considerado (restringiéndolo si es necesario, ej. $x \\ge 0$ para $x^2$).',
+                'Despeja algebraicamente $x$ en términos de $y$ (deshaciendo las operaciones en orden inverso al aplicado a $x$).',
+                'Intercambia las variables $x \\leftrightarrow y$ y verifica con un punto concreto: si $f(a) = b$, debe cumplirse $f^{-1}(b) = a$.'
+              ],
+              conditions: 'Recuerda: $\\text{Dom}(f^{-1}) = \\text{Rango}(f)$ y $\\text{Rango}(f^{-1}) = \\text{Dom}(f)$. Nunca confundas $f^{-1}(x)$ con $[f(x)]^{-1} = \\frac{1}{f(x)}$.'
+            },
+            {
+              code: '5.4.3',
+              kind: 'method',
+              name: 'División Polinomial para Asíntotas Oblicuas y Detección de Huecos Removibles',
+              latex: '\\frac{P(x)}{D(x)} = Q(x) + \\frac{R(x)}{D(x)} \\implies \\text{A.O.: } y = mx + b \\quad (\\text{gr}(P) = \\text{gr}(D) + 1)',
+              variables: 'Donde $Q(x) = mx + b$ es el cociente lineal de la división polinomial y $R(x)$ el residuo con $\\text{gr}(R) < \\text{gr}(D)$.',
+              steps: [
+                'Factoriza numerador y denominador: si un factor $(x - c)$ se cancela arriba y abajo, en $x = c$ hay un hueco removible (no asíntota vertical).',
+                'En las raíces restantes del denominador ($D(x) = 0$ no canceladas), traza las asíntotas verticales $x = a$.',
+                'Si $\\text{gr}(P) = \\text{gr}(D) + 1$, realiza la división polinomial o sintética: el cociente $y = Q(x)$ es exactamente la asíntota oblicua pues $\\frac{R(x)}{D(x)} \\to 0$ cuando $x \\to \\pm\\infty$.'
+              ],
+              conditions: 'Una función racional no puede tener asíntota horizontal y oblicua simultáneamente.'
+            },
+            {
+              code: '5.4.4',
+              kind: 'method',
+              name: 'Resolución de Ecuaciones Exponenciales (Bases Iguales vs. Logaritmo Natural)',
+              latex: 'b^{u(x)} = b^{v(x)} \\iff u(x) = v(x) \\qquad \\quad a^{f(x)} = k \\;(k > 0) \\iff f(x) = \\frac{\\ln(k)}{\\ln(a)}',
+              variables: 'Donde $b, a > 0$ ($b, a \\neq 1$) son las bases exponenciales y $k > 0$ el valor aislado en el lado derecho.',
+              steps: [
+                'Camino 1 (Bases iguales): si ambos lados son potencias limpias de una misma base ($2^k, 3^k, 5^k$), reescríbelos con base común e iguala exponentes directamente.',
+                'Camino 2 (Universal con $\\ln$): aísla la exponencial $a^{f(x)} = k$, aplica $\\ln$ en ambos lados para bajar el exponente ($f(x)\\ln a = \\ln k$) y despeja $x$.',
+                'En ecuaciones tipo $a^{2x} + B a^x + C = 0$, haz la sustitución $u = a^x$ ($u > 0$) y resuelve la cuadrática en $u$.'
+              ],
+              conditions: 'Como $a^{f(x)} > 0$ para todo $x \\in \\mathbb{R}$, si al aislar queda $k \\le 0$ la ecuación NO tiene solución real.'
+            },
+            {
+              code: '5.4.5',
+              kind: 'method',
+              name: 'Resolución de Ecuaciones Logarítmicas (Unificación de $\\ln$ vs. Exponenciación $e^{(\\cdot)}$)',
+              latex: '\\log_b(A) = \\log_b(B) \\iff A = B \\;(A, B > 0) \\qquad \\quad \\ln(A) = c \\iff A = e^c',
+              variables: 'Donde $A = A(x)$ y $B = B(x)$ son los argumentos logarítmicos, $b > 0$ ($b \\neq 1$) la base y $c \\in \\mathbb{R}$ una constante.',
+              steps: [
+                'Aplica las leyes de logaritmos (suma $\\to$ producto, resta $\\to$ cociente, coeficiente $\\to$ exponente) para condensar cada lado en un solo logaritmo.',
+                'Si tienes $\\log_b(A) = \\log_b(B)$ iguala los argumentos $A = B$; si tienes $\\log_b(A) = c$ reescribe en forma exponencial $A = b^c$ (o $A = e^c$ con $\\ln$).',
+                'Verificación OBLIGATORIA: sustituye cada raíz en la ecuación original y descarta cualquier solución que haga cero o negativo algún argumento.'
+              ],
+              conditions: 'Al elevar o unificar logaritmos pueden aparecer soluciones extrañas fuera del dominio; la verificación de positividad ($> 0$) en los argumentos originales es indispensable.'
+            }
+          ]
         }
       ]
     },
 
     /* ======================================================================
-       6. FORMULARIO DE LÍMITES (11 Fórmulas Exhaustivas)
+       6. FORMULARIO DE LÍMITES (Fórmulas y Métodos de Resolución)
        ====================================================================== */
     {
       id: 'limites',
@@ -589,7 +957,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       symbol: 'lim',
       color: '#7C3AED',
       levelTag: 'Cálculo Diferencial',
-      description: 'Definición formal y existencia bilateral, álgebra de límites, técnicas de resolución para indeterminaciones 0/0, límites al infinito, límites trigonométricos y exponenciales notables, y criterios de continuidad.',
+      description: 'Definición ε-δ y límites laterales, leyes algebraicas, indeterminaciones 0/0 (factorización, conjugado, cambio de variable y traslación), límites al infinito, sándwich, notables y continuidad.',
       sections: [
         {
           id: 'lim-sec-1',
@@ -685,12 +1053,96 @@ window.MatInteractiva = window.MatInteractiva || {};
               conditions: 'Condición: $f$ debe ser estrictamente continua en $[a, b]$ y presentar signos opuestos en los extremos ($f(a)$ y $f(b)$ de signos contrarios).'
             }
           ]
+        },
+        {
+          id: 'lim-sec-4',
+          title: '6.4 Métodos Especializados de Evaluación, Demostración y Continuidad',
+          formulas: [
+            {
+              code: '6.4.1',
+              kind: 'method',
+              name: 'Definición Formal $\\varepsilon$-$\\delta$ (Cauchy-Weierstrass), Límites Laterales y Tabla Numérica',
+              latex: '\\lim_{x \\to a} f(x) = L \\iff \\forall \\varepsilon > 0,\\; \\exists \\delta > 0 :\\; 0 < |x - a| < \\delta \\implies |f(x) - L| < \\varepsilon',
+              variables: 'Donde $\\varepsilon > 0$ es la tolerancia vertical alrededor de $L$ y $\\delta > 0$ es el radio horizontal perforado alrededor de $a$.',
+              steps: [
+                'Sustitución y laterales: prueba primero $x = a$; en funciones por partes, valores absolutos $|x - a|$ o bordes, calcula por separado $x \\to a^-$ y $x \\to a^+$ (o estima con $a \\pm 0.001$).',
+                'Borrador $\\varepsilon$-$\\delta$ (ingeniería inversa): factoriza $|f(x) - L|$ hasta aislar $|x - a| \\cdot M$ (si aparece otro factor con $x$, acótalo imponiendo $|x - a| < 1$).',
+                'Elección formal: define $\\delta = \\varepsilon / K$ (o $\\delta = \\min(1, \\varepsilon / M)$) y encadena las desigualdades desde $0 < |x - a| < \\delta$ hasta $|f(x) - L| < \\varepsilon$.'
+              ],
+              conditions: 'Recuerda que en el límite $x$ se acerca a $a$ pero $x \\neq a$ ($0 < |x - a|$): el valor aislado $f(a)$ nunca altera el valor del límite.'
+            },
+            {
+              code: '6.4.2',
+              kind: 'method',
+              name: 'Cambio de Variable Racionalizador ($u = \\sqrt[n]{g(x)}$) y Traslación al Origen ($h = x - a$)',
+              latex: 'u = \\sqrt[n]{g(x)} \\quad (\\text{elimina radicales}) \\qquad \\quad x = a + h \\implies \\lim_{x \\to a} f(x) = \\lim_{h \\to 0} f(a + h)',
+              variables: 'Donde $u$ convierte expresiones con raíces cúbicas o mixtas en polinomios racionales, y $h = x - a$ traslada cualquier punto $a \\neq 0$ al origen $h \\to 0$.',
+              steps: [
+                'Cambio racionalizador: define $u = \\sqrt[n]{g(x)}$, despeja $x$ en términos de $u$, calcula el nuevo destino $u_0 = \\sqrt[n]{g(a)}$ y factoriza el polinomio en $u$.',
+                'Traslación al origen: si $a \\neq 0$ (ej. $x \\to \\pi/2$ en límites trigonométricos o polinomios desplazados), sustituye $x = a + h$ con $h \\to 0$.',
+                'Simplifica cancelando el factor común ($u - u_0$ o $h$) y evalúa por sustitución directa.'
+              ],
+              conditions: 'Indispensable en indeterminaciones $\\frac{0}{0}$ con raíces cúbicas/cuartas ($\\sqrt[3]{x} - 2$) o límites trigonométricos que no tienden a $0$.'
+            },
+            {
+              code: '6.4.3',
+              kind: 'method',
+              name: 'Límites al Infinito: División por $x^m$, Términos Dominantes, $t = -x$ e Inversión $u = 1/x$',
+              latex: '\\sqrt{x^2} = |x| = \\begin{cases} +x, & x \\to +\\infty \\\\ -x, & x \\to -\\infty \\end{cases} \\qquad x = -t\\;(t \\to +\\infty) \\qquad x = \\frac{1}{u}\\;(u \\to 0)',
+              variables: 'Donde $x^m$ es la mayor potencia del denominador, $t = -x > 0$ evita errores de signo en $-\\infty$, y $u = 1/x$ convierte límites al infinito en límites en $0$.',
+              steps: [
+                'Método formal: divide todos los términos de numerador y denominador por la mayor potencia $x^m$ del denominador y aplica $\\lim_{x \\to \\pm\\infty} \\frac{c}{x^k} = 0$.',
+                'Atajo y raíces en $-\\infty$: conserva solo los términos líderes; si $x \\to -\\infty$ y hay raíces cuadradas, haz $t = -x \\to +\\infty$ para jamás olvidar $\\sqrt{x^2} = -x$.',
+                'Inversión $u = 1/x$: en expresiones como $x\\,\\text{sen}(1/x)$, cambia $x = 1/u$ ($u \\to 0$) y aplica límites notables en el origen.'
+              ],
+              conditions: 'Atención: para indeterminaciones $\\infty - \\infty$ con radicales, racionaliza primero multiplicando por el conjugado para llevar a $\\frac{\\infty}{\\infty}$.'
+            },
+            {
+              code: '6.4.4',
+              kind: 'method',
+              name: 'Test de Signos para Asíntotas Verticales ($k / 0^\\pm$) frente a Huecos Removibles',
+              latex: '\\lim_{x \\to a^\\pm} \\frac{P(x)}{Q(x)} = \\frac{k}{0^\\pm} = \\pm\\infty \\;\\;(k \\neq 0) \\qquad \\text{vs. hueco removible si } \\frac{0}{0} \\to L \\in \\mathbb{R}',
+              variables: 'Donde $a$ es un cero del denominador ($Q(a) = 0$) y $k = P(a)$ el valor del numerador en dicho punto.',
+              steps: [
+                'Resuelve $Q(x) = 0$ para listar todos los candidatos a discontinuidad vertical.',
+                'Evalúa $P(a)$: si $P(a) = 0$, factoriza y cancela $(x - a)$ primero para determinar si queda un hueco removible o persiste una asíntota.',
+                'Si $P(a) = k \\neq 0$, analiza el signo del numerador y del denominador en $a - 0.01$ y $a + 0.01$ para concluir si cada rama diverge a $+\\infty$ o $-\\infty$.'
+              ],
+              conditions: 'Un denominador que se anula solo garantiza asíntota vertical si tras simplificar el numerador permanece distinto de cero.'
+            },
+            {
+              code: '6.4.5',
+              kind: 'method',
+              name: 'Teorema del Sándwich (Acotamiento) y Ruta de Ángulo Medio para $1 - \\cos(kx)$',
+              latex: 'g(x) \\le f(x) \\le h(x) \\;\\text{ y }\\; \\lim_{x \\to a} g(x) = \\lim_{x \\to a} h(x) = L \\implies \\lim_{x \\to a} f(x) = L \\qquad 1 - \\cos(kx) = 2\\,\\text{sen}^2\\!\\left(\\frac{kx}{2}\\right)',
+              variables: 'Donde $g(x)$ y $h(x)$ son funciones envolventes (cota inferior y superior) alrededor de $f(x)$ cerca de $a$.',
+              steps: [
+                'Acotamiento (Sándwich): para factores oscilantes como $x^n\\,\\text{sen}(1/x)$, parte de $-1 \\le \\text{sen}(\\cdot) \\le 1$, multiplica por $|x^n|$ y toma el límite de ambos extremos.',
+                'Completar argumento: en cocientes con $\\text{sen}(ax)$ o $\\tan(ax)$, multiplica y divide por $a$ para formar $\\frac{\\text{sen}(u)}{u} \\to 1$.',
+                'Para $1 - \\cos(kx)$: usa el conjugado $(1 + \\cos(kx))$ o sustituye directo $1 - \\cos(kx) = 2\\,\\text{sen}^2(kx/2)$ antes de dividir entre $x^2$.'
+              ],
+              conditions: 'El ángulo en todos los límites trigonométricos debe medirse obligatoriamente en radianes ($\\text{rad}$).'
+            },
+            {
+              code: '6.4.6',
+              kind: 'method',
+              name: 'Protocolo de Continuidad por Partes y Reparación de Discontinuidades',
+              latex: '\\lim_{x \\to a^-} f(x) = \\lim_{x \\to a^+} f(x) = f(a) \\implies \\text{sistema algebraico para parámetros continuos}',
+              variables: 'Donde $x = a$ es el punto de empalme entre ramas de una función definida a trozos o el punto con hueco removible.',
+              steps: [
+                'Evalúa $f(a)$ en la rama que contiene el signo $\\le$ o $\\ge$ (o escribe su expresión en función de los parámetros $c, k$).',
+                'Calcula el límite lateral izquierdo $\\lim_{x \\to a^-} f(x)$ con la rama $x < a$ y el límite derecho $\\lim_{x \\to a^+} f(x)$ con la rama $x > a$.',
+                'Iguala $L^- = L^+ = f(a)$ para despejar los parámetros que garantizan continuidad; en huecos removibles, define $f(a) = L$.'
+              ],
+              conditions: 'Si $L^- \\neq L^+$ la discontinuidad es de salto (irreparable); si alguno es $\\pm\\infty$, es discontinuidad esencial infinita.'
+            }
+          ]
         }
       ]
     },
 
     /* ======================================================================
-       7. FORMULARIO DE DERIVADAS (13 Fórmulas Exhaustivas)
+       7. FORMULARIO DE DERIVADAS (Fórmulas y Métodos de Resolución)
        ====================================================================== */
     {
       id: 'derivadas',
@@ -700,7 +1152,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       symbol: "f'(x)",
       color: '#9333EA',
       levelTag: 'Cálculo Diferencial',
-      description: 'Definición formal por cociente incremental, reglas algebraicas básicas, regla del producto, cociente y cadena, derivadas de funciones trigonométricas directas e inversas, funciones trascendentes, derivación implícita y derivadas de orden superior.',
+      description: 'Definición formal, reglas de derivación, funciones trascendentes e inversas, derivación implícita y logarítmica, derivadas laterales, linealización, extremos absolutos, optimización y polinomios de Taylor.',
       sections: [
         {
           id: 'der-sec-1',
@@ -816,12 +1268,96 @@ window.MatInteractiva = window.MatInteractiva || {};
               conditions: 'Condición indispensable: la base debe ser estrictamente positiva ($u(x) > 0$). Se despeja $y\' = y \\cdot [\\dots]$.'
             }
           ]
+        },
+        {
+          id: 'der-sec-5',
+          title: '7.5 Métodos Estratégicos de Derivación, Aproximación y Optimización',
+          formulas: [
+            {
+              code: '7.5.1',
+              kind: 'method',
+              name: 'Derivadas Laterales, Diferenciación Numérica Centrada y Linealización $L(x)$',
+              latex: "f'_-(a) = f'_+(a) \\qquad \\quad f'(x_0) \\approx \\frac{f(x_0 + h) - f(x_0 - h)}{2h} \\qquad \\quad L(x) = f(x_0) + f'(x_0)(x - x_0)",
+              variables: 'Donde $f\'_-(a), f\'_+(a)$ son las pendientes laterales en puntos de quiebre, $h$ un paso pequeño (ej. $0.001$) y $L(x)$ la aproximación lineal tangente en $x_0$.',
+              steps: [
+                'En funciones a trozos o valores absolutos $|x - a|$, calcula por separado las derivadas laterales $f\'_-(a)$ y $f\'_+(a)$; solo si coinciden y son finitas existe $f\'(a)$.',
+                'Para comprobar cualquier derivada simbólica en un punto $x_0$, evalúa el cociente centrado $\\frac{f(x_0 + 0.001) - f(x_0 - 0.001)}{0.002}$.',
+                'Para estimar $f(x_0 + \\Delta x)$ cerca de $x_0$, construye la recta tangente $L(x)$ o usa el diferencial $dy = f\'(x_0)\\,dx$.'
+              ],
+              conditions: 'La linealización es más precisa cuanto más pequeño sea $|x - x_0|$. En picos o cúspides ($|x - a|$ en $x = a$), $f$ es continua pero NO derivable.'
+            },
+            {
+              code: '7.5.2',
+              kind: 'method',
+              name: 'Reescritura a Potencias ($a x^n$), Cociente como Producto ($u \\cdot v^{-1}$) y Sustitución de Leibniz',
+              latex: "\\frac{c}{g(x)} = c\\,[g(x)]^{-1} \\implies \\left(\\frac{c}{g}\\right)' = -\\frac{c\\,g'(x)}{[g(x)]^2} \\qquad \\quad \\frac{u}{v} = u \\cdot v^{-1}",
+              variables: 'Donde $c \\in \\mathbb{R}$ es una constante, $g(x) \\neq 0$ y $u, v$ son funciones diferenciables.',
+              steps: [
+                'Antes de derivar radicales ($\\sqrt[n]{x^m}$) o cocientes con denominador monómico ($\\frac{x^3 + 2x}{x}$), reescríbelos como suma de potencias $a x^n$ y aplica la regla de potencia.',
+                'Si el numerador es constante ($c / g(x)$), evita la regla del cociente usando $c\\,[g(x)]^{-1}$ con regla de la cadena.',
+                'En funciones compuestas profundas, bautiza $u = g(x)$ y aplica la notación de Leibniz $\\frac{dy}{dx} = \\frac{dy}{du} \\cdot \\frac{du}{dx}$ capa por capa.'
+              ],
+              conditions: 'Al aplicar la regla del cociente $\\frac{u\'v - uv\'}{v^2}$ suele convenir NO desarrollar $v^2$ y factorizar factores comunes del numerador.'
+            },
+            {
+              code: '7.5.3',
+              kind: 'method',
+              name: 'Expansión Previa de Logaritmos y Atajos de Derivación Implícita ($-F_x / F_y$ en un Punto)',
+              latex: "\\frac{d}{dx}\\left[\\ln\\!\\left(\\frac{A^p \\cdot B^q}{C^r}\\right)\\right] = p\\,\\frac{A'}{A} + q\\,\\frac{B'}{B} - r\\,\\frac{C'}{C} \\qquad \\quad \\left.\\frac{dy}{dx}\\right|_{(x_0, y_0)} = -\\frac{F_x(x_0, y_0)}{F_y(x_0, y_0)}",
+              variables: 'Donde $A, B, C$ son expresiones diferenciables positivas, $p, q, r \\in \\mathbb{R}$, y $F(x, y) = 0$ es una curva implícita evaluada en $(x_0, y_0)$.',
+              steps: [
+                'Antes de derivar $\\ln(\\text{productos/cocientes/raíces})$, expande primero con las leyes de logaritmos y deriva cada término simple como $\\frac{u\'}{u}$.',
+                'Para derivar productos largos o $y = u(x)^{v(x)}$, toma $\\ln$ en ambos lados (derivación logarítmica) y despeja $y\' = y \\cdot [\\dots]$.',
+                'En derivación implícita, si solo te piden la pendiente numérica en $(x_0, y_0)$, sustituye $x = x_0, y = y_0$ inmediatamente después de derivar (o aplica $-F_x / F_y$).'
+              ],
+              conditions: 'En la expansión logarítmica requiere $A, B, C > 0$ (o valor absoluto); en implícita requiere $F_y(x_0, y_0) \\neq 0$.'
+            },
+            {
+              code: '7.5.4',
+              kind: 'method',
+              name: 'Método de Extremos Absolutos en $[a, b]$ (Competencia de Fronteras y Puntos Críticos)',
+              latex: '\\max_{[a, b]} f = \\max\\big\\{f(a),\\; f(b),\\; f(c_1), \\dots, f(c_k)\\big\\}, \\qquad \\min_{[a, b]} f = \\min\\big\\{f(a),\\; f(b),\\; f(c_1), \\dots, f(c_k)\\big\\}',
+              variables: 'Donde $f$ es continua en el intervalo cerrado $[a, b]$ y $c_1, \\dots, c_k \\in (a, b)$ son los puntos críticos interiores ($f\'(c_i) = 0$ o $\\nexists f\'(c_i)$).',
+              steps: [
+                'Calcula $f\'(x)$ y encuentra todos los puntos críticos que caigan ESTRICTAMENTE dentro del intervalo abierto $(a, b)$.',
+                'Evalúa la función original $f(x)$ tanto en los puntos críticos interiores $c_i$ como en los extremos de frontera $a$ y $b$.',
+                'Compara todos los valores obtenidos: el mayor es el máximo absoluto y el menor es el mínimo absoluto (Teorema de Weierstrass).'
+              ],
+              conditions: 'Válido si $f$ es continua en $[a, b]$. Descarta siempre cualquier punto crítico que quede fuera de $[a, b]$.'
+            },
+            {
+              code: '7.5.5',
+              kind: 'method',
+              name: 'Protocolo de Optimización Aplicada y Comprobación por Vértice / Desigualdad MA–MG',
+              latex: "M(x, y) \\xrightarrow{g(x, y) = k} M(x) \\implies M'(x_0) = 0 \\qquad \\quad \\frac{u + v}{2} \\ge \\sqrt{u \\cdot v} \\;\\;(\\text{igualdad si } u = v)",
+              variables: 'Donde $M(x, y)$ es la magnitud objetivo a maximizar/minimizar, $g(x, y) = k$ la ecuación de restricción y $u, v > 0$.',
+              steps: [
+                'Plantea la función objetivo $M(x, y)$ y la restricción $g(x, y) = k$; despeja una variable para dejar $M(x)$ en una sola variable con su dominio físico.',
+                'Resuelve $M\'(x) = 0$ para hallar el punto crítico $x_0$ y clasifícalo con el criterio de la 1.ª o 2.ª derivada ($M\'\'(x_0) < 0$ máximo, $> 0$ mínimo).',
+                'Comprobación rápida: en modelos cuadráticos verifica con el vértice $x = -b/(2a)$; en productos con suma fija ($u + v = C$) comprueba con MA–MG ($u = v = C/2$).'
+              ],
+              conditions: 'Verifica siempre que el valor óptimo $x_0$ pertenezca al dominio geométrico o físico permitido (ej. longitudes positivas).'
+            },
+            {
+              code: '7.5.6',
+              kind: 'method',
+              name: 'Aproximación Polinomial de Taylor y Maclaurin de Orden $n$',
+              latex: "P_n(x) = \\sum_{k=0}^{n} \\frac{f^{(k)}(a)}{k!}\\,(x - a)^k = f(a) + f'(a)(x - a) + \\frac{f''(a)}{2!}(x - a)^2 + \\dots + \\frac{f^{(n)}(a)}{n!}(x - a)^n",
+              variables: 'Donde $a$ es el centro de expansión (si $a = 0$ se llama polinomio de Maclaurin) y $f^{(k)}(a)$ es la $k$-ésima derivada evaluada en $a$.',
+              steps: [
+                'Calcula las derivadas sucesivas $f(x), f\'(x), f\'\'(x), \\dots, f^{(n)}(x)$ y evalúa cada una en el centro $x = a$.',
+                'Divide cada valor $f^{(k)}(a)$ entre $k!$ y multiplícalo por $(x - a)^k$.',
+                'Suma los términos desde $k = 0$ hasta $n$; para $n = 1$ recuperas la linealización tangente $L(x)$.'
+              ],
+              conditions: 'Exige que $f$ sea $n$ veces derivable en $a$. Series de Maclaurin célebres: $e^x \\approx 1 + x + \\frac{x^2}{2!} + \\frac{x^3}{3!}$, $\\text{sen}(x) \\approx x - \\frac{x^3}{3!}$, $\\cos(x) \\approx 1 - \\frac{x^2}{2!}$.'
+            }
+          ]
         }
       ]
     },
 
     /* ======================================================================
-       8. FORMULARIO DE INTEGRALES (13 Fórmulas Exhaustivas)
+       8. FORMULARIO DE INTEGRALES (Fórmulas y Métodos de Resolución)
        ====================================================================== */
     {
       id: 'integrales',
@@ -831,7 +1367,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       symbol: '∫',
       color: '#059669',
       levelTag: 'Cálculo Integral',
-      description: 'Antiderivación inmediata, linealidad del operador integral, fórmulas algebraicas, trascendentes y trigonométricas, métodos de cambio de variable, integración por partes, fracciones parciales y sustitución trigonométrica.',
+      description: 'Antiderivación inmediata, linealidad, sustitución (directa y radical), integración por partes (ILATE, método tabular DI y coeficientes indeterminados), fracciones parciales, sustitución trigonométrica, simetría, Trapecio/Simpson e integrales impropias.',
       sections: [
         {
           id: 'int-sec-1',
@@ -947,12 +1483,96 @@ window.MatInteractiva = window.MatInteractiva || {};
               conditions: 'Permite transformar integrales algebraicas con raíces de segundo grado en integrales trigonométricas inmediatas mediante identidades pitagóricas.'
             }
           ]
+        },
+        {
+          id: 'int-sec-5',
+          title: '8.5 Estrategias Avanzadas de Integración, Simetría e Integración Numérica',
+          formulas: [
+            {
+              code: '8.5.1',
+              kind: 'method',
+              name: 'Reescritura Algebraica Previa, Constante $C$ por Condición Inicial y Verificación',
+              latex: "\\int \\frac{A + B}{x^k}\\,dx = \\int A x^{-k}\\,dx + \\int B x^{-k}\\,dx \\qquad F(x) = y_0 + \\int_{x_0}^{x} f(t)\\,dt \\qquad F'(x) = f(x)",
+              variables: 'Donde $F(x)$ es la antiderivada particular que satisface el problema de valor inicial $F(x_0) = y_0$.',
+              steps: [
+                'Antes de integrar, reescribe radicales como $x^{m/n}$, sube potencias del denominador como $x^{-k}$, separa fracciones con denominador monómico y desarrolla productos sencillos.',
+                'Si conoces una condición inicial $F(x_0) = y_0$, sustitúyela en $F(x) = F_0(x) + C$ para despejar $C = y_0 - F_0(x_0)$ (o integra directo desde $x_0$ hasta $x$).',
+                'Prueba SIEMPRE tu antiderivada derivándola término a término y comprobando que recuperas exactamente el integrando $f(x)$.'
+              ],
+              conditions: 'Nunca olvides sumar $+C$ en toda integral indefinida; en el cociente monómico exige $x \\neq 0$.'
+            },
+            {
+              code: '8.5.2',
+              kind: 'method',
+              name: 'Sustitución Radical Completa ($t = \\sqrt{g(x)}$) y Sustitución Mental Directa',
+              latex: "t = \\sqrt{g(x)} \\implies t^2 = g(x) \\implies 2t\\,dt = g'(x)\\,dx",
+              variables: 'Donde $t \\ge 0$ absorbe la raíz cuadrada completa para transformar la integral en un simple polinomio en $t$.',
+              steps: [
+                'Sustitución mental: cuando el integrando tiene la derivada del interior salvo una constante $k$, multiplica por $k$ adentro y por $1/k$ afuera sin cambiar de letra.',
+                'Sustitución radical completa: si hay una raíz molesta $\\sqrt{g(x)}$, define $t = \\sqrt{g(x)}$, eleva al cuadrado ($t^2 = g(x)$) y diferencia implícitamente ($2t\\,dt = g\'(x)\\,dx$).',
+                'Sustituye la raíz y $dx$, integra el polinomio en $t$ y regresa al final a $t = \\sqrt{g(x)}$.'
+              ],
+              conditions: 'Requiere $g(x) \\ge 0$ y $g\'(x) \\neq 0$. También generaliza a raíces $n$-ésimas haciendo $t^n = g(x)$.'
+            },
+            {
+              code: '8.5.3',
+              kind: 'method',
+              name: 'Método Tabular (DI) para Integración por Partes Reiterada y Coeficientes Indeterminados',
+              latex: "\\int P(x)\\,g(x)\\,dx = \\sum_{j=0}^{n} (-1)^j P^{(j)}(x)\\,I_{j+1}(x) + C \\qquad F(x) = (Ax + B)e^{kx} \\implies F'(x) = f(x)",
+              variables: 'Donde $P(x)$ es un polinomio de grado $n$ (columna D que se deriva hasta $0$) e $I_j(x)$ son las antiderivadas sucesivas de $g(x)$ (columna I).',
+              steps: [
+                'Método Tabular (DI): en la columna D deriva $u = P(x)$ hasta llegar a $0$; en la columna I integra $dv = g(x)$ en paralelo; multiplica en diagonal bajando con signos alternados $+, -, +, -$.',
+                'Coeficientes indeterminados: para $P(x)e^{kx}$ o $P(x)\\cos(kx)$, propón una primitiva de igual estructura (ej. $(Ax + B)e^{kx}$), derívala e iguala coeficientes con el integrando.',
+                'En integrales cíclicas ($e^{ax}\\,\\text{sen}(bx)$), aplica partes dos veces y despeja la integral original $I$ de la ecuación resultante.'
+              ],
+              conditions: 'El método tabular termina en $n + 1$ pasos cuando $u$ es un polinomio de grado $n$ y $dv$ es fácilmente integrable ($e^{kx}, \\text{sen}(kx), \\cos(kx)$).'
+            },
+            {
+              code: '8.5.4',
+              kind: 'method',
+              name: 'Cambio de Límites en Sustitución Definida y Simetría Par/Impar en $[-a, a]$',
+              latex: "\\int_a^b f(g(x))\\,g'(x)\\,dx = \\int_{g(a)}^{g(b)} f(u)\\,du \\qquad \\int_{-a}^{a} f_{\\text{impar}}(x)\\,dx = 0, \\qquad \\int_{-a}^{a} f_{\\text{par}}(x)\\,dx = 2\\int_0^a f_{\\text{par}}(x)\\,dx",
+              variables: 'Donde $g(a), g(b)$ son los nuevos límites en la variable $u$, y $[-a, a]$ es un intervalo simétrico respecto al origen.',
+              steps: [
+                'En integrales definidas por sustitución $u = g(x)$, transforma los límites $x = a \\to u = g(a)$ y $x = b \\to u = g(b)$ y evalúa directo en $u$ sin regresar jamás a $x$.',
+                'Si el intervalo es simétrico $[-a, a]$, separa términos impares ($f(-x) = -f(x) \\implies$ integral neta $= 0$) y pares ($f(-x) = f(x) \\implies 2\\int_0^a$).',
+                'Protege siempre el segundo término en Barrow entre paréntesis: $F(b) - (F(a))$ para evitar errores de signos.'
+              ],
+              conditions: '¡Cuidado!: en área geométrica total $\\int_{-a}^a |f(x)|\\,dx$, una función impar NO se anula (da $2\\int_0^a |f(x)|\\,dx$).'
+            },
+            {
+              code: '8.5.5',
+              kind: 'method',
+              name: 'Área Neta vs. Área Geométrica Total y Métodos Numéricos (Trapecio y Regla de Simpson)',
+              latex: 'A_{\\text{total}} = \\int_a^b |f(x)|\\,dx \\qquad T_n = \\frac{\\Delta x}{2}\\!\\left[f_0 + 2\\sum_{i=1}^{n-1} f_i + f_n\\right] \\qquad S_n = \\frac{\\Delta x}{3}\\!\\left[f_0 + 4f_1 + 2f_2 + \\dots + 4f_{n-1} + f_n\\right]',
+              variables: 'Donde $\\Delta x = \\frac{b - a}{n}$, $x_i = a + i\\Delta x$ y $f_i = f(x_i)$; en $S_n$ los pesos alternan $1, 4, 2, 4, \\dots, 2, 4, 1$.',
+              steps: [
+                'Para hallar el área geométrica total (siempre positiva), busca los ceros de $f(x) = 0$ dentro de $(a, b)$, parte la integral y suma los valores absolutos de cada tramo ($A_+ + A_-$).',
+                'Regla del Trapecio ($T_n$): aproxima cada subintervalo con trapecios lineales; sirve para cualquier $n \\ge 1$.',
+                'Regla de Simpson ($S_n$): exige $n$ PAR (ej. $n = 2, 4, 6$) y aproxima con arcos parabólicos; es 100% EXACTA para polinomios de grado $\\le 3$.'
+              ],
+              conditions: 'Para comprobar resultados rápidamente en cuadráticas sobre $[a, b]$, $S_2 = \\frac{b - a}{6}\\left[f(a) + 4f\\!\\left(\\frac{a+b}{2}\\right) + f(b)\\right]$ da el valor exacto sin integrar.'
+            },
+            {
+              code: '8.5.6',
+              kind: 'method',
+              name: 'Integrales Impropias (Límites Infinitos o Discontinuidades) y Criterio $p$-Integral',
+              latex: '\\int_a^{\\infty} f(x)\\,dx = \\lim_{t \\to \\infty} \\int_a^t f(x)\\,dx \\qquad \\quad \\int_1^{\\infty} \\frac{dx}{x^p} \\text{ converge} \\iff p > 1 \\;\\left(= \\frac{1}{p - 1}\\right)',
+              variables: 'Donde el extremo infinito (o una asíntota vertical $c \\in [a, b]$) se reemplaza por un parámetro $t$ para evaluar el límite tras integrar.',
+              steps: [
+                'Tipo I (intervalo infinito): sustituye $\\infty$ por $t$, calcula $\\int_a^t f(x)\\,dx$ con Barrow y toma $\\lim_{t \\to \\infty}$. Si ambos límites son $\\pm\\infty$, parte en un punto $c$ (ej. $0$).',
+                'Tipo II (discontinuidad en $c$): reemplaza el punto conflictivo por $t \\to c^-$ o $t \\to c^+$ y evalúa el límite lateral.',
+                'Si el límite es finito, la integral impropia converge a ese número; si es $\\pm\\infty$ o no existe, diverge.'
+              ],
+              conditions: 'Atención a discontinuidades ocultas en el interior de $[a, b]$ (ej. $\\int_{-1}^1 \\frac{dx}{x^2}$): debes partir obligatoriamente en $x = 0$ antes de aplicar Barrow.'
+            }
+          ]
         }
       ]
     },
 
     /* ======================================================================
-       9. FORMULARIO DE CÁLCULO DIFERENCIAL E INTEGRAL APLICADO (12 Fórmulas)
+       9. FORMULARIO DE CÁLCULO DIFERENCIAL E INTEGRAL APLICADO
        ====================================================================== */
     {
       id: 'calculo',
@@ -962,7 +1582,7 @@ window.MatInteractiva = window.MatInteractiva || {};
       symbol: '∫∂',
       color: '#D97706',
       levelTag: 'Cálculo Aplicado',
-      description: 'Ecuaciones de la recta tangente y normal, criterios de extremos locales y concavidad, teoremas de Rolle y Valor Medio, regla de L’Hôpital, sumas de Riemann, Teoremas Fundamentales del Cálculo, áreas entre curvas y volúmenes de revolución.',
+      description: 'Rectas tangente y normal, extremos y concavidad, Rolle, TVM, L’Hôpital, TFC, áreas entre curvas (y atajo de Arquímedes), volúmenes, cinemática, ecuaciones diferenciales (separables, 1.º y 2.º orden) y álgebra lineal aplicada.',
       sections: [
         {
           id: 'calc-sec-1',
@@ -1071,6 +1691,90 @@ window.MatInteractiva = window.MatInteractiva || {};
               conditions: 'Condición: $f$ continua en $[a, b]$ con $b > a$. Equivale geométricamente a transformar la curva en un área rectangular homogénea.'
             }
           ]
+        },
+        {
+          id: 'calc-sec-5',
+          title: '9.5 Cinemática, Ecuaciones Diferenciales (EDO) y Álgebra Lineal Aplicada',
+          formulas: [
+            {
+              code: '9.5.1',
+              kind: 'method',
+              name: 'Atajo de Arquímedes (Recta y Parábola) y Método de Rebanadas Horizontales ($dy$)',
+              latex: 'A = \\frac{|a|}{6}(\\beta - \\alpha)^3 = \\frac{2}{3} \\cdot \\text{base} \\cdot \\text{flecha} \\qquad \\quad A = \\int_c^d \\big[x_{\\text{der}}(y) - x_{\\text{izq}}(y)\\big]\\,dy',
+              variables: 'Donde $\\alpha < \\beta$ son las abscisas de intersección entre la parábola y la recta, $|a|$ el coeficiente líder de $x^2$ en la diferencia, y $c < d$ los cortes en el eje $Y$.',
+              steps: [
+                'Con rebanadas verticales ($dx$): iguala $f(x) = g(x)$ para hallar los cruces $a < b$, identifica la curva superior con un punto interior e integra $\\int_a^b [f_{\\text{sup}} - g_{\\text{inf}}]\\,dx$.',
+                'Con rebanadas horizontales ($dy$): cuando las fronteras están despejadas como $x(y)$, integra $\\int_c^d [x_{\\text{der}}(y) - x_{\\text{izq}}(y)]\\,dy$ para evitar partir en varias zonas.',
+                'Atajo de Arquímedes: si la región está encerrada exclusivamente por una parábola y una recta (o dos parábolas), aplica directo $A = \\frac{|a|}{6}(\\beta - \\alpha)^3$.'
+              ],
+              conditions: 'En el atajo de Arquímedes, $|a|$ es el valor absoluto del coeficiente cuadrático de $(f - g)(x)$ tras igualar ambas curvas.'
+            },
+            {
+              code: '9.5.2',
+              kind: 'method',
+              name: 'Integración en Cinemática: de Aceleración $a(t)$ a Velocidad $v(t)$ y Posición $s(t)$',
+              latex: 'v(t) = v(t_0) + \\int_{t_0}^{t} a(\\tau)\\,d\\tau \\qquad s(t) = s(t_0) + \\int_{t_0}^{t} v(\\tau)\\,d\\tau \\qquad \\Delta s = \\int_{t_1}^{t_2} v(t)\\,dt, \\quad d_{\\text{total}} = \\int_{t_1}^{t_2} |v(t)|\\,dt',
+              variables: 'Donde $a(t) = v\'(t) = s\'\'(t)$ es la aceleración, $v(t) = s\'(t)$ la velocidad, $\\Delta s$ el desplazamiento neto y $d_{\\text{total}}$ la distancia total recorrida.',
+              steps: [
+                'Integra $a(t)$ y usa la velocidad inicial $v(t_0)$ para fijar la constante y obtener $v(t)$ (o usa la integral definida desde $t_0$).',
+                'Integra $v(t)$ y usa la posición inicial $s(t_0)$ para obtener $s(t)$.',
+                'Para distancia total recorrida $d_{\\text{total}}$, halla los instantes donde $v(t) = 0$ (cambios de sentido), parte el intervalo y suma $|\\Delta s_i|$; comprueba derivando $s\'\'(t) = a(t)$.'
+              ],
+              conditions: 'El desplazamiento neto $\\Delta s = s(t_2) - s(t_1)$ puede ser negativo o cero; la distancia total recorrida es siempre no negativa ($d_{\\text{total}} \\ge 0$).'
+            },
+            {
+              code: '9.5.3',
+              kind: 'method',
+              name: 'EDO de Variables Separables: Integración Indefinida ($+C$) vs. Definida desde $(x_0, y_0)$',
+              latex: '\\frac{dy}{dx} = p(x)\\,q(y) \\implies \\int \\frac{dy}{q(y)} = \\int p(x)\\,dx + C \\qquad \\text{o directo:} \\qquad \\int_{y_0}^{y} \\frac{dv}{q(v)} = \\int_{x_0}^{x} p(u)\\,du',
+              variables: 'Donde $p(x)$ depende solo de $x$, $q(y)$ depende solo de $y$ y $(x_0, y_0)$ es la condición inicial del problema de valor inicial (PVI).',
+              steps: [
+                'Factoriza el lado derecho en producto $p(x) \\cdot q(y)$ y separa cada variable con su diferencial: $\\frac{1}{q(y)}\\,dy = p(x)\\,dx$.',
+                'Camino 1 (Indefinida): integra ambos lados agregando una sola constante $+C$ (o $K = \\pm e^C$) y sustituye $(x_0, y_0)$ antes o después de despejar $y$.',
+                'Camino 2 (Definida): integra simultáneamente desde $y_0$ hasta $y$ y desde $x_0$ hasta $x$ para obtener la solución particular sin calcular $C$.'
+              ],
+              conditions: 'Al dividir entre $q(y)$ exige $q(y) \\neq 0$, pero revisa siempre por separado las soluciones constantes de equilibrio $y(x) \\equiv y^*$ donde $q(y^*) = 0$.'
+            },
+            {
+              code: '9.5.4',
+              kind: 'method',
+              name: 'Modelos de Crecimiento/Decaimiento Exponencial, Vida Media y Verificación de EDO',
+              latex: '\\frac{dy}{dt} = k\\,y,\\;\\; y(0) = y_0 \\implies y(t) = y_0\\,e^{kt} \\qquad \\quad t_{1/2} = \\frac{\\ln(2)}{|k|}, \\qquad t_{\\text{doble}} = \\frac{\\ln(2)}{k}',
+              variables: 'Donde $y_0$ es la cantidad inicial en $t = 0$, $k$ la constante de proporcionalidad continua, $t_{1/2}$ la vida media ($k < 0$) y $t_{\\text{doble}}$ el tiempo de duplicación ($k > 0$).',
+              steps: [
+                'Identifica la tasa $k$ y la condición inicial $y(0) = y_0$ para escribir directamente $y(t) = y_0 e^{kt}$ (o halla $k = \\frac{1}{t_1}\\ln\\!\\left(\\frac{y_1}{y_0}\\right)$ con un segundo dato).',
+                'Para desintegración radiactiva usa la vida media $t_{1/2} = \\frac{\\ln(2)}{|k|}$ (o base $1/2$: $y(t) = y_0 \\left(\\frac{1}{2}\\right)^{t / t_{1/2}}$).',
+                'Comprobación universal de toda EDO: verifica $y(x_0) = y_0$, deriva $y(x)$ para el lado izquierdo y confirma que coincide idénticamente con el lado derecho.'
+              ],
+              conditions: 'Válido para procesos con tasa proporcional a la cantidad presente ($y_0 > 0$). En enfriamiento de Newton se usa $\\frac{dT}{dt} = k(T - T_m) \\implies T(t) = T_m + (T_0 - T_m)e^{kt}$.'
+            },
+            {
+              code: '9.5.5',
+              kind: 'method',
+              name: 'EDO Lineal de 1.º Orden (Factor Integrante) y EDO Homogénea de 2.º Orden',
+              latex: "y' + P(x)y = Q(x),\\;\\; \\mu(x) = e^{\\int P(x)\\,dx} \\implies \\big(\\mu y\\big)' = \\mu Q \\qquad ay'' + by' + cy = 0 \\implies ar^2 + br + c = 0",
+              variables: 'Donde $\\mu(x)$ es el factor integrante de la EDO lineal de primer orden, y $r_1, r_2$ son las raíces de la ecuación característica de la EDO de segundo orden.',
+              steps: [
+                'EDO lineal 1.º orden: normaliza a $y\' + P(x)y = Q(x)$, calcula $\\mu(x) = e^{\\int P(x)\\,dx}$, multiplica toda la ecuación por $\\mu(x)$, integra $\\mu(x)y = \\int \\mu(x)Q(x)\\,dx + C$ y despeja $y$.',
+                'EDO homogénea 2.º orden: resuelve $ar^2 + br + c = 0$ con la fórmula cuadrática según su discriminante $\\Delta = b^2 - 4ac$.',
+                'Escribe la solución general: reales distintas $\\to C_1 e^{r_1 x} + C_2 e^{r_2 x}$; raíz doble $r \\to (C_1 + C_2 x)e^{rx}$; complejas $\\alpha \\pm \\beta i \\to e^{\\alpha x}(C_1\\cos \\beta x + C_2\\,\\text{sen}\\,\\beta x)$.'
+              ],
+              conditions: 'En la EDO de 2.º orden con coeficientes constantes se exige $a \\neq 0$; las constantes $C_1, C_2$ se fijan con dos condiciones iniciales $y(x_0), y\'(x_0)$.'
+            },
+            {
+              code: '9.5.6',
+              kind: 'method',
+              name: 'Álgebra Lineal Aplicada: Determinante, Matriz Inversa $2 \\times 2$, Ortogonalidad y Eigenvalores',
+              latex: 'A^{-1} = \\frac{1}{ad - bc}\\begin{pmatrix} d & -b \\\\ -c & a \\end{pmatrix} \\qquad \\mathbf{u} \\perp \\mathbf{v} \\iff \\mathbf{u} \\cdot \\mathbf{v} = 0 \\qquad \\det(A - \\lambda I) = 0',
+              variables: 'Donde $A = \\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}$, $\\det(A) = ad - bc$, $\\mathbf{u} \\cdot \\mathbf{v} = \\sum u_i v_i$ es el producto punto y $\\lambda$ los valores propios (eigenvalores).',
+              steps: [
+                'Determinante e inversa $2 \\times 2$: calcula $\\det(A) = ad - bc$; si $\\det(A) \\neq 0$, intercambia la diagonal principal ($a \\leftrightarrow d$), cambia signo a la secundaria ($-b, -c$) y divide por $\\det(A)$.',
+                'Producto punto y ortogonalidad: dos vectores no nulos en $\\mathbb{R}^n$ son perpendiculares si y solo si $\\mathbf{u} \\cdot \\mathbf{v} = u_1 v_1 + u_2 v_2 + u_3 v_3 = 0$; el área transformada por $T$ se escala por $|\\det(T)|$.',
+                'Eigenvalores: plantea el polinomio característico $\\det(A - \\lambda I) = 0$ (en $2 \\times 2$: $\\lambda^2 - \\text{tr}(A)\\lambda + \\det(A) = 0$) y halla sus raíces $\\lambda$.'
+              ],
+              conditions: 'La matriz inversa $A^{-1}$ existe si y solo si $\\det(A) \\neq 0$ (matriz invertible o no singular). En matrices $3 \\times 3$, expande por cofactores o Regla de Sarrus.'
+            }
+          ]
         }
       ]
     }
@@ -1121,7 +1825,9 @@ window.MatInteractiva = window.MatInteractiva || {};
       const matchedSections = [];
       for (const sec of mod.sections) {
         const matchedFormulas = sec.formulas.filter(f => {
-          const haystack = normalizeSearchText(`${f.code} ${f.name} ${f.latex} ${f.variables} ${f.conditions} ${sec.title} ${mod.name}`);
+          const stepsText = Array.isArray(f.steps) ? f.steps.join(' ') : '';
+          const kindText = f.kind === 'method' ? 'metodo procedimiento estrategia' : 'formula propiedad';
+          const haystack = normalizeSearchText(`${f.code} ${f.name} ${f.latex} ${f.variables} ${f.conditions} ${stepsText} ${kindText} ${sec.title} ${mod.name}`);
           return haystack.includes(q);
         });
         if (matchedFormulas.length > 0) {
@@ -1136,21 +1842,27 @@ window.MatInteractiva = window.MatInteractiva || {};
   }
 
   /**
-   * Renderiza una ficha individual de fórmula con sus 4 componentes pedagógicos:
-   * Nombre, Expresión Matemática, Significado de Variables y Condiciones/Restricciones,
-   * más acciones interactivas (.no-print) para copiar fórmula LaTeX y abrir en el Editor de Expresiones.
+   * Renderiza una ficha individual de fórmula o método de resolución con sus componentes pedagógicos:
+   * Nombre, Expresión Matemática, Significado de Variables, Procedimiento paso a paso (si aplica)
+   * y Condiciones/Restricciones, más acciones interactivas (.no-print) para copiar LaTeX y abrir en el Editor.
    */
   function renderFormulaCardHtml(f, accentColor) {
+    const nameHtml = ns.MathRenderer ? ns.MathRenderer.formatRichText(f.name) : f.name;
     const mathHtml = ns.MathRenderer ? ns.MathRenderer.renderMath(f.latex, true) : f.latex;
     const varsHtml = ns.MathRenderer ? ns.MathRenderer.formatRichText(f.variables) : f.variables;
     const condHtml = ns.MathRenderer ? ns.MathRenderer.formatRichText(f.conditions) : f.conditions;
+    const stepsHtml = Array.isArray(f.steps) && f.steps.length > 0
+      ? f.steps.map(step => `<li>${ns.MathRenderer ? ns.MathRenderer.formatRichText(step) : step}</li>`).join('')
+      : '';
+    const isMethod = f.kind === 'method';
     const encodedLatex = encodeURIComponent(f.latex);
 
     return `
-      <article class="fs-formula-card" style="--fs-accent: ${accentColor || '#2563EB'};">
+      <article class="fs-formula-card ${isMethod ? 'fs-method-card' : ''}" style="--fs-accent: ${accentColor || '#2563EB'};">
         <div class="fs-formula-card-header">
           <span class="fs-formula-code">${f.code}</span>
-          <h4 class="fs-formula-name">${f.name}</h4>
+          ${isMethod ? '<span class="fs-formula-kind-badge">⚙️ Método</span>' : ''}
+          <h4 class="fs-formula-name">${nameHtml}</h4>
           <div class="fs-card-actions no-print">
             <button
               type="button"
@@ -1180,8 +1892,14 @@ window.MatInteractiva = window.MatInteractiva || {};
           </div>
           ${f.conditions ? `
             <div class="fs-formula-meta-item fs-meta-condition">
-              <span class="fs-meta-label">⚠️ Condiciones y restricciones:</span>
+              <span class="fs-meta-label">${isMethod ? '🎯 Cuándo usar y restricciones:' : '⚠️ Condiciones y restricciones:'}</span>
               <span class="fs-meta-text">${condHtml}</span>
+            </div>
+          ` : ''}
+          ${stepsHtml ? `
+            <div class="fs-formula-meta-item fs-meta-steps">
+              <span class="fs-meta-label">🧭 Procedimiento paso a paso:</span>
+              <ol class="fs-method-steps">${stepsHtml}</ol>
             </div>
           ` : ''}
         </div>
@@ -1198,18 +1916,18 @@ window.MatInteractiva = window.MatInteractiva || {};
     const isGeneral = sheetState.modality === 'all';
 
     const docTitle = isGeneral
-      ? 'Compendio General de Fórmulas Matemáticas (9 Módulos)'
+      ? 'Compendio General de Fórmulas y Métodos Matemáticos (9 Módulos)'
       : activeMod.name;
     const docSubtitle = isGeneral
-      ? 'Referencia académica unificada desde Aritmética, Álgebra, Geometría y Trigonometría hasta Cálculo Diferencial e Integral.'
+      ? 'Referencia académica unificada de fórmulas y métodos de resolución desde Aritmética, Álgebra, Geometría y Trigonometría hasta Cálculo Diferencial, Integral, EDO y Álgebra Lineal.'
       : activeMod.description;
 
     if (filteredModules.length === 0) {
       return `
         <div class="content-card" style="text-align:center; padding:2.5rem 1.5rem;">
           <div style="font-size:2.2rem; margin-bottom:0.5rem;">🔍</div>
-          <h3 style="margin-bottom:0.35rem;">No se encontraron fórmulas que coincidan con "${sheetState.searchQuery}"</h3>
-          <p class="theory-paragraph" style="margin-bottom:1rem;">Prueba con otro término (ej. Pitágoras, cuadrática, logaritmo, cosenos, dominio, derivada, integral) o cambia al Compendio General.</p>
+          <h3 style="margin-bottom:0.35rem;">No se encontraron fórmulas ni métodos que coincidan con "${sheetState.searchQuery}"</h3>
+          <p class="theory-paragraph" style="margin-bottom:1rem;">Prueba con otro término (ej. Ruffini, Cramer, Pitágoras, sándwich, Taylor, partes, Simpson, EDO) o cambia al Compendio General.</p>
           <button type="button" class="btn btn-outline btn-sm" id="btn-fs-clear-search-empty">Limpiar filtro de búsqueda</button>
         </div>
       `;
@@ -1228,12 +1946,12 @@ window.MatInteractiva = window.MatInteractiva || {};
               <span class="fs-letterhead-logo">∫π</span>
               <div>
                 <div class="fs-letterhead-org">${appName.toUpperCase()} · ${appTagline.toUpperCase()}</div>
-                <div class="fs-letterhead-doc-type">FORMULARIO MATEMÁTICO DE ESTUDIO Y CONSULTA · ${studioName.toUpperCase()}</div>
+                <div class="fs-letterhead-doc-type">FORMULARIO Y GUÍA DE MÉTODOS MATEMÁTICOS · ${studioName.toUpperCase()}</div>
               </div>
             </div>
             <div class="fs-letterhead-meta">
               <span class="fs-meta-pill">${isGeneral ? 'Modalidad B · Compendio Completo' : `Modalidad A · Módulo ${activeMod.moduleNumber} de 9`}</span>
-              <span class="fs-meta-count">${totalShown} ${totalShown === 1 ? 'fórmula seleccionada' : 'fórmulas documentadas'}</span>
+              <span class="fs-meta-count">${totalShown} ${totalShown === 1 ? 'ficha seleccionada' : 'fórmulas y métodos'}</span>
             </div>
           </div>
 
@@ -1343,7 +2061,7 @@ window.MatInteractiva = window.MatInteractiva || {};
             <div class="subject-big-icon" style="background:linear-gradient(135deg, #1E40AF, #2563EB);">📄</div>
             <div class="subject-title-text">
               <h1>Formularios Matemáticos de Estudio e Impresión</h1>
-              <p>Compendio riguroso de fórmulas, propiedades, significado de variables y restricciones de dominio listo para consultar en pantalla o imprimir en tamaño Carta (PDF).</p>
+              <p>Compendio riguroso de fórmulas, propiedades, métodos de resolución paso a paso y restricciones de dominio para las 9 ramas matemáticas, listo para consultar o imprimir en tamaño Carta (PDF).</p>
             </div>
           </div>
           <div class="fs-header-print-actions">
@@ -1374,21 +2092,21 @@ window.MatInteractiva = window.MatInteractiva || {};
               aria-selected="${sheetState.modality === 'all' ? 'true' : 'false'}"
               class="fs-modality-btn ${sheetState.modality === 'all' ? 'active' : ''}"
               data-fs-modality="all">
-              <span class="fs-mod-btn-title">📚 Modalidad B: Formulario General (${totalAll} fórmulas)</span>
-              <span class="fs-mod-btn-sub">Compendio completo con Índice General</span>
+              <span class="fs-mod-btn-title">📚 Modalidad B: Formulario General (${totalAll} fichas)</span>
+              <span class="fs-mod-btn-sub">Compendio completo de fórmulas y métodos con Índice</span>
             </button>
           </div>
 
-          <!-- Buscador instantáneo de fórmulas -->
+          <!-- Buscador instantáneo de fórmulas y métodos -->
           <div class="fs-search-box">
-            <label for="fs-search-input" class="fs-search-label">🔍 Filtrar fórmulas o propiedades:</label>
+            <label for="fs-search-input" class="fs-search-label">🔍 Filtrar fórmulas, propiedades o métodos:</label>
             <div class="fs-search-input-wrap">
               <input
                 type="search"
                 id="fs-search-input"
                 class="fn-input fs-search-input"
                 value="${sheetState.searchQuery.replace(/"/g, '&quot;')}"
-                placeholder="Ej: cuadrática, Pitágoras, logaritmo, cosenos, dominio, derivada..."
+                placeholder="Ej: Ruffini, Cramer, método, Pitágoras, Taylor, partes, Simpson, EDO..."
                 autocomplete="off"
               />
             </div>
@@ -1419,7 +2137,7 @@ window.MatInteractiva = window.MatInteractiva || {};
                   <span class="fs-pill-symbol" style="background:${mod.color};">${mod.symbol}</span>
                   <span class="fs-pill-info">
                     <strong class="fs-pill-name">${mod.moduleNumber}. ${mod.shortName}</strong>
-                    <small class="fs-pill-count">${fCount} fórmulas</small>
+                    <small class="fs-pill-count">${fCount} fórmulas y métodos</small>
                   </span>
                 </button>
               `;

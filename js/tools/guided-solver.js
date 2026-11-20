@@ -66,6 +66,8 @@ window.MatInteractiva = window.MatInteractiva || {};
         fallbackInputId: inputId,
         initialCasValue: String(initialValue ?? ''),
         compact: options.compact !== false,
+        hideNativeToggle: true,
+        disableNativeKeyboard: true,
         placeholder: options.placeholder || '',
         ariaLabel: ariaLabel || 'Campo matemático',
         onChange: () => {
@@ -673,6 +675,8 @@ window.MatInteractiva = window.MatInteractiva || {};
         fallbackInputId: 'inp-guided-attempt',
         initialCasValue: solverState.studentAttempt,
         compact: true,
+        hideNativeToggle: true,
+        disableNativeKeyboard: true,
         placeholder: 'Escribe tu resultado matemático...',
         ariaLabel: 'Campo para intentar resolver el problema',
         onChange: syncAttemptPreview,
