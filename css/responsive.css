@@ -471,17 +471,11 @@
     display: none;
   }
 
-  /* Botones flotantes al hacer scroll: zona inferior para no tapar títulos ni badges */
+  /* Botones flotantes al hacer scroll: ubicados en la parte superior */
   .floating-mobile-menu-btn,
   .floating-mobile-calc-btn {
-    top: auto;
-    bottom: max(0.9rem, env(safe-area-inset-bottom, 0px));
-  }
-  /* Ocultar botones flotantes mientras el teclado matemático visual está abierto para no tapar ninguna tecla */
-  body:has(.exercise-card.has-vkb-open, .exercise-vkb-drawer.is-open) .floating-mobile-menu-btn,
-  body:has(.exercise-card.has-vkb-open, .exercise-vkb-drawer.is-open) .floating-mobile-calc-btn {
-    opacity: 0;
-    pointer-events: none;
+    top: calc(0.75rem + env(safe-area-inset-top, 0px));
+    bottom: auto;
   }
 
   /* Evitar duplicar el aviso de gestos encima del plano en todo el rango móvil (< 768px) */

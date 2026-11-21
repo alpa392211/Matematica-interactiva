@@ -10,12 +10,25 @@
 
   const APP_NAME = 'MateTic';
   const APP_TAGLINE = 'Matemáticas Interactivas';
-  const APP_VERSION = '1.10.0';
+  const APP_VERSION = '1.10.1';
   const APP_RELEASE_DATE = '2026-11-20';
   const STUDIO_NAME = 'ALPA Studio';
   const STUDIO_MEANING = '';
 
   const RELEASE_NOTES = [
+    {
+      version: '1.10.1',
+      date: '2026-11-20',
+      items: [
+        'Botón flotante de barra lateral (☰) reubicado en la esquina superior izquierda al desplazarse en teléfono.',
+        'Botón flotante de calculadora rápida (🧮) reubicado en la esquina superior derecha al desplazarse en teléfono.',
+        'Acceso permanente a ambos botones sin estorbar al teclado matemático ni a los controles inferiores.',
+        'Conservado el comportamiento de ocultar los botones flotantes cuando se expande una gráfica a pantalla completa.',
+        'Respetado el margen seguro superior (safe-area-inset-top) en teléfonos con muesca o isla dinámica.',
+        'Diseño de tableta y escritorio sin cambios.',
+        'Verificación visual en celular (360×800) y suite completa de 65 pruebas automatizadas aprobadas.'
+      ]
+    },
     {
       version: '1.10.0',
       date: '2026-11-20',

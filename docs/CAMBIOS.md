@@ -574,6 +574,14 @@ Este archivo documenta de forma acumulativa cada fase ejecutada, sus archivos mo
   - **Versionado ([js/version.js](../js/version.js), [docs/CAMBIOS.md](../docs/CAMBIOS.md))**: versión elevada a `1.10.0`.
 - **Verificación**: Compilación estricta de las `1,448` expresiones KaTeX del formulario (`0` errores), auditoría sintáctica (`node --check`), suite completa `node --test tests/*.test.js` (`65/65` aprobadas) y verificación visual y de búsqueda en Chromium headless (escritorio y móvil `360×800`).
 
+---
+## v1.10.1 — Botones flotantes de barra lateral y calculadora en la parte superior en teléfono
+- **Qué cambió**:
+  - **Reubicación de botones flotantes en móvil ([css/responsive.css](../css/responsive.css))**: movidos `.floating-mobile-menu-btn` (`☰`) y `.floating-mobile-calc-btn` (`🧮`) de la parte inferior a las esquinas superiores (`top: calc(0.75rem + env(safe-area-inset-top, 0px)); bottom: auto;`) en `<= 767px`, eliminando la ocultación innecesaria al abrir el teclado matemático inferior.
+  - **Versionado ([js/version.js](../js/version.js), [docs/CAMBIOS.md](../docs/CAMBIOS.md))**: versión elevada a `1.10.1`.
+- **Verificación**: Suite completa `node --test tests/*.test.js` (`65/65` aprobadas) y verificación de posición en Chromium headless (`360×800`) confirmando ambos botones en la franja superior (`top = 12px`).
+
+
 
 
 
